@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
+
 const Reports = () => {
   const [estado, setEstado] = useState('');
   const [idDoctor, setIdDoctor] = useState('');
@@ -7,7 +8,8 @@ const Reports = () => {
   const [endDate, setEndDate] = useState('');
   const [patientId, setPatientId] = useState('');
   const [data, setData] = useState([]);
-  const [doctors, setDoctors] = useState([]); // Estado para los doctores
+  const [doctors, setDoctors] = useState([]); 
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -36,6 +38,7 @@ const Reports = () => {
   useEffect(() => {
     fetchDoctors();
   }, []);
+  
 
   // Función para obtener los reportes
   const fetchReports = async () => {
@@ -56,23 +59,25 @@ const Reports = () => {
   };
 
   return (
-    <div>
-      <h2>Filtrar Reportes de Turnos</h2>
+    <div className="reports-container">
+      <h2>Reportes de Turnos</h2>
 
-      <div>
-        <label>Estado:</label>
-        <select value={estado} onChange={(e) => setEstado(e.target.value)}>
-          <option value="">Seleccione un estado</option>
-          <option value="disponible">Disponible</option>
-          <option value="confirmado">Confirmado</option>
-          <option value="cancelado">Cancelado</option>
-          <option value="eliminado">Eliminado</option>
-          <option value="ejecutado">Ejecutado</option>
-          <option value="no_asistido">No Asistido</option>
-          <option value="no_reservado">No Reservado</option>
-        </select>
+      <div className="reports-content">
+        {/* Contenedor de Filtros */}
+        <div className="filter-container">
+          <label>Estado:</label>
+          <select value={estado} onChange={(e) => setEstado(e.target.value)}>
+            <option value="">Seleccione un estado</option>
+            <option value="disponible">Disponible</option>
+            <option value="confirmado">Confirmado</option>
+            <option value="cancelado">Cancelado</option>
+            <option value="eliminado">Eliminado</option>
+            <option value="ejecutado">Ejecutado</option>
+            <option value="no_asistido">No Asistido</option>
+            <option value="no_reservado">No Reservado</option>
+          </select>
 
-        <label>Doctor:</label>
+          <label>Doctor:</label>
         <select value={idDoctor} onChange={(e) => setIdDoctor(e.target.value)}>
           <option value="">Seleccione un doctor</option>
           {doctors.map((doctor) => (
@@ -82,42 +87,48 @@ const Reports = () => {
           ))}
         </select>
 
-        <label>Fecha de Inicio:</label>
-        <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+          <label>Fecha de Inicio:</label>
+          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
 
-        <label>Fecha de Fin:</label>
-        <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+          <label>Fecha de Fin:</label>
+          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
 
-        <label>Paciente ID:</label>
-        <input type="number" value={patientId} onChange={(e) => setPatientId(e.target.value)} />
+          <label>Paciente ID:</label>
+          <input type="number" value={patientId} onChange={(e) => setPatientId(e.target.value)} />
 
-        <button onClick={fetchReports}>Obtener Reportes</button>
+          <button onClick={fetchReports}>Obtener Reportes</button>
+        </div>
+
+        {/* Contenedor de Tabla */}
+        <div className="table-container">
+          <table className="tableContainer">
+            <thead>
+              <tr>
+                <th>ID Turno</th>
+                <th>Doctor</th>
+                <th>Fecha</th>
+                <th>Hora Inicio</th>
+                <th>Hora Fin</th>
+                <th>Paciente</th> 
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((turno) => (
+                <tr key={turno.idSchedule}>
+                  <td>{turno.idSchedule}</td>
+                  <td>{turno.idDoctor}</td>                  
+                  <td>{turno.day}</td>
+                  <td>{turno.start_Time}</td>
+                  <td>{turno.end_Time}</td>
+                  <td>{turno.patient ? turno.patient.fullName : 'Sin asignar'}</td>
+                  <td>{turno.estado}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>ID Turno</th>
-            <th>Doctor</th>
-            <th>Fecha</th>
-            <th>Hora Inicio</th>
-            <th>Hora Fin</th>
-            <th>Estado</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((turno) => (
-            <tr key={turno.idSchedule}>
-              <td>{turno.idSchedule}</td>
-              <td>{turno.idDoctor}</td>
-              <td>{turno.day}</td>
-              <td>{turno.start_Time}</td>
-              <td>{turno.end_Time}</td>
-              <td>{turno.estado}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </div>
   );
 };
