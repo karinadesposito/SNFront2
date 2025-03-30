@@ -1,0 +1,35 @@
+.bg-dark{
+    background-color: rgba(44, 99, 103, 0.8)!important;
+}
+.navbar-nav .nav-link {
+    color: #fff;
+    padding: 0.5rem 1rem;
+  }
+  
+  .navbar-nav .nav-link:hover {
+    color: #9bea7e; /* Cambia el color cuando pasas el mouse */
+  }
+  @media (max-width: 320px) {
+    #logoSN {
+      max-width: 50px; /* Adjust logo size */
+    }
+  
+    .form-control-sm {
+      font-size: 0.8rem; /* Smaller font size for input */
+    }
+  
+    .navbar {
+      padding: 0.5rem; /* Adjust navbar padding */
+    }
+  }
+ 
+  .bi{
+    color: azure;
+  }
+  .dropdown-menu{
+    background-color: rgb(178, 218, 158);
+    margin: 0;
+    padding: 10;
+  
+  }
+   
