@@ -4,27 +4,42 @@ import { useNavigate } from "react-router-dom";
 
 const AddDoctor = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    lastName: "",
-    specialty: "",
-    insurance: "",
-    phone: "",
+    fullName: "",
+    dni: "",
+    license: "",
     email: "",
+    phone: "",
+    specialityId: "",
   });
 
   const navigate = useNavigate();
+  const apiUrl = import.meta.env.VITE_API_URL;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Doctor creado:", formData);
-    // Aquí puedes agregar la lógica para enviar los datos al backend
-    alert("Doctor creado exitosamente");
-    navigate("/"); // Redirige a la página principal o donde desees
+    try {
+      const response = await fetch(`${apiUrl}/doctor`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      if (response.ok) {
+        alert("Doctor creado exitosamente");
+        navigate("/admin");
+      } else {
+        const error = await response.json();
+        alert("Error al crear doctor: " + (error.message || "Error desconocido"));
+      }
+    } catch (err) {
+      alert("Error de conexión con el servidor");
+    }
   };
 
   return (
@@ -33,26 +48,26 @@ const AddDoctor = () => {
       <Form onSubmit={handleSubmit}>
         <Row className="mb-3">
           <Col md={6}>
-            <Form.Group controlId="formName">
-              <Form.Label>Nombre</Form.Label>
+            <Form.Group controlId="formFullName">
+              <Form.Label>Nombre completo</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Ingrese el nombre"
-                name="name"
-                value={formData.name}
+                placeholder="Ingrese el nombre completo"
+                name="fullName"
+                value={formData.fullName}
                 onChange={handleChange}
                 required
               />
             </Form.Group>
           </Col>
           <Col md={6}>
-            <Form.Group controlId="formLastName">
-              <Form.Label>Apellido</Form.Label>
+            <Form.Group controlId="formDni">
+              <Form.Label>DNI</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Ingrese el apellido"
-                name="lastName"
-                value={formData.lastName}
+                placeholder="Ingrese el DNI"
+                name="dni"
+                value={formData.dni}
                 onChange={handleChange}
                 required
               />
@@ -61,27 +76,28 @@ const AddDoctor = () => {
         </Row>
         <Row className="mb-3">
           <Col md={6}>
-            <Form.Group controlId="formSpecialty">
-              <Form.Label>Especialidad</Form.Label>
+            <Form.Group controlId="formLicense">
+              <Form.Label>Matrícula</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Ingrese la especialidad"
-                name="specialty"
-                value={formData.specialty}
+                placeholder="Ingrese la matrícula"
+                name="license"
+                value={formData.license}
                 onChange={handleChange}
                 required
               />
             </Form.Group>
           </Col>
           <Col md={6}>
-            <Form.Group controlId="formInsurance">
-              <Form.Label>Obra Social</Form.Label>
+            <Form.Group controlId="formSpecialityId">
+              <Form.Label>ID Especialidad</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Ingrese la obra social"
-                name="insurance"
-                value={formData.insurance}
+                placeholder="Ingrese el ID de especialidad"
+                name="specialityId"
+                value={formData.specialityId}
                 onChange={handleChange}
+                required
               />
             </Form.Group>
           </Col>
