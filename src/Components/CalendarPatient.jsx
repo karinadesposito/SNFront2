@@ -79,7 +79,13 @@ const CalendarPatient = () => {
               <Form.Label className="text-white">Seleccionar Médico</Form.Label>
               <Form.Select
                 value={selectedDoctor || ""}
-                onChange={(e) => setSelectedDoctor(e.target.value)}
+                onChange={(e) => {
+                  const selected = e.target.value;
+                  setSelectedDoctor(selected);
+                  setSelectedDate(null);
+                  setAvailableDates([]);
+                  setSlots([]);
+                }}
               >
                 <option value="">-- Seleccione --</option>
                 {doctors.map((doc) => (
@@ -119,7 +125,13 @@ const CalendarPatient = () => {
                   <Form.Label className="text-white">Profesionales disponibles</Form.Label>
                   <Form.Select
                     value={selectedDoctor || ""}
-                    onChange={(e) => setSelectedDoctor(e.target.value)}
+                    onChange={(e) => {
+                      const selected = e.target.value;
+                      setSelectedDoctor(selected);
+                      setSelectedDate(null);
+                      setAvailableDates([]);
+                      setSlots([]);
+                    }}
                   >
                     <option value="">-- Seleccione --</option>
                     {doctors
@@ -168,3 +180,4 @@ const CalendarPatient = () => {
 };
 
 export default CalendarPatient;
+
