@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
@@ -12,8 +12,23 @@ const AddDoctor = () => {
     specialityId: "",
   });
 
+  const [specialities, setSpecialities] = useState([]);
+
   const navigate = useNavigate();
   const apiUrl = import.meta.env.VITE_API_URL;
+
+  useEffect(() => {
+    const fetchSpecialities = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/speciality`);
+        const data = await response.json();
+        setSpecialities(data);
+      } catch (error) {
+        console.error("Error al cargar especialidades:", error);
+      }
+    };
+    fetchSpecialities();
+  }, [apiUrl]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -89,16 +104,21 @@ const AddDoctor = () => {
             </Form.Group>
           </Col>
           <Col md={6}>
-            <Form.Group controlId="formSpecialityId">
-              <Form.Label>ID Especialidad</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Ingrese el ID de especialidad"
+            <Form.Group controlId="formSpeciality">
+              <Form.Label>Especialidad</Form.Label>
+              <Form.Select
                 name="specialityId"
                 value={formData.specialityId}
                 onChange={handleChange}
                 required
-              />
+              >
+                <option value="">Seleccione una especialidad</option>
+                {specialities.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </Form.Select>
             </Form.Group>
           </Col>
         </Row>

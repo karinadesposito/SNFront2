@@ -15,26 +15,26 @@ const FourSectionsAdmin = () => {
             }}
           >
             <Dropdown>
-            <Dropdown.Toggle
-    as="div" // Cambiamos el comportamiento del botón para que sea un div
-    className="text-decoration-none d-flex justify-content-center align-items-center"
-    style={{ cursor: "pointer" }} // Cambiamos el cursor para indicar que es clickeable
-  >
-    <h2 className="card-title">ADMINISTRAR PROFESIONALES</h2>
-  </Dropdown.Toggle>
+              <Dropdown.Toggle
+                as="div"
+                className="text-decoration-none d-flex justify-content-center align-items-center"
+                style={{ cursor: "pointer" }}
+              >
+                <h2 className="card-title">ADMINISTRAR PROFESIONALES</h2>
+              </Dropdown.Toggle>
 
-  <Dropdown.Menu align="center">
-    <Dropdown.Item as={Link} to="/AgregarProfesional">
-      Agregar Profesional
-    </Dropdown.Item>
-    <Dropdown.Item as={Link} to="/EditarProfesional">
-      Editar Profesional
-    </Dropdown.Item>
-    <Dropdown.Item as={Link} to="/EliminarProfesional">
-      Eliminar Profesional
-    </Dropdown.Item>
-  </Dropdown.Menu>
-</Dropdown>
+              <Dropdown.Menu align="center">
+                <Dropdown.Item as={Link} to="/AgregarProfesional">
+                  Agregar Profesional
+                </Dropdown.Item>
+                <Dropdown.Item as={Link} to="/EditarProfesional">
+                  Editar Profesional
+                </Dropdown.Item>
+                <Dropdown.Item as={Link} to="/EliminarProfesional">
+                  Eliminar Profesional
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
           </div>
         </div>
 
@@ -46,9 +46,24 @@ const FourSectionsAdmin = () => {
               backgroundImage: `url(https://www.shutterstock.com/image-illustration/top-view-medical-stethoscope-icon-600nw-2075382679.jpg)`,
             }}
           >
-            <Link to="/Agenda" className="stretched-link">
-              <h2 className="card-title">ADMINISTRAR AGENDA</h2>
-            </Link>
+            <Dropdown>
+              <Dropdown.Toggle
+                as="div"
+                className="text-decoration-none d-flex justify-content-center align-items-center"
+                style={{ cursor: "pointer" }}
+              >
+                <h2 className="card-title">ADMINISTRAR AGENDA</h2>
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu align="center">
+                <Dropdown.Item as={Link} to="/crear-agenda">
+                  Crear Agenda
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => alert("Funcionalidad en desarrollo")}>
+                  Actualizar Agenda
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
           </div>
         </div>
 

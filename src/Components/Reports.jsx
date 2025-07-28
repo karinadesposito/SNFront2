@@ -30,7 +30,7 @@ const TurnosReport = () => {
       try {
         const response = await fetch(`${apiUrl}/doctor`);
         const result = await response.json();
-        console.log("Respuesta backend:", result); 
+        console.log("Respuesta backend:", result);
         if (result.data && Array.isArray(result.data)) {
           setDoctors(result.data);
         } else if (Array.isArray(result)) {
@@ -54,16 +54,24 @@ const TurnosReport = () => {
       patientId,
     }).toString();
 
-    try {
-      const response = await fetch(
-        `${apiUrl}/schedules/report/${estado}?${queryParams}`
-      );
-      const result = await response.json();
-      setData(result);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+     try {
+    const response = await fetch(
+      `${apiUrl}/schedules/report/${estado}?${queryParams}`
+    );
+    const result = await response.json();
+
+    const arrayTurnos = Array.isArray(result?.data)
+  ? result.data
+  : Array.isArray(result)
+    ? result
+    : [];
+
+    setData(arrayTurnos);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    setData([]);
+  }
+};
 
   const toggleReportSelection = (id) => {
     const updatedSelection = new Set(selectedReports);
@@ -237,7 +245,9 @@ const TurnosReport = () => {
                         : new Set();
                       setSelectedReports(newSelection);
                     }}
-                    checked={selectedReports.size === data.length && data.length > 0}
+                    checked={
+                      selectedReports.size === data.length && data.length > 0
+                    }
                   />
                 </th>
                 <th>Doctor</th>
@@ -248,25 +258,23 @@ const TurnosReport = () => {
               </tr>
             </thead>
             <tbody>
-              {data.map((turno) => {
-                const doctor = doctors.find((doc) => doc.id === turno.idDoctor);
-                return (
-                  <tr key={turno.idSchedule}>
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={selectedReports.has(turno.idSchedule)}
-                        onChange={() => toggleReportSelection(turno.idSchedule)}
-                      />
-                    </td>
-                    <td>{doctor ? doctor.fullName : "Sin asignar"}</td>
-                    <td>{turno.day}</td>
-                    <td>{turno.start_Time}</td>
-                    <td>{turno.patient ? turno.patient.fullName : "Sin asignar"}</td>
-                    <td>{turno.patient ? turno.patient.phone : "Sin asignar"}</td>
-                  </tr>
-                );
-              })}
+              {data.map((turno) => (
+  <tr key={turno.idSchedule}>
+    <td>
+      <input
+        type="checkbox"
+        checked={selectedReports.has(turno.idSchedule)}
+        onChange={() => toggleReportSelection(turno.idSchedule)}
+      />
+    </td>
+    <td>{turno.doctor?.fullName || "Sin asignar"}</td>
+    <td>{turno.day}</td>
+    <td>{turno.start_Time}</td>
+    <td>{turno.patient?.fullName || "Sin asignar"}</td>
+    <td>{turno.patient?.phone || "Sin asignar"}</td>
+  </tr>
+))}
+
             </tbody>
           </table>
         </div>
@@ -313,7 +321,7 @@ const DoctoresReport = () => {
                 <th>Matrícula</th>
                 <th>Email</th>
                 <th>Teléfono</th>
-                <th>ID Especialidad</th>
+                <th>Especialidad</th> {/* Renombramos la columna */}
               </tr>
             </thead>
             <tbody>
@@ -332,7 +340,8 @@ const DoctoresReport = () => {
                     <td>{doc.license}</td>
                     <td>{doc.email}</td>
                     <td>{doc.phone}</td>
-                    <td>{doc.specialityId}</td>
+                    <td>{doc.speciality?.name || "Sin asignar"}</td>{" "}
+                    {/* CAMBIO: mostramos nombre de la especialidad */}
                   </tr>
                 ))
               )}
@@ -364,7 +373,10 @@ const Reports = () => {
       >
         <Tab eventKey="general" title="General">
           <div className="text-center my-4">
-            <p>Selecciona un tipo de reporte para ver la información correspondiente.</p>
+            <p>
+              Selecciona un tipo de reporte para ver la información
+              correspondiente.
+            </p>
           </div>
         </Tab>
         <Tab eventKey="turnos" title="Turnos">

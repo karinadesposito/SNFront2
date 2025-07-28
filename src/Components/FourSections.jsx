@@ -14,13 +14,12 @@ const FourSections = () => {
             }}
           >
             <Link to="/profesionales" className="stretched-link">
-             
-                <h2 className="card-title">INFORMACIÓN PACIENTES</h2>
-             
+              <h2 className="card-title">INFORMACIÓN PACIENTES</h2>
             </Link>
           </div>
         </div>
 
+        
         {/* Novedades */}
         <div className="col-12 col-md-6">
           <div
@@ -29,15 +28,13 @@ const FourSections = () => {
               backgroundImage: `url(https://www.shutterstock.com/image-illustration/top-view-medical-stethoscope-icon-600nw-2075382679.jpg)`,
             }}
           >
-            <Link to="/novedades" className="stretched-link">
-           
-                <h2 className="card-title">NOVEDADES</h2>
-            
+            <Link to="/seleccionar-turno" className="stretched-link">
+              <h2 className="card-title">TURNOS DISPONIBLES</h2>
             </Link>
           </div>
         </div>
 
-        {/* Turnos */}
+        {/* Administración */}
         <div className="col-12 col-md-6">
           <div
             className="card-custom"
@@ -46,9 +43,7 @@ const FourSections = () => {
             }}
           >
             <Link to="/turnos" className="stretched-link">
-           
-                <h2 className="card-title">ADMINISTRACIÓN</h2>
-              
+              <h2 className="card-title">ADMINISTRACIÓN</h2>
             </Link>
           </div>
         </div>
@@ -62,9 +57,7 @@ const FourSections = () => {
             }}
           >
             <Link to="/sobre-nosotros" className="stretched-link">
-            
-                <h2 className="card-title">SOBRE NOSOTROS</h2>
-             
+              <h2 className="card-title">SOBRE NOSOTROS</h2>
             </Link>
           </div>
         </div>
