@@ -54,24 +54,26 @@ const TurnosReport = () => {
       patientId,
     }).toString();
 
-     try {
-    const response = await fetch(
-      `${apiUrl}/schedules/report/${estado}?${queryParams}`
-    );
-    const result = await response.json();
+    const url = !estado
+      ? `${apiUrl}/schedules?${queryParams}`
+      : `${apiUrl}/schedules/report/${estado}?${queryParams}`;
 
-    const arrayTurnos = Array.isArray(result?.data)
-  ? result.data
-  : Array.isArray(result)
-    ? result
-    : [];
+    try {
+      const response = await fetch(url);
+      const result = await response.json();
 
-    setData(arrayTurnos);
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    setData([]);
-  }
-};
+      const arrayTurnos = Array.isArray(result?.data)
+        ? result.data
+        : Array.isArray(result)
+        ? result
+        : [];
+
+      setData(arrayTurnos);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setData([]);
+    }
+  };
 
   const toggleReportSelection = (id) => {
     const updatedSelection = new Set(selectedReports);
@@ -83,34 +85,49 @@ const TurnosReport = () => {
     setSelectedReports(updatedSelection);
   };
 
-  const deleteSelectedReports = async () => {
+  const updateSelectedReports = async (nuevoEstado) => {
     if (selectedReports.size === 0) return;
 
+    const errores = [];
+
     try {
-      const body = Array.from(selectedReports).map((idSchedule) => ({
-        idSchedule,
-        estado: "ELIMINADO",
-        deletionReason: "Turno eliminado por administración",
-      }));
+      await Promise.all(
+        Array.from(selectedReports).map(async (idSchedule) => {
+          const body = {
+            estado: nuevoEstado,
+            ...(nuevoEstado === "ELIMINADO" && { deletionReason: "Turno eliminado por administración" }),
+          };
 
-      const response = await fetch(`${apiUrl}/schedules/status`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
+          const response = await fetch(`${apiUrl}/schedules/${idSchedule}/status`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+          });
 
-      if (!response.ok) {
-        const error = await response.json();
-        console.error("Error eliminando turnos:", error);
-        alert("Ocurrió un error eliminando los turnos seleccionados.");
-        return;
-      }
+          if (!response.ok) {
+            let errorMsg = `Turno ${idSchedule}: `;
+            try {
+              const error = await response.json();
+              errorMsg += error.message || JSON.stringify(error);
+            } catch {
+              errorMsg += "Error desconocido";
+            }
+            errores.push(errorMsg);
+          }
+        })
+      );
 
-      console.log("Turnos eliminados exitosamente.");
       setSelectedReports(new Set());
       fetchReports();
+
+      if (errores.length > 0) {
+        alert(
+          "Algunos turnos no pudieron actualizarse:\n\n" +
+            errores.join("\n")
+        );
+      }
     } catch (error) {
       console.error("Error en la petición:", error);
       alert("No se pudo conectar con el servidor.");
@@ -212,7 +229,7 @@ const TurnosReport = () => {
               <button
                 type="button"
                 className="btn btn-success"
-                onClick={deleteSelectedReports}
+                onClick={() => updateSelectedReports("EJECUTADO")}
                 disabled={selectedReports.size === 0}
               >
                 Ejecutar Seleccionados
@@ -220,7 +237,7 @@ const TurnosReport = () => {
               <button
                 type="button"
                 className="btn btn-danger"
-                onClick={deleteSelectedReports}
+                onClick={() => updateSelectedReports("ELIMINADO")}
                 disabled={selectedReports.size === 0}
               >
                 Eliminar Seleccionados
@@ -255,26 +272,29 @@ const TurnosReport = () => {
                 <th>Hora Inicio</th>
                 <th>Paciente</th>
                 <th>Teléfono</th>
+                {estado === "" && <th>Estado</th>} {/* Solo cuando es "Todos" */}
               </tr>
             </thead>
             <tbody>
               {data.map((turno) => (
-  <tr key={turno.idSchedule}>
-    <td>
-      <input
-        type="checkbox"
-        checked={selectedReports.has(turno.idSchedule)}
-        onChange={() => toggleReportSelection(turno.idSchedule)}
-      />
-    </td>
-    <td>{turno.doctor?.fullName || "Sin asignar"}</td>
-    <td>{turno.day}</td>
-    <td>{turno.start_Time}</td>
-    <td>{turno.patient?.fullName || "Sin asignar"}</td>
-    <td>{turno.patient?.phone || "Sin asignar"}</td>
-  </tr>
-))}
-
+                <tr key={turno.idSchedule}>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={selectedReports.has(turno.idSchedule)}
+                      onChange={() => toggleReportSelection(turno.idSchedule)}
+                    />
+                  </td>
+                  <td>{turno.doctor?.fullName || "Sin asignar"}</td>
+                  <td>{turno.day}</td>
+                  <td>{turno.start_Time}</td>
+                  <td>{turno.patient?.fullName || "Sin asignar"}</td>
+                  <td>{turno.patient?.phone || "Sin asignar"}</td>
+                  {estado === "" && (
+                    <td>{turno.estado || turno.state || "Sin estado"}</td>
+                  )}
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

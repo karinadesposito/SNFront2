@@ -4,6 +4,8 @@ import Reports from "./Components/Reports";
 import "./Styles/reports.css";
 import "./Styles/navbar.css";
 import "./Styles/card.css";
+
+import "./Styles/calendarPatient.css";
 import FourSections from "./Components/FourSections"; // Componente Home
 import FourSectionsAdmin from "./Components/FourSectionsAdmin"; // Componente para Turnos/Admin
 import CustomNavBar from "./Components/NavBar";

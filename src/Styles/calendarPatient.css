@@ -1,0 +1,23 @@
+/* CalendarPatient.css */
+.calendar-container {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  padding: 2rem 1rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  max-width: 700px;
+  width: 100%;
+}
+
+.calendar-title {
+  color: #2c6367;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+@media (min-width: 768px) {
+  .calendar-container .react-calendar {
+    margin-right: 24px;
+  }
+}
