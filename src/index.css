@@ -3,18 +3,14 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%;
- 
+   background: #fff;
   font-family: Arial, sans-serif;
 }
-
 #root {
-  display: flex;
-  justify-content: center; /* Centra el contenido horizontalmente */
-  align-items: flex-start; /* Alinea el contenido al inicio vertical */
-height: 100%; /* Hace que ocupe al menos la altura de la ventana */
-
-  background-color: rgba(44, 99, 103, 0.8); /* Fondo que combina con el estilo del componente */
-  margin-top: 50px;
+  min-height: 100vh;
+  background: #fff;
+  padding-top: 60px;
+  box-sizing: border-box;
 }
 
 

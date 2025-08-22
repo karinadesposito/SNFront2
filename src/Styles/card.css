@@ -1,7 +1,7 @@
 .card-custom {
     background-size: cover;
     background-position: center;
-    height: 300px;
+    height: 250px;
 
     position: relative; /* Necesario para que stretched-link funcione */
     display: flex;
@@ -11,6 +11,9 @@
    
    /* Asegura que la superposición no se salga del contenedor */
     transition: transform 0.3s ease; /* Transición suave para el zoom */
+      margin: 1rem;
+    border-radius: 8px;
+    overflow: hidden;
 }
 .card-custom:hover {
     transform: scale(1.02); /* Pequeño zoom para resaltar */
