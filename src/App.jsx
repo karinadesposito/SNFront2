@@ -28,9 +28,9 @@ function App() {
           {/* Ruta para Turnos / Admin */}
           <Route path="/turnos" element={<FourSectionsAdmin />} />
           <Route path="/crear-agenda" element={<CreateScheduleForm />} />
-          <Route path="/seleccionar-turno" element={<CalendarPatient />} />
+          <Route path="/reservar-turno" element={<CalendarPatient />} />
           {/* Ruta para Reportes */}
-          <Route path="/turnos/reportes" element={<Reports />} />
+          <Route path="/reportes" element={<Reports />} />
         </Routes>
       </div>
     </Router>

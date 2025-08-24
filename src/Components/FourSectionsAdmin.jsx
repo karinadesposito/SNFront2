@@ -75,8 +75,8 @@ const FourSectionsAdmin = () => {
               backgroundImage: `url(https://bancosdeimagenes.com/wp-content/uploads/2019/03/Getty-Medical-Category-768x443-1.jpg)`,
             }}
           >
-            <Link to="/EliminarTurnos" className="stretched-link">
-              <h2 className="card-title">ADMINISTRAR TURNOS</h2>
+            <Link to="/reservar-turno" className="stretched-link">
+              <h2 className="card-title">TURNOS DISPONIBLES</h2>
             </Link>
           </div>
         </div>
@@ -89,7 +89,7 @@ const FourSectionsAdmin = () => {
               backgroundImage: `url(https://economia3.com/wp-content/uploads/2021/02/informes_1.jpg)`,
             }}
           >
-            <Link to="/turnos/reportes" className="stretched-link">
+            <Link to="/reportes" className="stretched-link">
               <h2 className="card-title">REPORTES</h2>
             </Link>
           </div>

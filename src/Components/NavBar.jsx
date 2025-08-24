@@ -10,7 +10,7 @@ import {
   Col,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import logoSN from "../assets/logo.png"; // Ajusta la ruta si es necesario
+import logosaludnet from "../assets/logosaludnet.png"; // Ajusta la ruta si es necesario
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const CustomNavBar = () => {
@@ -21,10 +21,17 @@ const CustomNavBar = () => {
   };
 
   return (
-    <Navbar bg="dark" variant="dark" expand="lg" fixed="top">
+    <Navbar className="navbar-dark" expand="lg" fixed="top">
       <Container>
         <Navbar.Brand as={Link} to="/">
-          Juarez Salud
+          <div className="navbar-logo-text">
+            <img
+              src={logosaludnet}
+              alt="Logo SaludNet"
+              id="logosaludnet"
+            />
+            <span className="saludnet-text">SALUD NET</span>
+          </div>
         </Navbar.Brand>
 
         {/* Botón de toggle para pantallas pequeñas */}
