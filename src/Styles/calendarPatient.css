@@ -1,4 +1,6 @@
 /* CalendarPatient.css */
+
+/* ====== CARD / CONTENEDOR CALENDARIO ====== */
 .calendar-container {
   background: #fff;
   border-radius: 12px;
@@ -6,18 +8,214 @@
   padding: 2rem 1rem;
   margin-top: 2rem;
   margin-bottom: 2rem;
-  max-width: 700px;
+  max-width: clamp(720px, 90vw, 1200px);
   width: 100%;
 }
 
+/* Opcional: si el calendario y la lista viven lado a lado */
+.calendar-layout {
+  display: flex;
+  align-items: stretch;
+  gap: 24px;
+}
+
+/* Panel de horarios para igualar altura con el calendario y hacer scroll interno */
+.slots-panel {
+  flex: 1 1 0;
+  display: block;
+  overflow: hidden;
+}
+
+/* ====== TÍTULO ====== */
 .calendar-title {
-  color: #2c6367;
+  color: #fff;
   font-weight: bold;
   margin-bottom: 2rem;
   text-align: center;
 }
+
+/* ====== REACT-CALENDAR (estilos base) ====== */
+.calendar-container .react-calendar {
+  width: 100%;
+  background: #06475B;                 /* 🎯 Fondo azul */
+  border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+  padding: .5rem;
+}
+
+/* margen en pantallas md+ */
 @media (min-width: 768px) {
-  .calendar-container .react-calendar {
-    margin-right: 24px;
+  .calendar-container .react-calendar { margin-right: 24px; }
+}
+
+/* ====== Navegación del calendario ====== */
+.react-calendar__navigation {
+  display: flex;
+  height: 44px;
+  margin-bottom: .5rem;
+}
+.react-calendar__navigation button {
+  color: #fff;
+  font-weight: 600;
+  border-radius: 8px;
+  background: transparent;
+  border: 0;
+}
+.react-calendar__navigation button:hover { background: #f0faf4; }
+.react-calendar__navigation button:disabled { opacity: .4; }
+
+/* ====== Encabezados de días ====== */
+.react-calendar__month-view__weekdays {
+  text-align: center;
+  font-weight: 600;
+  color: #fff;                       /* naranja para headers */
+}
+.react-calendar__month-view__weekdays__weekday abbr {
+  text-decoration: none;
+  font-size: .85rem;
+}
+
+/* ====== Celdas (días) ====== */
+.react-calendar__tile {
+  padding: .6rem .2rem;
+  border-radius: 10px;
+  text-align: center;
+  transition: transform .06s ease, background-color .12s ease, color .12s ease, box-shadow .12s ease;
+}
+
+/* 🎯 DÍAS CON TURNOS DISPONIBLES (no deshabilitados) EN NARANJA */
+.react-calendar__tile:enabled {
+  background: #eea43d;                  /* naranja muy suave de base */
+  color: #161616;                        /* texto oscuro cálido */
+  /* aro naranja */
+}
+.react-calendar__tile:enabled:hover {
+  background: #ffe5bf;                  /* hover naranja suave */
+  transform: translateY(-1px);
+}
+
+
+
+/* Día seleccionado (se mantiene azul de marca para destacar selección) */
+.react-calendar__tile--active,
+.react-calendar__tile--hasActive {
+  background: #06475B;
+  color: #fff;
+  box-shadow: none;
+}
+
+/* Fuera de mes o deshabilitados (sin turnos) */
+.react-calendar__month-view__days__day--neighboringMonth,
+.react-calendar__tile:disabled {
+  color: #9aa7ab;
+  background: #f7f9fa;
+  box-shadow: none;
+}
+
+/* ====== GRID DE HORARIOS (ListGroup en columnas) ====== */
+.list-group.slot-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+  align-content: start;
+  padding-right: 4px;
+  border: 1px solid #e8eef0;
+  border-radius: 12px;
+  background: #ffffff;
+  overflow: auto;
+  min-height: 180px;
+}
+.list-group.slot-grid .list-group-item {
+  text-align: center;
+  border-radius: 10px;
+  border: 1px solid #e6ecec;
+  padding: 10px 8px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.list-group.slot-grid .list-group-item.active,
+.list-group.slot-grid .list-group-item.active:focus,
+.list-group.slot-grid .list-group-item.active:hover {
+  background-color: #eaf6ef !important;
+  color: #222 !important;
+  border-color: #b2da9e !important;
+}
+.list-group.slot-grid .list-group-item:hover {
+  filter: brightness(1.03);
+  cursor: pointer;
+}
+.list-group.slot-grid::-webkit-scrollbar { width: 8px; }
+.list-group.slot-grid::-webkit-scrollbar-thumb { background: #d8e6db; border-radius: 10px; }
+.list-group.slot-grid::-webkit-scrollbar-track { background: transparent; }
+
+/* ====== SELECTS (panel contenedor) ====== */
+.select-panel {
+  background: #ffffff;
+  border: 1px solid #e8eef0;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+/* ====== MODAL: fondo oscurecido + desenfocado ====== */
+.modal-backdrop.blurred-backdrop.show {
+  opacity: 1 !important;
+  background-color: rgba(6, 71, 91, 0.35) !important;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.glass-modal {
+  border-radius: 16px;
+  border: 1px solid rgba(232, 238, 240, 0.9);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  overflow: hidden;
+}
+.modal-title { color: #06475B; }
+.modal-header { border-bottom-color: #e8eef0; }
+.modal-footer { border-top-color: #e8eef0; }
+
+/* ====== react-select (opcional por CSS, usando classNamePrefix="doc") ====== */
+.doc__control {
+  background-color: #f7fbfd !important;
+  border: 1px solid #cfe3e8 !important;
+  border-radius: 12px !important;
+  min-height: 42px !important;
+  box-shadow: none !important;
+}
+.doc__control--is-focused {
+  border-color: #06475B !important;
+  box-shadow: 0 0 0 .25rem rgba(6,71,91,.15) !important;
+}
+.doc__single-value { color: #06475B!important; } /* si el select queda sobre fondo azul, podés volver a #0f2e36 */
+.doc__placeholder { color: #06475B !important; }
+.doc__indicator-separator { display: none !important; }
+.doc__dropdown-indicator { color: #e8a649 !important; }
+
+.doc__menu {
+  background-color: #eef8fb !important;
+  border: 1px solid #e8eef0 !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+.doc__menu-list { padding: 8px !important; }
+.doc__option {
+  background-color: #eef8fb !important;
+  color: #0f2e36 !important;
+  border-radius: 8px !important;
+  padding: 10px 12px !important;
+}
+.doc__option--is-focused { background-color: #eaf6ef !important; }
+.doc__option--is-selected {
+  background-color: #06475B !important;
+  color: #fff !important;
+}
+
+/* ====== Responsive ====== */
+@media (max-width: 576px) {
+  .list-group.slot-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   }
 }
+/* Contenedor ancho en XL/XXL (coincide con breakpoints de Bootstrap) */
+@media (min-width: 1200px) { .calendar-container { max-width: 1140px; } }
+@media (min-width: 1400px) { .calendar-container { max-width: 1320px; } }

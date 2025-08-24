@@ -4,14 +4,40 @@
   left: 0;
   width: 100%;
   z-index: 100;
-  background-color: #2c6367 !important;
+  background-color: #06475B !important;
   color: #fff;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  padding: 0.5rem 1rem;
-  height: 60px;
-  min-height: 60px;
+  padding: 0 1.5rem;
+  height: 60px; /* Ajustá según tu preferencia */
   display: flex;
   align-items: center;
+  /* Asegura espacio entre elementos */
+  gap: 1rem;
+}
+
+/* Logo alineado a la izquierda con margen derecho */
+#logosaludnet {
+  height: 60px;      /* Igual al alto de la navbar */
+  width: auto;
+  margin-right: 0.8rem;
+  display: block;
+  object-fit: contain;   /* Asegura que la imagen no se deforme */
+ 
+}
+
+.navbar-logo-text {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.saludnet-text {
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #fff;
+  line-height: 1;
+  transition: opacity 0.2s;
 }
 
 .bg-dark{
@@ -25,17 +51,14 @@
   .navbar-nav .nav-link:hover {
     color: #9bea7e; /* Cambia el color cuando pasas el mouse */
   }
-  @media (max-width: 320px) {
-    #logoSN {
-      max-width: 50px; /* Adjust logo size */
+  @media (max-width: 800px) {
+    #logosaludnet {
+      max-height: 55px;
+      margin-right: 0.5rem;
+      margin-left: 0.2rem;
     }
-  
-    .form-control-sm {
-      font-size: 0.8rem; /* Smaller font size for input */
-    }
-  
-    .navbar {
-      padding: 0.5rem; /* Adjust navbar padding */
+    .saludnet-text {
+      display: none;
     }
   }
  
@@ -48,3 +71,14 @@
     padding: 10px;
   
   }
+
+  /* Eliminá o corregí este bloque para móviles */
+@media (max-width: 320px) {
+  #logosaludnet {
+    max-width: 28px; /* No uses 10px, es demasiado chico */
+    max-height: 24px;
+  }
+  .navbar {
+    padding: 0.3rem;
+  }
+}

@@ -28,7 +28,7 @@ const FourSections = () => {
               backgroundImage: `url(https://www.shutterstock.com/image-illustration/top-view-medical-stethoscope-icon-600nw-2075382679.jpg)`,
             }}
           >
-            <Link to="/seleccionar-turno" className="stretched-link">
+            <Link to="/reservar-turno" className="stretched-link">
               <h2 className="card-title">TURNOS DISPONIBLES</h2>
             </Link>
           </div>
