@@ -132,6 +132,9 @@
   padding: 10px 8px;
   line-height: 1.2;
   white-space: nowrap;
+  color: #06475B; /* Azul oscuro, bien visible sobre fondo blanco */
+  font-weight: 600;
+  font-size: 1.08rem;
 }
 .list-group.slot-grid .list-group-item.active,
 .list-group.slot-grid .list-group-item.active:focus,
