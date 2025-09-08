@@ -1,0 +1,61 @@
+/* Barra compacta pegada abajo */
+.site-footer {
+  background: #06475B;
+  border-top: 1px solid #e5e7eb;
+  padding: 6px 0;         /* antes: py-2 o más */
+  line-height: 1;         /* reduce altura efectiva */
+}
+
+/* Logo y marca muy compactos */
+.brand-mark {
+  max-height: 20px;       /* ↓ */
+  width: auto;
+  object-fit: contain;
+}
+.brand-first {
+  font-weight: 700;
+  font-size: .95rem;      /* ↓ */
+  color: #fff;
+  line-height: 1;
+}
+
+/* Social, versión mini */
+.social {
+  display: inline-flex;
+  gap: 6px;               /* ↓ */
+}
+.social-icon {
+  width: 26px;            /* ↓ */
+  height: 26px;           /* ↓ */
+  border: 1px solid #e5e7eb;
+  border-radius: 50%;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: transform .15s ease, border-color .15s ease;
+}
+.social-icon svg {
+  width: 14px;            /* ↓ */
+  height: 14px;           /* ↓ */
+}
+.social-icon:hover {
+  transform: translateY(-1px);
+  border-color: #cbd5e1;
+  color: #fff;
+}
+
+/* Tipos pequeños en el lado derecho */
+.site-footer .small {
+  font-size: .8rem;
+  line-height: 1;
+}
+
+/* Sin gaps verticales entre columnas/filas */
+@media (min-width: 768px) {
+  .site-footer .row {
+    --bs-gutter-y: 0;     /* elimina gy */
+  }
+}
+

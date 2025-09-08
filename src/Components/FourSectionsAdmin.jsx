@@ -1,97 +1,84 @@
+// FourSectionsAdmin.jsx
 import React from "react";
 import { Link } from "react-router-dom";
-import Dropdown from "react-bootstrap/Dropdown";
+import { Button, ButtonGroup } from "react-bootstrap";
 
 const FourSectionsAdmin = () => {
   return (
-    <div className="container my-4">
-      <div className="row g-3">
-        {/* Administrar Profesionales */}
-        <div className="col-12 col-md-6">
-          <div
-            className="card-custom"
-            style={{
-              backgroundImage: `url(https://media.istockphoto.com/id/872676342/es/foto/concepto-de-tecnolog%C3%ADa-m%C3%A9dica-registro-m%C3%A9dico-electr%C3%B3nico.jpg?s=612x612&w=0&k=20&c=_Zg00u1zKtFAeH2EiNaA8htvx8yDFsq568pMl3wpyC0=)`,
-            }}
-          >
-            <Dropdown>
-              <Dropdown.Toggle
-                as="div"
-                className="text-decoration-none d-flex justify-content-center align-items-center"
-                style={{ cursor: "pointer" }}
-              >
-                <h2 className="card-title">ADMINISTRAR PROFESIONALES</h2>
-              </Dropdown.Toggle>
-
-              <Dropdown.Menu align="center">
-                <Dropdown.Item as={Link} to="/AgregarProfesional">
-                  Agregar Profesional
-                </Dropdown.Item>
-                <Dropdown.Item as={Link} to="/EditarProfesional">
-                  Editar Profesional
-                </Dropdown.Item>
-                <Dropdown.Item as={Link} to="/EliminarProfesional">
-                  Eliminar Profesional
-                </Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
+    <div className="admin-offset">{/* ⬅️ OFFSET SOLO EN /admin */}
+      <div className="container my-4">
+        <div className="row g-3">
+          {/* Administrar Profesionales */}
+          <div className="col-12 col-md-6">
+            <div
+              className="card-custom"
+              style={{
+                backgroundImage:
+                  "url(https://media.istockphoto.com/id/872676342/es/foto/concepto-de-tecnolog%C3%ADa-m%C3%A9dica-registro-m%C3%A9dico-electr%C3%B3nico.jpg?s=612x612&w=0&k=20&c=_Zg00u1zKtFAeH2EiNaA8htvx8yDFsq568pMl3wpyC0=)",
+              }}
+            >
+              <div className="card-inner">
+                <h2 className="card-title mb-3">PROFESIONALES</h2>
+                <ButtonGroup className="card-actions">
+                  <Button as={Link} to="/AgregarProfesional" variant="primary" size="sm">Agregar</Button>
+                  <Button as={Link} to="/EditarProfesional" variant="primary" size="sm">Editar</Button>
+                  <Button as={Link} to="/EliminarProfesional" variant="primary" size="sm">Eliminar</Button>
+                </ButtonGroup>
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Administrar Agenda */}
-        <div className="col-12 col-md-6">
-          <div
-            className="card-custom"
-            style={{
-              backgroundImage: `url(https://www.shutterstock.com/image-illustration/top-view-medical-stethoscope-icon-600nw-2075382679.jpg)`,
-            }}
-          >
-            <Dropdown>
-              <Dropdown.Toggle
-                as="div"
-                className="text-decoration-none d-flex justify-content-center align-items-center"
-                style={{ cursor: "pointer" }}
-              >
-                <h2 className="card-title">ADMINISTRAR AGENDA</h2>
-              </Dropdown.Toggle>
-
-              <Dropdown.Menu align="center">
-                <Dropdown.Item as={Link} to="/crear-agenda">
-                  Crear Agenda
-                </Dropdown.Item>
-                <Dropdown.Item onClick={() => alert("Funcionalidad en desarrollo")}>
-                  Actualizar Agenda
-                </Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
+          {/* Administrar Agenda */}
+          <div className="col-12 col-md-6">
+            <div
+              className="card-custom"
+              style={{
+                backgroundImage:
+                  "url(https://www.shutterstock.com/image-illustration/top-view-medical-stethoscope-icon-600nw-2075382679.jpg)",
+              }}
+            >
+              <div className="card-inner">
+                <h2 className="card-title mb-3">AGENDA</h2>
+                <ButtonGroup className="card-actions">
+                  <Button as={Link} to="/crear-agenda" variant="primary" size="sm">Crear Agenda</Button>
+                  <Button onClick={() => alert("Funcionalidad en desarrollo")} variant="primary" size="sm">
+                    Actualizar Agenda
+                  </Button>
+                </ButtonGroup>
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Administrar Turnos */}
-        <div className="col-12 col-md-6">
-          <div
-            className="card-custom"
-            style={{
-              backgroundImage: `url(https://bancosdeimagenes.com/wp-content/uploads/2019/03/Getty-Medical-Category-768x443-1.jpg)`,
-            }}
-          >
-            <Link to="/reservar-turno" className="stretched-link">
-              <h2 className="card-title">TURNOS DISPONIBLES</h2>
-            </Link>
+          {/* Turnos */}
+          <div className="col-12 col-md-6">
+            <div
+              className="card-custom"
+              style={{
+                backgroundImage:
+                  "url(https://bancosdeimagenes.com/wp-content/uploads/2019/03/Getty-Medical-Category-768x443-1.jpg)",
+              }}
+            >
+              <div className="card-inner">
+                <h2 className="card-title mb-3">TURNOS</h2>
+                <Button as={Link} to="/admin" variant="primary" size="sm">Ir a Turnos</Button>
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Reportes */}
-        <div className="col-12 col-md-6">
-          <div
-            className="card-custom"
-            style={{
-              backgroundImage: `url(https://economia3.com/wp-content/uploads/2021/02/informes_1.jpg)`,
-            }}
-          >
-            <Link to="/reportes" className="stretched-link">
-              <h2 className="card-title">REPORTES</h2>
-            </Link>
+          {/* Reportes */}
+          <div className="col-12 col-md-6">
+            <div
+              className="card-custom"
+              style={{
+                backgroundImage:
+                  "url(https://economia3.com/wp-content/uploads/2021/02/informes_1.jpg)",
+              }}
+            >
+              <div className="card-inner">
+                <h2 className="card-title mb-3">REPORTES</h2>
+                <Button as={Link} to="/reportes" variant="primary" size="sm">Ver Reportes</Button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

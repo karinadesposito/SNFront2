@@ -1,16 +1,117 @@
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-   background: #fff;
-  font-family: Arial, sans-serif;
-}
-#root {
-  min-height: 100vh;
-  background: #fff;
-  padding-top: 60px;
+/* =========================================
+   Reset básico y caja consistente
+========================================= */
+*, *::before, *::after {
   box-sizing: border-box;
 }
 
+/* =========================================
+   Alturas base: ocupar toda la ventana
+========================================= */
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+/* =========================================
+   Body base
+========================================= */
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  font-family: Arial, sans-serif;
+}
+
+/* =========================================
+   Variables de layout (ajustá a tu UI real)
+   - --header-h: altura aproximada de tu Navbar
+   - --footer-h: altura del footer compacto
+========================================= */
+:root {
+  --header-h: 64px;
+  --footer-h: 60px; /* subí/bajá 2-4px si querés afinar */
+}
+
+/* =========================================
+   #root como contenedor flex vertical
+========================================= */
+#root {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  /* ❌ quitado el padding-top anterior que generaba desplazamiento */
+  /* padding-top: 60px; */
+}
+
+/* =========================================
+   Área principal: ocupa espacio entre header y footer
+========================================= */
+main {
+  flex: 1 0 auto;
+  /* Si la página tiene poco contenido, igual llena la ventana */
+  min-height: calc(100vh - var(--header-h) - var(--footer-h));
+}
+
+/* iOS/Android: usar svh para evitar barras del navegador móviles */
+@supports (height: 100svh) {
+  main {
+    min-height: calc(100svh - var(--header-h) - var(--footer-h));
+  }
+}
+
+/* =========================================
+   Navbar fija (opcional)
+   Usá <body class="has-fixed-header"> si tu NavBar es fixed/top
+========================================= */
+body.has-fixed-header {
+  padding-top: var(--header-h);
+}
+
+/* =========================================
+   HOME: centrar verticalmente el grid de 3 cards
+   (aplicá la clase .home-wrap en el contenedor de las cards)
+========================================= */
+.home-wrap {
+  min-height: calc(100vh - var(--header-h) - var(--footer-h));
+  display: flex;
+  align-items: center;         /* centrado vertical */
+}
+
+/* Móviles con svh */
+@supports (height: 100svh) {
+  .home-wrap {
+    min-height: calc(100svh - var(--header-h) - var(--footer-h));
+  }
+}
+
+/* Asegurar que el .row ocupe todo el ancho dentro del wrap */
+.home-wrap .row {
+  width: 100%;
+}
+
+/* =========================================
+   Footer tipo “barra” compacto (altura fija)
+   (podés mover estas reglas a footer.css si preferís)
+========================================= */
+.site-footer {
+  height: var(--footer-h);
+  min-height: var(--footer-h);
+  padding: 6px 0;          /* padding horizontal mínimo */
+  line-height: 1;
+  display: flex;           /* centra verticalmente su contenido */
+  align-items: center;
+  background: #fff;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Evitar espacios verticales extra dentro del footer */
+.site-footer .row {
+  --bs-gutter-y: 0;
+}
+
+/* Despega SOLO la vista de Administración de la navbar fixed-top */
+.admin-offset {
+  padding-top: var(--header-h, 64px); /* usa la variable si existe, 64px fallback */
+}
 
