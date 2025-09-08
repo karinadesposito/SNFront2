@@ -4,22 +4,13 @@ import {
   Nav,
   NavDropdown,
   Container,
-  Form,
-  FormControl,
-  Row,
-  Col,
+  Button,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import logosaludnet from "../assets/logosaludnet.png"; // Ajusta la ruta si es necesario
-import 'bootstrap-icons/font/bootstrap-icons.css';
+import logosaludnet from "../assets/logosaludnet.png";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 const CustomNavBar = () => {
-  const handleSearch = (event) => {
-    event.preventDefault();
-    // Aquí puedes agregar la lógica de búsqueda
-    alert("Búsqueda realizada.");
-  };
-
   return (
     <Navbar className="navbar-dark" expand="lg" fixed="top">
       <Container>
@@ -34,13 +25,12 @@ const CustomNavBar = () => {
           </div>
         </Navbar.Brand>
 
-        {/* Botón de toggle para pantallas pequeñas */}
+        {/* Toggle mobile */}
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
-        {/* Contenido colapsable del Navbar */}
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            {/* Dropdown de Información */}
+            {/* Información */}
             <NavDropdown title="Información" id="dropdown-informacion">
               <NavDropdown.Item as={Link} to="/staff">
                 Staff
@@ -53,9 +43,9 @@ const CustomNavBar = () => {
               </NavDropdown.Item>
             </NavDropdown>
 
-            {/* Dropdown de Servicios */}
+            {/* Servicios */}
             <NavDropdown title="Servicios" id="dropdown-servicios">
-              <NavDropdown.Item as={Link} to="/turnos">
+              <NavDropdown.Item as={Link} to="/reservar-turno">
                 Turnos
               </NavDropdown.Item>
               <NavDropdown.Item as={Link} to="/recetas">
@@ -66,31 +56,37 @@ const CustomNavBar = () => {
             <Nav.Link as={Link} to="/nosotros">
               Nosotros
             </Nav.Link>
-          </Nav>
 
-          {/* Formulario de búsqueda */}
-          <Form className="d-flex" onSubmit={handleSearch}>
-            <div className="input-group">
-              <FormControl
-                type="search"
-                name="search"
-                placeholder="Buscar"
-                className="form-control-sm"
-                aria-label="Search"
-              />
-              <button
-                type="submit"
-                className="btn btn-outline-secondary"
-                id="button-addon-search"
+            {/* Botón Administración en MOBILE (dentro del collapse) */}
+            <div className="d-lg-none w-100 mt-2">
+              <Button
+                as={Link}
+                to="/admin"
+                variant="primary"
+                className="w-100"
+                size="sm"
               >
-                <i className="bi bi-search "></i>
-              </button>
+                Administración
+              </Button>
             </div>
-          </Form>
+          </Nav>
         </Navbar.Collapse>
+
+        {/* Botón Administración en DESKTOP (fuera del collapse) */}
+        <Button
+          as={Link}
+          to="/admin"
+          variant="primary"
+          size="sm"
+          className="d-none d-lg-inline-flex ms-2"
+        >
+          Administración
+        </Button>
       </Container>
     </Navbar>
   );
 };
 
 export default CustomNavBar;
+
+

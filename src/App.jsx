@@ -1,40 +1,59 @@
+// App.jsx
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom"; // Import Router and Route
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
+
 import Reports from "./Components/Reports";
 import "./Styles/reports.css";
 import "./Styles/navbar.css";
 import "./Styles/card.css";
-
 import "./Styles/calendarPatient.css";
-import FourSections from "./Components/FourSections"; // Componente Home
-import FourSectionsAdmin from "./Components/FourSectionsAdmin"; // Componente para Turnos/Admin
+
+import FourSections from "./Components/FourSections";
+import FourSectionsAdmin from "./Components/FourSectionsAdmin";
 import CustomNavBar from "./Components/NavBar";
 import AddDoctor from "./Components/AddDoctor";
 import CreateScheduleForm from "./Components/CreateSchedule";
-
 import CalendarPatient from "./Components/CalendarPatient";
+import Footer from "./Components/Footer";
 
-function App() {
+function AppRoutes() {
+  const location = useLocation();
+  const isHome = location.pathname === "/";
+
   return (
-    <Router>
-      <div className="App">
-        <CustomNavBar />
+    <div className="App d-flex flex-column min-vh-100">
+      {/* shell */}
+      <CustomNavBar />
 
+      <main className="flex-fill">
+        {/* ocupa el alto libre */}
         <Routes>
-          {/* Ruta para el Home */}
           <Route path="/" element={<FourSections />} />
           <Route path="/admin" element={<FourSectionsAdmin />} />
-          <Route path="/AgregarProfesional" element={<AddDoctor />} />
-          {/* Ruta para Turnos / Admin */}
+          <Route path="/administracion" element={<FourSectionsAdmin />} />
           <Route path="/turnos" element={<FourSectionsAdmin />} />
           <Route path="/crear-agenda" element={<CreateScheduleForm />} />
+          <Route path="/AgregarProfesional" element={<AddDoctor />} />
           <Route path="/reservar-turno" element={<CalendarPatient />} />
-          {/* Ruta para Reportes */}
           <Route path="/reportes" element={<Reports />} />
         </Routes>
-      </div>
-    </Router>
+      </main>
+
+      {isHome && <Footer />}
+      {/* footer solo en home */}
+    </div>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <Router>
+      <AppRoutes />
+    </Router>
+  );
+}
