@@ -32,7 +32,7 @@ const CreateSchedule = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    fetch(`${apiUrl}/doctor/basic`)
+    fetch(`${apiUrl}/doctor`)
       .then((res) => res.json())
       .then((data) => {
         const doctorList = data?.data || data;

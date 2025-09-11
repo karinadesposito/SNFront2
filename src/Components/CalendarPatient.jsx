@@ -121,7 +121,7 @@ const CalendarPatient = () => {
 
   // Carga inicial
   useEffect(() => {
-    fetch(`${apiUrl}/doctor/basic`)
+    fetch(`${apiUrl}/doctor`)
       .then((res) => res.json())
       .then((data) => setDoctors(data?.data || data))
       .catch(() => setDoctors([]));
@@ -141,7 +141,11 @@ const CalendarPatient = () => {
     setLoading(true);
     fetch(`${apiUrl}/schedules/available/by-doctor/${selectedDoctor}`)
       .then((res) => res.json())
-      .then((data) => setAvailableDates(Array.isArray(data) ? data : []))
+     // .then((data) => setAvailableDates(Array.isArray(data) ? data : []))
+     .then((data) => {
+  console.log("Disponibilidad:", data);
+  setAvailableDates(Array.isArray(data.data) ? data.data : []);
+})
       .catch(() => setAvailableDates([]))
       .finally(() => setLoading(false));
   }, [selectedDoctor, apiUrl]);
