@@ -1,0 +1,191 @@
+/* ==============================
+   ALTURAS BASE
+============================== */
+:root{
+  --header-h: 64px;
+  --footer-h: 60px;
+}
+
+/* ==============================
+   MAIN de HOME (layout y alturas)
+   - Sin scroll: el main ocupa la ventana menos header y footer
+   - Fallback 100vh + soportes modernos (dvh/svh)
+============================== */
+.home-main{
+  display: flex;
+  flex-direction: column;
+
+  /* Fallback: resta header y footer */
+  min-height: calc(100vh - var(--header-h) - var(--footer-h));
+}
+
+@supports (height: 100svh) {
+  .home-main{
+    min-height: calc(100svh - var(--header-h) - var(--footer-h));
+  }
+}
+@supports (height: 100dvh) {
+  .home-main{
+    min-height: calc(100dvh - var(--header-h) - var(--footer-h));
+  }
+}
+
+/* ==============================
+   FONDO HOME (GENÉRICO .home-bg)
+   - Mantiene la parte superior visible (corta por abajo)
+   - Sin bandas ni repetición
+============================== */
+.home-bg{
+  position: relative;
+
+  background-image: var(--home-bg);
+  background-size: cover;
+  background-position: top center; /* ▲ ancla arriba para cortar por abajo */
+  background-repeat: no-repeat;
+  /* background-attachment: fixed;  <- dejalo off si causa saltos en mobile */
+
+  /* llena el alto del main pero sin forzar más allá */
+  min-height: 100%;
+
+  display: flex;         /* evita colapso de márgenes */
+  flex-direction: column;
+  overflow: hidden;      /* por si algún hijo crece, no genere scroll visual */
+}
+
+/* Velo único (consolidado) */
+.home-bg::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(6, 28, 36, 0.38);
+  pointer-events: none;
+}
+
+/* Contenido dentro de .home-bg */
+.home-bg .home-wrap{
+  position: relative;
+  z-index: 1;
+  flex: 1;                 /* empuja hasta el inicio del footer */
+  display: flex;
+  align-items: center;     /* centrado vertical por defecto */
+}
+
+/* ==============================
+   FONDO HOME dentro de .home-main (específico)
+   - No repetimos background-*
+   - Sólo layout/ajustes contextuales
+============================== */
+.home-main > .home-bg{
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+
+  /* Garantiza que siga anclado arriba en este contexto específico */
+  background-position: top center !important; /* ▲ mantiene parte superior siempre */
+}
+
+/* Ajustes del contenido en desktop (texto/botones más cerca del pie de la imagen) */
+@media (min-width: 992px){
+  .home-main > .home-bg .home-wrap{
+    align-items: flex-end;
+    padding-bottom: 3rem;
+  }
+}
+
+/* ==============================
+   PANTALLAS GRANDES (XL+)
+   - Achicamos la hero sin recortar por arriba
+   - Si tenías scroll, debería desaparecer
+============================== */
+@media (min-width: 1400px){
+  .home-main > .home-bg{
+    /* Si querés “bajar” un poquito el encuadre superior, usá 0%→5% */
+    background-position: 0% 0%; /* top-left ≈ “más cielo visible”, corta abajo */
+
+    /* ALTURA CONTROLADA: más baja que antes (antes 62vh/780px) */
+    height: clamp(360px, 48vh, 640px);
+  }
+}
+
+/* ==============================
+   Variante “glass” SOLO usada en la home
+============================== */
+.card-glass{
+  height: 100px !important;          /* cards más chicas en la home */
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: 0 10px 22px rgba(0,0,0,.18);
+  backdrop-filter: blur(8px) saturate(1.08);
+  -webkit-backdrop-filter: blur(8px) saturate(1);
+  position: relative;
+  margin-top: 2rem;
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease,
+    background-color .25s ease,
+    border-color .25s ease,
+    backdrop-filter .25s ease;
+}
+
+/* Anula el oscurecido base de .card-custom en la versión glass */
+.card-glass::before{ background-color: transparent !important; }
+
+/* Anillo/realce en hover + efecto más notorio */
+.card-glass::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.25) inset;
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+
+.card-glass:hover{
+  transform: translateY(-4px) scale(1.02);
+  background: rgba(255,255,255,0.22);
+  border-color: rgba(255,255,255,0.40);
+  box-shadow: 0 18px 40px rgba(0,0,0,.28);
+  backdrop-filter: blur(10px) saturate(1.15);
+  -webkit-backdrop-filter: blur(10px) saturate(1.15);
+}
+
+.card-glass:hover::after{ opacity: 1; }
+
+/* Título legible en vidrio */
+.card-glass .card-title{
+  color: #fff;
+  text-shadow: 0 2px 6px rgba(0,0,0,.55);
+}
+
+/* En móviles aún más compactas */
+@media (max-width: 480px){
+  .card-glass{ height: 150px !important; }
+}
+
+/* Links sin subrayado dentro de glass */
+.card-glass a{ text-decoration: none !important; }
+
+/* ===== Overrides para Home con secciones debajo del hero ===== */
+
+/* 1) El main NO debe tener altura fija ni mínima forzada */
+.home-main {
+  height: auto !important;
+  min-height: initial !important;
+  display: block; /* evita que flex + alturas previas interfieran */
+}
+
+/* 2) El hero controla SU propia altura, no el main */
+.home-bg {
+  background-position: top center; /* recorta por ABAJO */
+  background-size: cover;
+  background-repeat: no-repeat;
+
+  /* altura visible del hero; ajustá a gusto */
+  height: clamp(320px, 46vh, 600px);
+  overflow: hidden; /* evita barras por contenido interno */
+}
+
+/* 3) Separación por si tenés navbar fija */
+#profesionales { scroll-margin-top: 80px; }
+

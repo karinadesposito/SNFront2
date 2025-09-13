@@ -12,7 +12,7 @@ import "./Styles/reports.css";
 import "./Styles/navbar.css";
 import "./Styles/card.css";
 import "./Styles/calendarPatient.css";
-
+import "./Styles/home.css";
 import FourSections from "./Components/FourSections";
 import FourSectionsAdmin from "./Components/FourSectionsAdmin";
 import CustomNavBar from "./Components/NavBar";
@@ -30,7 +30,7 @@ function AppRoutes() {
       {/* shell */}
       <CustomNavBar />
 
-      <main className="flex-fill">
+      <main className={`flex-fill ${isHome ? "home-main" : ""}`}>
         {/* ocupa el alto libre */}
         <Routes>
           <Route path="/" element={<FourSections />} />

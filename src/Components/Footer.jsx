@@ -3,6 +3,7 @@ import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import "./../Styles/footer.css";
 import clinicBrand from "../assets/logosaludnet.png";
+import pixeliaBlanco from "../assets/pixeliaBlanco.png";
 
 function SocialIcon({ href, label, children }) {
   return (
@@ -23,20 +24,9 @@ export default function Footer() {
     <footer className="site-footer">
       <Container>
         <Row className="align-items-center gy-0">
-          <Col xs={12} md={4} className="mb-2 mb-md-0">
-            <div className="d-flex align-items-center">
-              <img
-                src={clinicBrand}
-                alt="SaludNet — logo"
-                className="brand-mark"
-              />
-              <span className="brand-first ms-2">SaludNet</span>
-            </div>
-          </Col>
-
           <Col
             xs={12}
-            md={4}
+            md={2}
             className="d-flex justify-content-center mb-2 mb-md-0"
           >
             <div className="social">
@@ -58,13 +48,18 @@ export default function Footer() {
             </div>
           </Col>
 
-          <Col xs={12} md={4} className="text-md-end small">
-            <span className="me-2 d-none d-md-inline text-white">
-              © {new Date().getFullYear()}
-            </span>
-            <span className="d-none d-md-inline text-white">
-              Todos los derechos reservados.
-            </span>
+          <Col xs={12} md={6} className="mb-2 mb-md-0">
+            <div className="d-flex align-items-center">
+           
+              <span className="brand-first ms-2">Zibecchi 74, Benito Juárez, Buenos Aires. cel:2281-570849</span>
+            </div>
+          </Col>
+
+          <Col
+           
+            className="d-flex justify-content-center justify-content-md-end "
+          >
+            <img src={pixeliaBlanco} alt="Logo Dev" id="pixeliaBlanco" />
           </Col>
         </Row>
       </Container>
