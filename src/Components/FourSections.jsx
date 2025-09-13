@@ -45,7 +45,7 @@ export default function FourSections() {
                 Bienvenidos a Salud Net
               </h1>
               <p className="lead text-white-50 mb-0">
-                Especialistas y turnos para cuidar tu salud, todo en un solo lugar.
+                Profesionales de la Salud en Benito Juárez
               </p>
             </div>
           </div>
