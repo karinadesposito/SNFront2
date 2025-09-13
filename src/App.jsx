@@ -1,18 +1,15 @@
 // App.jsx
 import React from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  useLocation,
-} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
 
 import Reports from "./Components/Reports";
+import "bootstrap/dist/css/bootstrap.min.css";   // por si lo cargás acá también
 import "./Styles/reports.css";
-import "./Styles/navbar.css";
-import "./Styles/card.css";
+import "./Styles/cards.css";
 import "./Styles/calendarPatient.css";
 import "./Styles/home.css";
+import "./Styles/navbar.css";                    // ← SIEMPRE ÚLTIMO
+
 import FourSections from "./Components/FourSections";
 import FourSectionsAdmin from "./Components/FourSectionsAdmin";
 import CustomNavBar from "./Components/NavBar";
@@ -27,11 +24,8 @@ function AppRoutes() {
 
   return (
     <div className="App d-flex flex-column min-vh-100">
-      {/* shell */}
       <CustomNavBar />
-
       <main className={`flex-fill ${isHome ? "home-main" : ""}`}>
-        {/* ocupa el alto libre */}
         <Routes>
           <Route path="/" element={<FourSections />} />
           <Route path="/admin" element={<FourSectionsAdmin />} />
@@ -43,9 +37,7 @@ function AppRoutes() {
           <Route path="/reportes" element={<Reports />} />
         </Routes>
       </main>
-
       {isHome && <Footer />}
-      {/* footer solo en home */}
     </div>
   );
 }

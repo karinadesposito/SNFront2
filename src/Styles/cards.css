@@ -1,0 +1,186 @@
+/* ==============================
+   Tokens
+============================== */
+:root{
+  --navbar-bg: #062d38;
+
+  /* Superficies suaves (evitan blanco puro sobre el fondo) */
+  --surface-1: color-mix(in srgb, #ffffff 94%, var(--navbar-bg) 6%);
+  --surface-2: color-mix(in srgb, #ffffff 90%, var(--navbar-bg) 10%);
+
+  --card-radius: 12px;
+  --card-border-color: color-mix(in srgb, var(--navbar-bg) 14%, #dfe7eb);
+  --card-border: 1px solid var(--card-border-color);
+
+  --card-shadow: 0 1px 6px rgba(0,0,0,.06);
+  --card-shadow-hover: 0 6px 16px rgba(0,0,0,.08);
+
+  --text-strong: #0b2233;
+  --text-muted: #5b6b75;
+}
+
+/* ==============================
+   Base (simple, sin overlays)
+============================== */
+.card-custom{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 180px;
+  margin: 0;
+  padding: 0;
+
+  background: var(--surface-1);
+  border-radius: var(--card-radius);
+  border: var(--card-border);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  transition: box-shadow .2s ease, border-color .2s ease, background-color .2s ease;
+}
+.card-custom:hover{
+  box-shadow: var(--card-shadow-hover);
+  border-color: color-mix(in srgb, var(--navbar-bg) 20%, #dfe7eb);
+}
+
+.card-inner{ width: 100%; display: flex; flex-direction: column; }
+.card-title{
+  font-size: clamp(1rem, 2vw, 1.08rem);
+  font-weight: 700;
+  color: var(--text-strong);
+  margin: 0;
+  background: transparent !important;
+}
+.card-meta{
+  font-size: .92rem;
+  line-height: 1.3;
+  color: var(--text-muted);
+  margin: 0;
+  background: transparent !important;
+}
+.card-actions{ display:flex; gap:.5rem; flex-wrap:wrap; justify-content:flex-start; margin-top:.5rem; }
+.card-custom a, .no-underline{ text-decoration: none !important; }
+.card-custom a:focus-visible{ outline: 2px solid #0d6efd; outline-offset: 2px; }
+
+/* ==============================
+   ESPECIALIDADES — pill liviana (sin bold)
+============================== */
+.card-pill{
+  min-height: 56px;
+  background: var(--surface-2);
+  border: 1px solid color-mix(in srgb, var(--navbar-bg) 10%, #e6eef2);
+}
+.card-pill .card-inner{ padding: .8rem 1rem; align-items: flex-start; }
+.card-pill .card-title{
+  font-weight: 500;                         /* liviana */
+  font-size: clamp(.95rem, 1.6vw, 1.02rem);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* ==============================
+   PROFESIONALES — mini tipografía/espaciado
+   (NO toca fondo, borde ni altura → hereda de .card-pill)
+============================== */
+.card-mini{
+  /* sin background, sin border, sin min-height (evitamos pisar .card-pill) */
+  padding: .75rem 1rem;
+}
+.card-mini .card-title{ font-weight: 600; font-size: 1rem; margin: 0 0 .15rem; }
+.card-mini .card-meta{ font-size: .9rem; margin: 0; }
+
+/* Imagen (si alguna card la usa) */
+.card-media{
+  width: 100%; display:block; object-fit: cover;
+  border-bottom: 1px solid color-mix(in srgb, var(--navbar-bg) 8%, #eef2f4);
+  border-top-left-radius: var(--card-radius);
+  border-top-right-radius: var(--card-radius);
+}
+
+/* Botón primario (paleta tuya) */
+.btn-primary{
+  background-color: #06475B !important;
+  border-color: #06475b !important;
+  color: #fff !important;
+}
+.btn-primary:hover,.btn-primary:focus{
+  background-color: #053645 !important;
+  border-color: #053645 !important;
+  color: #fff !important;
+}
+
+/* 5 columnas en XL */
+.row.row-cols-xl-5 > *{ width: 20%; }
+/* --- Neutraliza fondos heredados dentro de nuestras cards --- */
+.card-custom .card-inner,
+.card-custom .card-body,
+.card-custom .card-title,
+.card-custom .card-meta {
+  background: transparent !important;
+}
+
+/* Si alguna regla ajena está pintando el texto, lo apagamos también */
+.card-custom .card-title *,
+.card-custom .card-meta * {
+  background: transparent !important;
+}
+/* ===== ADMIN: ajustes SOLO dentro de .admin-offset ===== */
+
+/* columnas estiran la card a misma altura */
+.admin-offset .row.g-3 > [class*="col-"]{ display:flex; }
+
+/* card con foto de fondo: altura uniforme y overlay para legibilidad */
+.admin-offset .card-custom{
+  min-height: clamp(280px, 32vh, 400px);
+  background-color: transparent;                  /* no cubre la foto */
+  box-shadow: 0 8px 24px rgba(0,0,0,.18);         /* un poco más de relieve en admin */
+  border: 1px solid rgba(255,255,255,.12);        /* borde sutil sobre foto */
+}
+.admin-offset .card-custom::before{
+  content:"";
+  position:absolute; inset:0;
+  background: linear-gradient(100deg,
+    rgba(6, 28, 36, .28) 0%,
+    rgba(6, 28, 36, .50) 100%
+  );                                              /* velo para textos */
+  z-index: 0;
+}
+
+/* centra contenido y títulos blancos */
+.admin-offset .card-inner{
+  position: relative; z-index: 1;
+  margin: auto;                                   /* centra vertical */
+  padding: 1.1rem;
+  display:flex; flex-direction:column; align-items:center; text-align:center;
+}
+.admin-offset .card-title{
+  color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,.55);
+  letter-spacing: .03em;
+  margin-bottom: .9rem !important;
+}
+
+/* acciones: centradas, con botones iguales y transparentes */
+.admin-offset .card-actions{
+  display:flex; gap:.75rem; flex-wrap:wrap; justify-content:center;
+}
+.admin-offset .btn-group.card-actions{            /* si usás ButtonGroup */
+  display:flex; gap:.75rem; flex-wrap:wrap; justify-content:center;
+}
+
+/* botones transparentes, tamaño fijo, sombrita */
+.admin-offset .card-actions .btn{
+  background: transparent !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,.35) !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,.18);
+  min-width: 11rem;                               /* mismo ancho */
+  height: 2.4rem;                                  /* misma altura */
+  font-weight: 400;
+}
+.admin-offset .card-actions .btn:hover{
+  transform: scale(1.16);
+  border-color: rgba(255,255,255,.55) !important;
+}
+.admin-offset .card-actions .btn:active{ transform: scale(.98); }
