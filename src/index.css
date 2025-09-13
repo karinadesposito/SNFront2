@@ -11,12 +11,6 @@
 html, body, #root {
   height: 100%;
   width: 100%;
-}
-
-/* =========================================
-   Body base
-========================================= */
-html, body {
   margin: 0;
   padding: 0;
   background: #fff;
@@ -60,6 +54,13 @@ main {
   }
 }
 
+/* ▲ Override más moderno (cuando exista): dvh por encima de svh */
+@supports (height: 100dvh) {
+  main {
+    min-height: calc(100dvh - var(--header-h) - var(--footer-h));
+  }
+}
+
 /* =========================================
    Navbar fija (opcional)
    Usá <body class="has-fixed-header"> si tu NavBar es fixed/top
@@ -71,47 +72,28 @@ body.has-fixed-header {
 /* =========================================
    HOME: centrar verticalmente el grid de 3 cards
    (aplicá la clase .home-wrap en el contenedor de las cards)
-========================================= */
-.home-wrap {
-  min-height: calc(100vh - var(--header-h) - var(--footer-h));
-  display: flex;
-  align-items: center;         /* centrado vertical */
-}
+/* ========================================= */
 
-/* Móviles con svh */
-@supports (height: 100svh) {
-  .home-wrap {
-    min-height: calc(100svh - var(--header-h) - var(--footer-h));
-  }
-}
 
 /* Asegurar que el .row ocupe todo el ancho dentro del wrap */
 .home-wrap .row {
   width: 100%;
-}
+} 
 
 /* =========================================
-   Footer tipo “barra” compacto (altura fija)
-   (podés mover estas reglas a footer.css si preferís)
+   Footer tipo “barra” compacto
+   (estética y color en footer.css)
 ========================================= */
-.site-footer {
-  height: var(--footer-h);
-  min-height: var(--footer-h);
-  padding: 6px 0;          /* padding horizontal mínimo */
-  line-height: 1;
-  display: flex;           /* centra verticalmente su contenido */
-  align-items: center;
-  background: #fff;
-  border-top: 1px solid #e5e7eb;
-}
+
 
 /* Evitar espacios verticales extra dentro del footer */
-.site-footer .row {
-  --bs-gutter-y: 0;
-}
+
 
 /* Despega SOLO la vista de Administración de la navbar fixed-top */
 .admin-offset {
   padding-top: var(--header-h, 64px); /* usa la variable si existe, 64px fallback */
 }
 
+/* =========================================
+   HOME background: ocupa el 100% del main
+========================================= */

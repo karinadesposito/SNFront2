@@ -1,8 +1,10 @@
+/* ==============================
+   Cards base (paneles y home)
+============================== */
 .card-custom {
   background-size: cover;
   background-position: center;
   height: 250px;
-
   position: relative;
   display: flex;
   align-items: center;
@@ -16,27 +18,23 @@
   transition: transform 0.25s ease, box-shadow 0.25s ease;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
-
 .card-custom:hover {
   transform: scale(1.015);
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.16);
 }
 
-/* Capa oscura por encima de la imagen */
+/* Capa oscura por encima de la imagen (se anula en variantes que lo necesiten) */
 .card-custom::before {
   content: "";
   position: absolute;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.35); /* MÁS OSCURO que antes */
+  background-color: rgba(0, 0, 0, 0.35);
   transition: background-color 0.25s ease;
   z-index: 1;
 }
+.card-custom:hover::before { background-color: rgba(0, 0, 0, 0.45); }
 
-.card-custom:hover::before {
-  background-color: rgba(0, 0, 0, 0.45);
-}
-
-/* Contenido interno por encima */
+/* Contenido interno sobre la capa */
 .card-inner {
   position: relative;
   z-index: 2;
@@ -50,26 +48,13 @@
 .card-title {
   font-size: clamp(1.2rem, 2.4vw, 1.4rem);
   font-weight: 700;
-  color: #ffffff;
+  color: #fff;
   margin: 0 0 0.5rem;
   text-transform: uppercase;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.65); /* más marcada */
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.65);
 }
 
-/* Botones: fondo sólido sobrio + texto blanco */
-.btn-primary {
-  background-color: #06475B !important; /* gris azulado sobrio */
-  border-color: #06475B !important;
-  color: #ffffff !important;
-}
-
-.btn-primary:hover,
-.btn-primary:focus {
-  background-color: #053645!important; /* aún más oscuro */
-  border-color: #053645 !important;
-  color: #ffffff !important;
-}
-
+/* Acciones (panel admin) */
 .card-actions {
   display: flex;
   gap: 0.5rem;
@@ -77,16 +62,44 @@
   justify-content: center;
 }
 
+/* Botón primario sobrio */
+.btn-primary {
+  background-color: #06475b !important;
+  border-color: #06475b !important;
+  color: #fff !important;
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #053645 !important;
+  border-color: #053645 !important;
+  color: #fff !important;
+}
 .btn.btn-sm {
   padding: 0.45rem 0.75rem;
   font-size: 0.9rem;
   border-radius: 6px;
 }
-/* Fuerza de grid responsivo por columnas iguales (Bootstrap 5) */
+
+/* Sin subrayado en links de cards */
+.card-custom a,
+.no-underline {
+  text-decoration: none !important;
+}
+
+/* ==============================
+   Grid responsivo (equal columns)
+============================== */
 .row.row-cols-1 > * { width: 100%; }
 @media (min-width: 576px) {
   .row.row-cols-sm-2 > * { width: 50%; }
 }
 @media (min-width: 992px) {
   .row.row-cols-lg-3 > * { width: 33.333333%; }
+}
+
+/* ==============================
+   Offset SOLO para /admin con navbar fixed
+============================== */
+.admin-offset {
+  padding-top: var(--header-h, 64px);
 }
