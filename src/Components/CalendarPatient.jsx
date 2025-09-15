@@ -141,11 +141,7 @@ const CalendarPatient = () => {
     setLoading(true);
     fetch(`${apiUrl}/schedules/available/by-doctor/${selectedDoctor}`)
       .then((res) => res.json())
-     // .then((data) => setAvailableDates(Array.isArray(data) ? data : []))
-     .then((data) => {
-  console.log("Disponibilidad:", data);
-  setAvailableDates(Array.isArray(data.data) ? data.data : []);
-})
+      .then((data) => setAvailableDates(Array.isArray(data.data) ? data.data : []))
       .catch(() => setAvailableDates([]))
       .finally(() => setLoading(false));
   }, [selectedDoctor, apiUrl]);
