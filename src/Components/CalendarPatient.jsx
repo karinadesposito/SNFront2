@@ -85,7 +85,7 @@ const CalendarPatient = () => {
           email: data.email,
         },
       };
-
+console.log("Payload que mando al backend:", payload);
       const response = await fetch(`${apiUrl}/schedules/book`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -109,19 +109,24 @@ const CalendarPatient = () => {
 
       // Refrescar disponibilidad del médico
       fetch(`${apiUrl}/schedules/available/by-doctor/${selectedDoctor}`)
-        .then((res) => res.json())
-        .then((data) => setAvailableDates(Array.isArray(data) ? data : []))
-        .catch(() => {});
-    } catch (error) {
-      Swal.fire("Error", error.message, "error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+      .then((res) => res.json())
+      .then((result) => {
+        const schedules = result?.data?.schedules || [];
+        setAvailableDates(schedules);
+      })
+      .catch(() => setAvailableDates([]))
+      .finally(() => setLoading(false));
+  } catch (err) {
+    console.error(err);
+    Swal.fire("Error", err.message || "Error inesperado", "error");
+    setLoading(false);
+  }
+};
+  
+ 
   // Carga inicial
   useEffect(() => {
-    fetch(`${apiUrl}/doctor/basic`)
+    fetch(`${apiUrl}/doctor`)
       .then((res) => res.json())
       .then((data) => setDoctors(data?.data || data))
       .catch(() => setDoctors([]));
@@ -140,11 +145,26 @@ const CalendarPatient = () => {
     setAvailableDates([]);
     setLoading(true);
     fetch(`${apiUrl}/schedules/available/by-doctor/${selectedDoctor}`)
-      .then((res) => res.json())
-      .then((data) => setAvailableDates(Array.isArray(data) ? data : []))
-      .catch(() => setAvailableDates([]))
-      .finally(() => setLoading(false));
-  }, [selectedDoctor, apiUrl]);
+    .then((res) => res.json())
+    .then((data) => {
+      // Normalizamos: puede venir en data.data.schedules o directamente en data (por back distintos handlers)
+      const schedules =
+    
+        // caso estándar: { message, data: { doctor, schedules: [...] }, statusCode }
+        data?.data?.schedules ??
+        // en caso raro: { doctor, schedules: [...] }
+        data?.schedules ??
+        // o si el backend ya devolvió directamente un array (compatibilidad)
+        (Array.isArray(data) ? data : []);
+         
+      setAvailableDates(schedules);
+    })
+    .catch((err) => {
+      console.error('Error al cargar disponibilidad:', err);
+      setAvailableDates([]);
+    })
+    .finally(() => setLoading(false));
+}, [selectedDoctor, apiUrl]);
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
