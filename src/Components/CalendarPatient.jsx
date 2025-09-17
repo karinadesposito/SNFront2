@@ -2,7 +2,15 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import Swal from "sweetalert2";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Container, Row, Col, Form, Button, ListGroup, Modal } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Form,
+  Button,
+  ListGroup,
+  Modal,
+} from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import Select from "react-select";
 
@@ -40,7 +48,7 @@ const CalendarPatient = () => {
   const [loading, setLoading] = useState(false);
 
   // Cola para abrir Swal después de cerrar el Modal (evita conflicto de foco/aria-hidden)
-  const [queuedSwal,setQueuedSwal] = useState(null);
+  const [queuedSwal, setQueuedSwal] = useState(null);
 
   // Ajuste de altura para panel de horarios
   const calWrapRef = useRef(null);
@@ -68,12 +76,38 @@ const CalendarPatient = () => {
 
   // ====== RESERVA ======
   const onSubmit = async (data) => {
-    try {
-      if (!selectedDoctor || !selectedDate || !selectedSlot) {
-        Swal.fire("Faltan datos", "Seleccioná profesional, día y horario", "info");
-        return;
-      }
+    if (!selectedDoctor || !selectedDate || !selectedSlot) {
+      Swal.fire(
+        "Faltan datos",
+        "Seleccioná profesional, día y horario",
+        "info"
+      );
+      return;
+    }
 
+    // 🔔 Confirmación antes de enviar
+    const result = await Swal.fire({
+      title: "¿Confirmar turno?",
+      html: `
+      <strong>Fecha:</strong> ${selectedDate?.toLocaleDateString()} <br/>
+      <strong>Hora:</strong> ${selectedSlot?.time ?? "—"} <br/>
+      <strong>Médico:</strong> ${
+        doctors.find((d) => d.id === selectedDoctor)?.fullName ?? "—"
+      } <br/>
+      <strong>Paciente:</strong> ${data.fullName} <br/>
+      <strong>DNI:</strong> ${data.dni} <br/>
+      <strong>Teléfono:</strong> ${data.phone} <br/>
+      <strong>Email:</strong> ${data.email}
+    `,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, reservar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
       setLoading(true);
 
       const payload = {
@@ -85,7 +119,7 @@ const CalendarPatient = () => {
           email: data.email,
         },
       };
-console.log("Payload que mando al backend:", payload);
+
       const response = await fetch(`${apiUrl}/schedules/book`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -93,37 +127,50 @@ console.log("Payload que mando al backend:", payload);
       });
 
       const result = await response.json();
-      if (!response.ok) throw new Error(result?.message || "Error al reservar turno");
+      if (!response.ok)
+        throw new Error(result?.message || "Error al reservar turno");
 
       // Guardamos datos crudos para el 2º Swal (evita desfase por timezone)
       const doctorName = result?.schedule?.doctor?.fullName || "el profesional";
-      const dayStr = result?.schedule?.day;         // "YYYY-MM-DD"
+      const dayStr = result?.schedule?.day; // "YYYY-MM-DD"
       const timeStr = result?.schedule?.start_Time; // "HH:mm"
       setQueuedSwal({ doctorName, dayStr, timeStr });
 
-      // Actualizamos UI y cerramos modal (el/los Swal se disparan en onExited)
-      setSlots((prev) => prev.filter((t) => t.idSchedule !== selectedSlot.idSchedule));
+      // Actualizamos UI y cerramos modal
+      setSlots((prev) =>
+        prev.filter((t) => t.idSchedule !== selectedSlot.idSchedule)
+      );
       setSelectedSlot(null);
       setShowForm(false);
       reset();
 
       // Refrescar disponibilidad del médico
       fetch(`${apiUrl}/schedules/available/by-doctor/${selectedDoctor}`)
-      .then((res) => res.json())
-      .then((result) => {
-        const schedules = result?.data?.schedules || [];
-        setAvailableDates(schedules);
-      })
-      .catch(() => setAvailableDates([]))
-      .finally(() => setLoading(false));
-  } catch (err) {
-    console.error(err);
-    Swal.fire("Error", err.message || "Error inesperado", "error");
-    setLoading(false);
-  }
-};
-  
- 
+        .then((res) => res.json())
+        .then((result) => {
+          const schedules = result?.data?.schedules || [];
+          setAvailableDates(schedules);
+        })
+        .catch(() => setAvailableDates([]))
+        .finally(() => setLoading(false));
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", err.message || "Error inesperado", "error");
+      setLoading(false);
+    }
+  };
+
+  // ====== ERRORES DE FORMULARIO ======
+  const onError = (errors) => {
+    const messages = Object.values(errors).map((err) => `- ${err.message}`);
+
+    Swal.fire({
+      icon: "error",
+      title: "Errores en el formulario",
+      html: messages.join("<br/>"),
+      confirmButtonText: "OK",
+    });
+  };
   // Carga inicial
   useEffect(() => {
     fetch(`${apiUrl}/doctor`)
@@ -145,26 +192,25 @@ console.log("Payload que mando al backend:", payload);
     setAvailableDates([]);
     setLoading(true);
     fetch(`${apiUrl}/schedules/available/by-doctor/${selectedDoctor}`)
-    .then((res) => res.json())
-    .then((data) => {
-      // Normalizamos: puede venir en data.data.schedules o directamente en data (por back distintos handlers)
-      const schedules =
-    
-        // caso estándar: { message, data: { doctor, schedules: [...] }, statusCode }
-        data?.data?.schedules ??
-        // en caso raro: { doctor, schedules: [...] }
-        data?.schedules ??
-        // o si el backend ya devolvió directamente un array (compatibilidad)
-        (Array.isArray(data) ? data : []);
-         
-      setAvailableDates(schedules);
-    })
-    .catch((err) => {
-      console.error('Error al cargar disponibilidad:', err);
-      setAvailableDates([]);
-    })
-    .finally(() => setLoading(false));
-}, [selectedDoctor, apiUrl]);
+      .then((res) => res.json())
+      .then((data) => {
+        // Normalizamos: puede venir en data.data.schedules o directamente en data (por back distintos handlers)
+        const schedules =
+          // caso estándar: { message, data: { doctor, schedules: [...] }, statusCode }
+          data?.data?.schedules ??
+          // en caso raro: { doctor, schedules: [...] }
+          data?.schedules ??
+          // o si el backend ya devolvió directamente un array (compatibilidad)
+          (Array.isArray(data) ? data : []);
+
+        setAvailableDates(schedules);
+      })
+      .catch((err) => {
+        console.error("Error al cargar disponibilidad:", err);
+        setAvailableDates([]);
+      })
+      .finally(() => setLoading(false));
+  }, [selectedDoctor, apiUrl]);
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
@@ -312,7 +358,9 @@ console.log("Payload que mando al backend:", payload);
                       placeholder="-- Seleccione --"
                       options={filteredDoctorOptions}
                       value={
-                        filteredDoctorOptions.find((o) => o.value === selectedDoctor) || null
+                        filteredDoctorOptions.find(
+                          (o) => o.value === selectedDoctor
+                        ) || null
                       }
                       onChange={(opt) => {
                         setSelectedDoctor(opt?.value ?? null);
@@ -339,7 +387,9 @@ console.log("Payload que mando al backend:", payload);
                 />
               </div>
               {loading && (
-                <div className="mt-2 small text-muted">Cargando disponibilidad…</div>
+                <div className="mt-2 small text-muted">
+                  Cargando disponibilidad…
+                </div>
               )}
             </Col>
 
@@ -369,7 +419,9 @@ console.log("Payload que mando al backend:", payload);
                         </ListGroup.Item>
                       ))
                     ) : (
-                      <ListGroup.Item>No hay turnos disponibles.</ListGroup.Item>
+                      <ListGroup.Item>
+                        No hay turnos disponibles.
+                      </ListGroup.Item>
                     )}
                   </ListGroup>
                 </div>
@@ -420,14 +472,15 @@ console.log("Payload que mando al backend:", payload);
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form onSubmit={handleSubmit(onSubmit)}>
+          <Form onSubmit={handleSubmit(onSubmit, onError)}>
             <Row>
               <Col md={12} className="mb-3">
                 <div className="text-muted small">
                   <strong>Médico:</strong>{" "}
                   {doctors?.length
-                    ? (doctors.find((d) => d.id === selectedDoctor)?.fullName || "—")
-                    : (selectedDoctor ?? "—")}
+                    ? doctors.find((d) => d.id === selectedDoctor)?.fullName ||
+                      "—"
+                    : selectedDoctor ?? "—"}
                 </div>
               </Col>
 
@@ -440,11 +493,18 @@ console.log("Payload que mando al backend:", payload);
                 <Form.Control
                   type="text"
                   placeholder="Ej: Juan Pérez"
-                  {...register("fullName", { required: true })}
+                  {...register("fullName", {
+                    required: "El nombre es obligatorio",
+                    minLength: {
+                      value: 3,
+                      message: "Debe tener al menos 3 caracteres",
+                    },
+                    maxLength: {
+                      value: 30,
+                      message: "No puede superar los 30 caracteres",
+                    },
+                  })}
                 />
-                {errors.fullName && (
-                  <span className="text-danger">Este campo es obligatorio</span>
-                )}
               </Col>
 
               <Col md={6} className="mb-3">
@@ -452,11 +512,15 @@ console.log("Payload que mando al backend:", payload);
                 <Form.Control
                   type="text"
                   placeholder="Ej: 30111222"
-                  {...register("dni", { required: true })}
+                  {...register("dni", {
+                    required: "El DNI es obligatorio",
+                    pattern: {
+                      value: /^[1-9]\d{7}$/,
+                      message:
+                        "El DNI debe tener 8 dígitos sin ceros iniciales",
+                    },
+                  })}
                 />
-                {errors.dni && (
-                  <span className="text-danger">Este campo es obligatorio</span>
-                )}
               </Col>
 
               <Col md={6} className="mb-3">
@@ -464,11 +528,15 @@ console.log("Payload que mando al backend:", payload);
                 <Form.Control
                   type="text"
                   placeholder="Ej: 2215555555"
-                  {...register("phone", { required: true })}
+                  {...register("phone", {
+                    required: "El teléfono es obligatorio",
+                    pattern: {
+                      value: /^[1-9]\d{9}$/,
+                      message:
+                        "El teléfono debe tener 10 dígitos sin 0 inicial ni guiones",
+                    },
+                  })}
                 />
-                {errors.phone && (
-                  <span className="text-danger">Este campo es obligatorio</span>
-                )}
               </Col>
 
               <Col md={12} className="mb-3">
@@ -476,11 +544,14 @@ console.log("Payload que mando al backend:", payload);
                 <Form.Control
                   type="email"
                   placeholder="Ej: paciente@email.com"
-                  {...register("email", { required: true })}
+                  {...register("email", {
+                    required: "El correo es obligatorio",
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: "Debe ser un correo válido",
+                    },
+                  })}
                 />
-                {errors.email && (
-                  <span className="text-danger">Este campo es obligatorio</span>
-                )}
               </Col>
             </Row>
 
