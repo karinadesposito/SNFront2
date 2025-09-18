@@ -493,6 +493,13 @@ const CalendarPatient = () => {
                 <Form.Control
                   type="text"
                   placeholder="Ej: Juan Pérez"
+                  maxLength={30}
+                  onInput={(e) => {
+                    e.target.value = e.target.value.replace(
+                      /[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g,
+                      ""
+                    );
+                  }}
                   {...register("fullName", {
                     required: "El nombre es obligatorio",
                     minLength: {
@@ -503,6 +510,10 @@ const CalendarPatient = () => {
                       value: 30,
                       message: "No puede superar los 30 caracteres",
                     },
+                    pattern: {
+                      value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/,
+                      message: "Solo se permiten letras y espacios",
+                    },
                   })}
                 />
               </Col>
@@ -512,6 +523,10 @@ const CalendarPatient = () => {
                 <Form.Control
                   type="text"
                   placeholder="Ej: 30111222"
+                  maxLength={8}
+                  onInput={(e) => {
+                    e.target.value = e.target.value.replace(/[^0-9]/g, "");
+                  }}
                   {...register("dni", {
                     required: "El DNI es obligatorio",
                     pattern: {
@@ -527,7 +542,11 @@ const CalendarPatient = () => {
                 <Form.Label>Teléfono</Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="Ej: 2215555555"
+                  placeholder="Ej: 2281555555"
+                  maxLength={10}
+                  onInput={(e) => {
+                    e.target.value = e.target.value.replace(/[^0-9]/g, "");
+                  }}
                   {...register("phone", {
                     required: "El teléfono es obligatorio",
                     pattern: {
