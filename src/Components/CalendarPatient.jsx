@@ -1,6 +1,7 @@
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import Swal from "sweetalert2";
+import ReCAPTCHA from "react-google-recaptcha";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   Container,
@@ -54,6 +55,9 @@ const CalendarPatient = () => {
   const calWrapRef = useRef(null);
   const [calHeight, setCalHeight] = useState(0);
 
+  //recaptcha
+  const recaptchaRef = useRef < ReCAPTCHA > null;
+
   useLayoutEffect(() => {
     const el = calWrapRef.current?.querySelector(".react-calendar");
     if (!el) return;
@@ -85,6 +89,14 @@ const CalendarPatient = () => {
       return;
     }
 
+    // recaptcha
+    const token = await recaptchaRef.current?.executeAsync();
+    recaptchaRef.current?.reset();
+    if (!token) {
+      Swal.fire("Error", "No se pudo validar reCAPTCHA", "error");
+      return;
+    }
+
     // 🔔 Confirmación antes de enviar
     const result = await Swal.fire({
       title: "¿Confirmar turno?",
@@ -112,6 +124,7 @@ const CalendarPatient = () => {
 
       const payload = {
         idSchedule: selectedSlot.idSchedule,
+        recaptchaToken: token,
         patient: {
           fullName: data.fullName,
           dni: data.dni,
@@ -442,7 +455,6 @@ const CalendarPatient = () => {
             const { doctorName, dayStr, timeStr } = queuedSwal;
             const fecha = formatDayLocal(dayStr);
 
-            // 1) Swal simple (como estaba antes)
             Swal.fire("¡Turno confirmado!", "", "success").then(() => {
               // 2) Detalle con doctor + fecha + hora (sin desfase)
               Swal.fire({
@@ -573,6 +585,11 @@ const CalendarPatient = () => {
                 />
               </Col>
             </Row>
+            <ReCAPTCHA
+              sitekey="TU_SITE_KEY_DE_JULIO2024"
+              size="invisible"
+              ref={recaptchaRef}
+            />
 
             <div className="d-flex justify-content-end gap-2 mt-2">
               <Button
