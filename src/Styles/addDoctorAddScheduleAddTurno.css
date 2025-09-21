@@ -1,0 +1,91 @@
+/* Marco con borde degradado e interior blanco */
+.adddoctor-frame {
+  /* interior blanco */
+  background:
+    linear-gradient(#35a3b6, #ffffff) padding-box,
+    linear-gradient(
+      180deg,
+      #06475B 0%,
+      #0a6b84 45%,
+      #35a3b6 75%,
+      #6fd7d9 100%
+    ) border-box;
+  border: 2px solid transparent;       /* activa el border-box */
+  border-radius: 12px;
+  padding: 1.5rem;                      /* espacio interno */
+  /* el texto hereda tu tipografía global; color lo define tu tema */
+}
+
+/* Inputs claros con texto oscuro (contraste) */
+.adddoctor-frame .form-control,
+.adddoctor-frame .form-select {
+  background-color: #fff;
+  color: #0b2239;
+}
+
+/* Marco compartido con borde degradado e interior claro */
+.form-panel {
+  background:
+    linear-gradient(#35a3b6, #ffffff) padding-box,
+    linear-gradient(
+      180deg,
+      #06475B 0%,
+      #0a6b84 45%,
+      #35a3b6 75%,
+      #6fd7d9 100%
+    ) border-box;
+  border: 2px solid transparent;   /* activa el border-box */
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+/* Inputs claros con texto oscuro (contraste) */
+.form-panel .form-control,
+.form-panel .form-select {
+  background-color: #fff;
+  color: #0b2239;
+}
+
+/* Botón principal dentro del panel: deja el spacing visual */
+.form-panel .btn-admin.sm {
+  min-width: 240px;
+  box-shadow: 0 10px 20px rgba(0,0,0,.18);
+}
+
+/* Espaciado consistente entre grupos */
+.form-panel .form-text {
+  margin-top: .375rem;
+}
+/* Marco compartido con borde degradado e interior claro */
+.form-panel {
+  background:
+    linear-gradient(#35a3b6, #ffffff) padding-box,
+    linear-gradient(
+      180deg,
+      #06475B 0%,
+      #0a6b84 45%,
+      #35a3b6 75%,
+      #6fd7d9 100%
+    ) border-box;
+  border: 2px solid transparent;   /* activa el border-box */
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+/* Inputs claros con texto oscuro (contraste) */
+.form-panel .form-control,
+.form-panel .form-select {
+  background-color: #fff;
+  color: #0b2239;
+}
+
+/* Botón principal dentro del panel: deja el spacing visual */
+.form-panel .btn-admin.sm {
+  min-width: 240px;
+  box-shadow: 0 10px 20px rgba(0,0,0,.18);
+}
+
+/* Espaciado consistente entre grupos */
+.form-panel .form-text {
+  margin-top: .375rem;
+}

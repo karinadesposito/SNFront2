@@ -12,6 +12,8 @@ const TurnosReport = () => {
   const [data, setData] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [selectedReports, setSelectedReports] = useState(new Set());
+// ✅ nuevo
+const [selectedDoctors, setSelectedDoctors] = useState([]); // array de IDs
 
   const estadosEnum = [
     "disponible",
@@ -42,6 +44,14 @@ const TurnosReport = () => {
         console.error("Error fetching doctor:", error);
       }
     };
+// ✅ usa setIdDoctor (no setSelectedDoctor)
+const toggleDoctor = (id) => {
+  setSelectedDoctorIds(prev =>
+    prev.includes(id) ? prev.filter(d => d !== id) : [...prev, id]
+  );
+  // Compatibilidad con tu lógica existente que usa idDoctor:
+  setIdDoctor(prev => (prev ? prev : id));
+};
 
     fetchDoctors();
   }, [apiUrl]);
@@ -232,7 +242,7 @@ const TurnosReport = () => {
                 onClick={() => updateSelectedReports("EJECUTADO")}
                 disabled={selectedReports.size === 0}
               >
-                Ejecutar Seleccionados
+                Pacientes confirmados
               </button>
               <button
                 type="button"
@@ -287,7 +297,7 @@ const TurnosReport = () => {
                   </td>
                   <td>{turno.doctor?.fullName || "Sin asignar"}</td>
                   <td>{turno.day}</td>
-                  <td>{turno.start_Time}</td>
+                  <td>{turno.startTime}</td>
                   <td>{turno.patient?.fullName || "Sin asignar"}</td>
                   <td>{turno.patient?.phone || "Sin asignar"}</td>
                   {estado === "" && (
@@ -361,7 +371,7 @@ const DoctoresReport = () => {
                     <td>{doc.email}</td>
                     <td>{doc.phone}</td>
                     <td>{doc.speciality?.name || "Sin asignar"}</td>{" "}
-                    {/* CAMBIO: mostramos nombre de la especialidad */}
+                  
                   </tr>
                 ))
               )}
@@ -373,9 +383,7 @@ const DoctoresReport = () => {
   );
 };
 
-const EspecialidadesReport = () => (
-  <div className="text-center my-4">Aquí irá el reporte de Especialidades.</div>
-);
+
 
 // --- Componente principal con Tabs ---
 const Reports = () => {
@@ -391,23 +399,14 @@ const Reports = () => {
         className="mb-3"
         justify
       >
-        <Tab eventKey="general" title="General">
-          <div className="text-center my-4">
-            <p>
-              Selecciona un tipo de reporte para ver la información
-              correspondiente.
-            </p>
-          </div>
-        </Tab>
+      
         <Tab eventKey="turnos" title="Turnos">
           <TurnosReport />
         </Tab>
         <Tab eventKey="doctores" title="Doctores">
           <DoctoresReport />
         </Tab>
-        <Tab eventKey="especialidades" title="Especialidades">
-          <EspecialidadesReport />
-        </Tab>
+     
       </Tabs>
     </Container>
   );

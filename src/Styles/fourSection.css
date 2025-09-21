@@ -1,0 +1,240 @@
+/* Contenedor que hace que las cards se "metan" en el Home y se separen del footer */
+.fs-wrap {
+  position: relative;
+  z-index: 2;
+  margin-top: 50px;   /* se superpone apenas sobre el hero */
+  margin-bottom: 56px; /* separación del footer */
+}
+
+/* Grid: centramos columnas para que las cards angostas no queden pegadas a los bordes */
+.fs-row {
+  justify-content: center;
+}
+
+/* Card base */
+.card-box {
+  position: relative;
+  width: 100%;
+  max-width: 340px;                  /* angostas */
+  height: clamp(420px, 54vh, 520px); /* altas */
+  border-radius: 16px;
+  overflow: hidden;
+
+  background-image: var(--card-bg, none);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  /* separación visual: sombra + contorno sutil para evitar “foto sobre foto” */
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+  outline: 1px solid color-mix(in srgb, #ffffff 70%, rgba(0,0,0,0.2));
+
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.card-box:hover {
+  transform: scale(1.04);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.26);
+}
+
+/* Capas de contenido */
+.card-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+  color: #fff;
+}
+
+/* Título visible por defecto */
+.card-title-only {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.30) 0%,
+    rgba(0, 0, 0, 0.18) 60%,
+    rgba(0, 0, 0, 0.06) 100%
+  );
+}
+
+.card-title {
+  font-weight: 700;
+  letter-spacing:0.5px;
+  text-transform: uppercase;
+  margin: 0;
+  font-size: clamp(1.7rem, 1.8vw, 1.40rem); /* títulos más chicos */
+}
+
+/* Capa hover (mensaje + degradado en gama #06475B) */
+.card-hover {
+  /* Fallback sólido por compatibilidad */
+  background-color: #06475B;
+  /* Degradado */
+  background-image: linear-gradient(
+    180deg,
+    #06475B 0%,
+    #0a6b84 45%,
+    #35a3b6 75%,
+    #6fd7d9 100%
+  );
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.card-box:hover .card-hover {
+  opacity: 0.98;
+}
+
+/* Texto del hover */
+.info-wrap {
+  max-width: 75%;
+}
+
+.info-title {
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.info-text {
+  font-size: 0.95rem;
+  line-height: 1.35;
+  margin: 0 0 18px 0;
+}
+
+/* Flecha CTA */
+.info-arrow {
+  display: inline-flex;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.92);
+  align-items: center;
+  justify-content: center;
+}
+
+.info-arrow svg {
+  width: 22px;
+  height: 22px;
+  transform: translateX(0);
+  transition: transform 200ms ease;
+}
+
+.card-box:hover .info-arrow svg {
+  transform: translateX(4px);
+}
+
+/* Enlaces sin subrayado y heredando color */
+.card-link,
+.card-box .stretched-link {
+  text-decoration: none !important;
+  color: inherit !important;
+}
+
+/* Responsive: en móviles, un poco menos altas */
+@media (max-width: 576px) {
+  .card-box {
+    height: 380px;
+    max-width: 92%;
+  }
+}
+
+/* Botón unificado para Admin */
+.btn-admin{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.4rem;
+  padding:.5rem 1.15rem;
+  border-radius:999px;
+  border:0;
+  color:#fff !important;
+  font-weight:400;
+  text-decoration:none !important;
+  background: var(
+    --navbar-gradient,
+    linear-gradient(
+      150deg,
+      #06475B 0%,
+      #0a6b84 45%,
+      #35a3b6 75%,
+      #6fd7d9 100%
+    )
+  );
+  box-shadow:0 6px 16px rgba(0,0,0,.15);
+  transition: transform .18s ease, filter .18s ease, box-shadow .18s ease;
+}
+.btn-admin:hover,
+.btn-admin:focus{
+  transform:scale(1.04);
+  filter:brightness(1.04);
+}
+.btn-admin:active{ transform:scale(.98); }
+.btn-admin.sm{ padding:.45rem 1rem; font-size:.95rem; }
+
+/* ===== Tamaño SOLO para FourSectionsAdmin ===== */
+.admin-card{
+  height: clamp(320px, 46vh, 420px);
+  max-width: 600px;
+}
+
+/* ↓↓↓ Ajuste para desktop: bajar altura para evitar scroll en /admin */
+@media (min-width: 992px){
+  .admin-card{
+    height: clamp(260px, 32vh, 340px);
+  }
+}
+
+@media (max-width: 576px){
+  .admin-card{
+    height: 360px;
+    max-width: 92%;
+  }
+}
+
+/* contenedor más ancho que .container para achicar márgenes laterales */
+.admin-container.container-xxl {
+  max-width: 1320px;      /* ancho xxl de Bootstrap */
+}
+
+/* padding lateral contenido (más ceñido) */
+.admin-container {
+  padding-inline: 12px;   /* 12px a cada lado */
+}
+
+/* ===== /admin: layout y tamaño propios de FourSectionsAdmin ===== */
+.admin-page {
+  padding-top: 15px;
+}
+
+.admin-container {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 12px;
+}
+/* Centrado en admin sin footer (Flex, mantiene ancho completo) */
+.no-footer .admin-page{
+  min-height: calc(100svh - var(--nav-h));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;   /* centra vertical */
+  padding: 16px 0;
+}
+
+.no-footer .admin-page > .admin-container{
+  width: 100%;               /* evita contracción “angosta” */
+}
+
+.no-footer .admin-page .row{
+  --bs-gutter-y: 1rem;
+  margin: 0;
+}
+
+
+
+
+
