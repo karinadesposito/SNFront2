@@ -29,7 +29,7 @@ const formatDayLocal = (dayStr /* "YYYY-MM-DD" */) => {
 
 const CalendarPatient = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
-
+console.log("ReCAPTCHA KEY:", import.meta.env.VITE_RECAPTCHA_SITE_KEY);
   const [doctors, setDoctors] = useState([]);
   const [specialities, setSpecialities] = useState([]);
 
@@ -56,7 +56,11 @@ const CalendarPatient = () => {
   const [calHeight, setCalHeight] = useState(0);
 
   //recaptcha
-  const recaptchaRef = useRef < ReCAPTCHA > null;
+  // const recaptchaRef = useRef < ReCAPTCHA > null;
+  const recaptchaRef = useRef(null);
+  const setRecaptchaRef = (el) => {
+    recaptchaRef.current = el;
+  };
 
   useLayoutEffect(() => {
     const el = calWrapRef.current?.querySelector(".react-calendar");
@@ -90,8 +94,14 @@ const CalendarPatient = () => {
     }
 
     // recaptcha
-    const token = await recaptchaRef.current?.executeAsync();
-    recaptchaRef.current?.reset();
+     let token = null;
+  try {
+    // Ejecutar reCAPTCHA
+    token = recaptchaRef.current ? await recaptchaRef.current.executeAsync() : null;
+   // const token = recaptchaRef.current
+   //   ? await recaptchaRef.current.executeAsync()
+   //   : null;
+   // recaptchaRef.current?.reset();
     if (!token) {
       Swal.fire("Error", "No se pudo validar reCAPTCHA", "error");
       return;
@@ -119,7 +129,7 @@ const CalendarPatient = () => {
 
     if (!result.isConfirmed) return;
 
-    try {
+    //try {
       setLoading(true);
 
       const payload = {
@@ -139,14 +149,14 @@ const CalendarPatient = () => {
         body: JSON.stringify(payload),
       });
 
-      const result = await response.json();
+      const resultJson = await response.json();
       if (!response.ok)
-        throw new Error(result?.message || "Error al reservar turno");
+        throw new Error(resultJson?.message || "Error al reservar turno");
 
       // Guardamos datos crudos para el 2º Swal (evita desfase por timezone)
-      const doctorName = result?.schedule?.doctor?.fullName || "el profesional";
-      const dayStr = result?.schedule?.day; // "YYYY-MM-DD"
-      const timeStr = result?.schedule?.start_Time; // "HH:mm"
+      const doctorName = resultJson?.schedule?.doctor?.fullName || "el profesional";
+      const dayStr = resultJson?.schedule?.day; // "YYYY-MM-DD"
+      const timeStr = resultJson?.schedule?.start_Time; // "HH:mm"
       setQueuedSwal({ doctorName, dayStr, timeStr });
 
       // Actualizamos UI y cerramos modal
@@ -171,6 +181,10 @@ const CalendarPatient = () => {
       Swal.fire("Error", err.message || "Error inesperado", "error");
       setLoading(false);
     }
+    finally {
+    setLoading(false);
+    recaptchaRef.current?.reset(); 
+  }
   };
 
   // ====== ERRORES DE FORMULARIO ======
@@ -585,12 +599,12 @@ const CalendarPatient = () => {
                 />
               </Col>
             </Row>
+            
             <ReCAPTCHA
-              sitekey="TU_SITE_KEY_DE_JULIO2024"
+              sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
               size="invisible"
-              ref={recaptchaRef}
+              ref={setRecaptchaRef}
             />
-
             <div className="d-flex justify-content-end gap-2 mt-2">
               <Button
                 variant="outline-secondary"

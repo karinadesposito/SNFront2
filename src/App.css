@@ -1,0 +1,5 @@
+.grecaptcha-badge {
+  bottom: 80px !important;  /* lo sube un poco */
+  right: 20px !important;   /* ajusta a la derecha */
+  z-index: 9999;
+}
