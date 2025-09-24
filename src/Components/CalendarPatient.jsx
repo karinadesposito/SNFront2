@@ -29,7 +29,7 @@ const formatDayLocal = (dayStr /* "YYYY-MM-DD" */) => {
 
 const CalendarPatient = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
-console.log("ReCAPTCHA KEY:", import.meta.env.VITE_RECAPTCHA_SITE_KEY);
+ 
   const [doctors, setDoctors] = useState([]);
   const [specialities, setSpecialities] = useState([]);
 
@@ -56,11 +56,8 @@ console.log("ReCAPTCHA KEY:", import.meta.env.VITE_RECAPTCHA_SITE_KEY);
   const [calHeight, setCalHeight] = useState(0);
 
   //recaptcha
-  // const recaptchaRef = useRef < ReCAPTCHA > null;
   const recaptchaRef = useRef(null);
-  const setRecaptchaRef = (el) => {
-    recaptchaRef.current = el;
-  };
+  const [captchaToken, setCaptchaToken] = useState(null);
 
   useLayoutEffect(() => {
     const el = calWrapRef.current?.querySelector(".react-calendar");
@@ -93,24 +90,17 @@ console.log("ReCAPTCHA KEY:", import.meta.env.VITE_RECAPTCHA_SITE_KEY);
       return;
     }
 
-    // recaptcha
-     let token = null;
-  try {
     // Ejecutar reCAPTCHA
-    token = recaptchaRef.current ? await recaptchaRef.current.executeAsync() : null;
-   // const token = recaptchaRef.current
-   //   ? await recaptchaRef.current.executeAsync()
-   //   : null;
-   // recaptchaRef.current?.reset();
-    if (!token) {
-      Swal.fire("Error", "No se pudo validar reCAPTCHA", "error");
+    if (!captchaToken) {
+      Swal.fire("Error", "Por favor completá el reCAPTCHA", "error");
       return;
     }
 
-    // 🔔 Confirmación antes de enviar
-    const result = await Swal.fire({
-      title: "¿Confirmar turno?",
-      html: `
+    try {
+      // 🔔 Confirmación antes de enviar
+      const result = await Swal.fire({
+        title: "¿Confirmar turno?",
+        html: `
       <strong>Fecha:</strong> ${selectedDate?.toLocaleDateString()} <br/>
       <strong>Hora:</strong> ${selectedSlot?.time ?? "—"} <br/>
       <strong>Médico:</strong> ${
@@ -121,20 +111,20 @@ console.log("ReCAPTCHA KEY:", import.meta.env.VITE_RECAPTCHA_SITE_KEY);
       <strong>Teléfono:</strong> ${data.phone} <br/>
       <strong>Email:</strong> ${data.email}
     `,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Sí, reservar",
-      cancelButtonText: "Cancelar",
-    });
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Sí, reservar",
+        cancelButtonText: "Cancelar",
+      });
 
-    if (!result.isConfirmed) return;
+      if (!result.isConfirmed) return;
 
-    //try {
+      //try {
       setLoading(true);
 
       const payload = {
         idSchedule: selectedSlot.idSchedule,
-        recaptchaToken: token,
+        recaptchaToken: captchaToken,
         patient: {
           fullName: data.fullName,
           dni: data.dni,
@@ -154,7 +144,8 @@ console.log("ReCAPTCHA KEY:", import.meta.env.VITE_RECAPTCHA_SITE_KEY);
         throw new Error(resultJson?.message || "Error al reservar turno");
 
       // Guardamos datos crudos para el 2º Swal (evita desfase por timezone)
-      const doctorName = resultJson?.schedule?.doctor?.fullName || "el profesional";
+      const doctorName =
+        resultJson?.schedule?.doctor?.fullName || "el profesional";
       const dayStr = resultJson?.schedule?.day; // "YYYY-MM-DD"
       const timeStr = resultJson?.schedule?.start_Time; // "HH:mm"
       setQueuedSwal({ doctorName, dayStr, timeStr });
@@ -180,11 +171,11 @@ console.log("ReCAPTCHA KEY:", import.meta.env.VITE_RECAPTCHA_SITE_KEY);
       console.error(err);
       Swal.fire("Error", err.message || "Error inesperado", "error");
       setLoading(false);
+    } finally {
+      setLoading(false);
+      recaptchaRef.current?.reset();
+      setCaptchaToken(null);
     }
-    finally {
-    setLoading(false);
-    recaptchaRef.current?.reset(); 
-  }
   };
 
   // ====== ERRORES DE FORMULARIO ======
@@ -599,11 +590,11 @@ console.log("ReCAPTCHA KEY:", import.meta.env.VITE_RECAPTCHA_SITE_KEY);
                 />
               </Col>
             </Row>
-            
+
             <ReCAPTCHA
               sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
-              size="invisible"
-              ref={setRecaptchaRef}
+              onChange={(token) => setCaptchaToken(token)}
+              ref={recaptchaRef}
             />
             <div className="d-flex justify-content-end gap-2 mt-2">
               <Button
