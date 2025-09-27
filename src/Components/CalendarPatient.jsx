@@ -2,7 +2,15 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import Swal from "sweetalert2";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Container, Row, Col, Form, Button, ListGroup, Modal } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Form,
+  Button,
+  ListGroup,
+  Modal,
+} from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import Select from "react-select";
 
@@ -38,6 +46,13 @@ const CalendarPatient = () => {
 
   // [{ date: 'YYYY-MM-DD', timeSlots: ['HH:mm:ss', ...] }]
   const [availableDates, setAvailableDates] = useState([]);
+  // Set con fechas disponibles para pintar el calendario en O(1)
+  const availableDateSet = useMemo(() => {
+    const s = new Set();
+    for (const it of availableDates || []) if (it?.date) s.add(it.date);
+    return s;
+  }, [availableDates]);
+
   const [selectedDate, setSelectedDate] = useState(null);
 
   // [{ idSchedule, time:'HH:mm' }]
@@ -78,7 +93,11 @@ const CalendarPatient = () => {
   const onSubmit = async (data) => {
     try {
       if (!selectedDoctor || !selectedDate || !selectedSlot) {
-        Swal.fire("Faltan datos", "Seleccioná profesional, día y horario", "info");
+        Swal.fire(
+          "Faltan datos",
+          "Seleccioná profesional, día y horario",
+          "info"
+        );
         return;
       }
 
@@ -101,7 +120,8 @@ const CalendarPatient = () => {
       });
 
       const result = await response.json();
-      if (!response.ok) throw new Error(result?.message || "Error al reservar turno");
+      if (!response.ok)
+        throw new Error(result?.message || "Error al reservar turno");
 
       // Guardamos datos crudos para el 2º Swal
       const saved = result?.data || result;
@@ -111,7 +131,9 @@ const CalendarPatient = () => {
       setQueuedSwal({ doctorName, dayStr, timeStr });
 
       // Actualizamos UI y cerramos modal
-      setSlots((prev) => prev.filter((t) => t.idSchedule !== selectedSlot.idSchedule));
+      setSlots((prev) =>
+        prev.filter((t) => t.idSchedule !== selectedSlot.idSchedule)
+      );
       setSelectedSlot(null);
       setShowForm(false);
       reset();
@@ -328,7 +350,9 @@ const CalendarPatient = () => {
                         placeholder="-- Seleccione --"
                         options={filteredDoctorOptions}
                         value={
-                          filteredDoctorOptions.find((o) => o.value === selectedDoctor) || null
+                          filteredDoctorOptions.find(
+                            (o) => o.value === selectedDoctor
+                          ) || null
                         }
                         onChange={(opt) => {
                           setSelectedDoctor(opt?.value ?? null);
@@ -348,14 +372,32 @@ const CalendarPatient = () => {
             <Row className="mt-4 align-items-stretch">
               <Col md={6} className="mb-4 mb-md-0">
                 <div className="d-flex justify-content-center" ref={calWrapRef}>
-                  <Calendar onChange={handleDateChange} value={selectedDate} tileDisabled={tileDisabled} />
+                  <Calendar
+                    onChange={handleDateChange}
+                    value={selectedDate}
+                    tileDisabled={tileDisabled}
+                    /* Marca con clase los días que tienen turnos disponibles */
+                    tileClassName={({ date, view }) =>
+                      view === "month" && availableDateSet.has(toYMDLocal(date))
+                        ? "has-slots"
+                        : undefined
+                    }
+                  />
                 </div>
-                {loading && <div className="mt-2 small text-muted">Cargando disponibilidad…</div>}
+
+                {loading && (
+                  <div className="mt-2 small text-muted">
+                    Cargando disponibilidad…
+                  </div>
+                )}
               </Col>
 
               <Col md={6}>
                 {selectedDate && (
-                  <div className="slots-panel d-flex flex-column" style={{ height: calHeight || "auto" }}>
+                  <div
+                    className="slots-panel d-flex flex-column"
+                    style={{ height: calHeight || "auto" }}
+                  >
                     <h5 className="mb-3">
                       Horarios para el {selectedDate.toLocaleDateString()}
                     </h5>
@@ -366,7 +408,9 @@ const CalendarPatient = () => {
                           <ListGroup.Item
                             key={slot.idSchedule}
                             action
-                            active={selectedSlot?.idSchedule === slot.idSchedule}
+                            active={
+                              selectedSlot?.idSchedule === slot.idSchedule
+                            }
                             onClick={() => {
                               setSelectedSlot(slot);
                               setShowForm(true);
@@ -376,7 +420,9 @@ const CalendarPatient = () => {
                           </ListGroup.Item>
                         ))
                       ) : (
-                        <ListGroup.Item>No hay turnos disponibles.</ListGroup.Item>
+                        <ListGroup.Item>
+                          No hay turnos disponibles.
+                        </ListGroup.Item>
                       )}
                     </ListGroup>
                   </div>
@@ -432,7 +478,8 @@ const CalendarPatient = () => {
                 <div className="text-muted small">
                   <strong>Médico:</strong>{" "}
                   {doctors?.length
-                    ? doctors.find((d) => d.id === selectedDoctor)?.fullName || "—"
+                    ? doctors.find((d) => d.id === selectedDoctor)?.fullName ||
+                      "—"
                     : selectedDoctor ?? "—"}
                 </div>
               </Col>
@@ -448,7 +495,9 @@ const CalendarPatient = () => {
                   placeholder="Ej: Juan Pérez"
                   {...register("fullName", { required: true })}
                 />
-                {errors.fullName && <span className="text-danger">Este campo es obligatorio</span>}
+                {errors.fullName && (
+                  <span className="text-danger">Este campo es obligatorio</span>
+                )}
               </Col>
 
               <Col md={6} className="mb-3">
@@ -458,7 +507,9 @@ const CalendarPatient = () => {
                   placeholder="Ej: 30111222"
                   {...register("dni", { required: true })}
                 />
-                {errors.dni && <span className="text-danger">Este campo es obligatorio</span>}
+                {errors.dni && (
+                  <span className="text-danger">Este campo es obligatorio</span>
+                )}
               </Col>
 
               <Col md={6} className="mb-3">
@@ -468,7 +519,9 @@ const CalendarPatient = () => {
                   placeholder="Ej: 2215555555"
                   {...register("phone", { required: true })}
                 />
-                {errors.phone && <span className="text-danger">Este campo es obligatorio</span>}
+                {errors.phone && (
+                  <span className="text-danger">Este campo es obligatorio</span>
+                )}
               </Col>
 
               <Col md={12} className="mb-3">
@@ -478,7 +531,9 @@ const CalendarPatient = () => {
                   placeholder="Ej: paciente@email.com"
                   {...register("email", { required: true })}
                 />
-                {errors.email && <span className="text-danger">Este campo es obligatorio</span>}
+                {errors.email && (
+                  <span className="text-danger">Este campo es obligatorio</span>
+                )}
               </Col>
             </Row>
 
@@ -505,4 +560,3 @@ const CalendarPatient = () => {
 };
 
 export default CalendarPatient;
-

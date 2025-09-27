@@ -180,11 +180,12 @@ const AddDoctor = () => {
             </Col>
           </Row>
 
-          <div className="text-center">
-            <Button type="submit" className="btn-admin sm">
-              Crear Profesional
-            </Button>
-          </div>
+       <div className="text-center">
+  <Button type="submit" bsPrefix="btn-admin" className="sm">
+    Crear Profesional
+  </Button>
+</div>
+
         </Form>
       </div>
     </Container>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../Styles/contacto.css";
+import { Button } from "react-bootstrap"; 
 
 export default function Contacto() {
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -91,9 +91,9 @@ export default function Contacto() {
                 />
               </div>
 
-              <button type="submit" className="btn-contact">
+                <Button type="submit" bsPrefix="btn-admin" className="sm">
                 ENVIAR
-              </button>
+                </Button>
             </form>
           </div>
 
@@ -103,7 +103,12 @@ export default function Contacto() {
               {/* Dirección */}
               <div className="mb-4">
                 <div className="contact-item">
-                  <svg className="contact-ico" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <svg
+                    className="contact-ico"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
                     <path
                       d="M12 21s7-6.307 7-11A7 7 0 1 0 5 10c0 4.693 7 11 7 11Z"
                       stroke="currentColor"
@@ -127,7 +132,12 @@ export default function Contacto() {
               {/* Teléfonos */}
               <div className="mb-4">
                 <div className="contact-item">
-                  <svg className="contact-ico" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <svg
+                    className="contact-ico"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
                     <path
                       d="M22 16.92v2a2 2 0 0 1-2.18 2 19.77 19.77 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.77 19.77 0 0 1 2.92 4.18 2 2 0 0 1 4.86 2h2a2 2 0 0 1 2 1.72c.12.86.31 1.7.57 2.5a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.58-1.58a2 2 0 0 1 2.11-.45c.8.26 1.64.45 2.5.57A2 2 0 0 1 22 16.92Z"
                       stroke="currentColor"
@@ -148,7 +158,12 @@ export default function Contacto() {
               {/* Correo */}
               <div className="mb-3">
                 <div className="contact-item">
-                  <svg className="contact-ico" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <svg
+                    className="contact-ico"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
                     <path
                       d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z"
                       stroke="currentColor"
@@ -180,23 +195,32 @@ export default function Contacto() {
                   />
                 ) : (
                   <div className="map-placeholder">
-                    <svg className="map-ico" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <svg
+                      className="map-ico"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      aria-hidden="true"
+                    >
                       <path
                         d="M12 21s7-6.307 7-11A7 7 0 1 0 5 10c0 4.693 7 11 7 11Z"
                         stroke="#fff"
                         strokeWidth="2"
                       />
-                      <circle cx="12" cy="10" r="2.5" stroke="#fff" strokeWidth="2" />
+                      <circle
+                        cx="12"
+                        cy="10"
+                        r="2.5"
+                        stroke="#fff"
+                        strokeWidth="2"
+                      />
                     </svg>
                     <button
-                      type="button"
                       className="map-btn"
                       onClick={() => setMapLoaded(true)}
-                      aria-label="Cargar mapa interactivo"
+                    
                     >
                       Ver mapa
                     </button>
-              
                   </div>
                 )}
               </div>
@@ -208,4 +232,3 @@ export default function Contacto() {
     </section>
   );
 }
-

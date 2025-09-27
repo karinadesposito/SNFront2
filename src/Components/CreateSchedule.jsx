@@ -173,10 +173,7 @@ const CreateSchedule = () => {
                     })
                   }
                 />
-                <Form.Text muted>
-                  Si lo dejás vacío o menor a 5, el backend usará 30 minutos por
-                  defecto.
-                </Form.Text>
+              
               </Form.Group>
             </Col>
           </Row>
@@ -195,9 +192,7 @@ const CreateSchedule = () => {
                 />
               ))}
             </div>
-            <Form.Text muted>
-              Se envían en inglés: monday…sunday (lo manejamos automáticamente).
-            </Form.Text>
+           
           </Form.Group>
 
           <Form.Label>Rangos Horarios</Form.Label>
@@ -237,7 +232,7 @@ const CreateSchedule = () => {
           </Button>
 
           <div className="text-center">
-            <Button type="submit" className="btn-admin sm">
+            <Button type="submit" bsPrefix="btn-admin" className="sm">
               Crear Agenda
             </Button>
           </div>

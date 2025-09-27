@@ -1,18 +1,7 @@
-.card-body{
-  /* interior blanco */
-  background:
-    linear-gradient(#35a3b6, #ffffff) padding-box,
-    linear-gradient(
-      180deg,
-      #06475B 0%,
-      #0a6b84 45%,
-      #35a3b6 75%,
-      #6fd7d9 100%
-    ) border-box;
-  border: 2px solid transparent;       /* activa el border-box */
+.card-body {
+  background: linear-gradient(#8fc9ca) padding-box, border-box;
   border-radius: 12px;
-  padding: 1rem;                      /* espacio interno */
-  /* el texto hereda tu tipografía global; color lo define tu tema */
+  padding: 1rem;
 }
 
 .card-body,

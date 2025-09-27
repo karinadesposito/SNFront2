@@ -155,26 +155,24 @@
   color:#fff !important;
   font-weight:400;
   text-decoration:none !important;
-  background: var(
-    --navbar-gradient,
-    linear-gradient(
-      150deg,
-      #06475B 0%,
-      #0a6b84 45%,
-      #35a3b6 75%,
-      #6fd7d9 100%
-    )
-  );
+
+  /* ⬇️ Antes: background: var(--navbar-gradient, linear-gradient(...)) */
+  background: var(--brand, #06475B); /* sólido, sin degradado */
+
   box-shadow:0 6px 16px rgba(0,0,0,.15);
   transition: transform .18s ease, filter .18s ease, box-shadow .18s ease;
 }
+
 .btn-admin:hover,
 .btn-admin:focus{
   transform:scale(1.04);
   filter:brightness(1.04);
 }
+
 .btn-admin:active{ transform:scale(.98); }
+
 .btn-admin.sm{ padding:.45rem 1rem; font-size:.95rem; }
+
 
 /* ===== Tamaño SOLO para FourSectionsAdmin ===== */
 .admin-card{

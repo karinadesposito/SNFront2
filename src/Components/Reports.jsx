@@ -147,8 +147,8 @@ const toggleDoctor = (id) => {
   return (
     <div>
       <h2 className="text-center mb-4 text-white">Reportes de Turnos</h2>
-      <div className="card shadow mb-4">
-        <div className="card-body">
+     
+     <div className="adddoctor-frame">
           <form className="row g-3">
             <div className="col-md-3">
               <label htmlFor="estado" className="form-label">
@@ -254,11 +254,10 @@ const toggleDoctor = (id) => {
               </button>
             </div>
           </form>
-        </div>
+       
       </div>
 
-      <div className="card shadow">
-        <div className="card-body">
+      <div className="adddoctor-frame">
           <table className="table table-hover">
             <thead className="table-light">
               <tr>
@@ -309,7 +308,7 @@ const toggleDoctor = (id) => {
           </table>
         </div>
       </div>
-    </div>
+   
   );
 };
 
