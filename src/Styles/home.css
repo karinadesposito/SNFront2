@@ -71,3 +71,10 @@
     background-position: 58% 10vh; /* baja ~10vh para ver mejor la parte de arriba */
   }
 }
+/* Pegar al final de home.css */
+.home-bg {
+  /* sube el hero para cubrir el padding del main */
+  margin-top: calc(-1 * var(--nav-h));
+  /* devuelve el respiro arriba del contenido del hero */
+  padding-top: calc(var(--nav-h) + clamp(48px, 8vh, 96px));
+}
