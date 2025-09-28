@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Form,
-  Button,
-  Row,
-  Col,
-  InputGroup,
-} from "react-bootstrap";
+import { Container, Form, Button, Row, Col, InputGroup } from "react-bootstrap";
 
 const diasCastellano = [
   { key: "monday", label: "Lunes" },
@@ -32,7 +25,7 @@ const CreateSchedule = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    fetch(`${apiUrl}/doctor/basic`)
+    fetch(`${apiUrl}/doctor`)
       .then((res) => res.json())
       .then((data) => {
         const doctorList = data?.data || data;
@@ -59,10 +52,10 @@ const CreateSchedule = () => {
   };
 
   const addTimeRange = () => {
-    setFormData({
-      ...formData,
-      timeRanges: [...formData.timeRanges, { start: "", end: "" }],
-    });
+    setFormData((prev) => ({
+      ...prev,
+      timeRanges: [...prev.timeRanges, { start: "", end: "" }],
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -102,139 +95,152 @@ const CreateSchedule = () => {
   return (
     <Container className="my-4">
       <h2 className="text-center text-white mb-4">Crear Agenda de Turnos</h2>
-      <Form onSubmit={handleSubmit}>
-        <Row className="mb-3">
-          <Col md={6}>
-            <Form.Group controlId="idDoctor">
-              <Form.Label>Seleccionar Doctor</Form.Label>
-              <Form.Select
-                name="idDoctor"
-                value={formData.idDoctor}
-                onChange={(e) =>
-                  setFormData({ ...formData, idDoctor: e.target.value })
-                }
-                required
-              >
-                <option value="">Seleccione un doctor</option>
-                {doctors.map((doctor) => (
-                  <option key={doctor.id} value={doctor.id}>
-                    {doctor.fullName} - Matrícula {doctor.license}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-          </Col>
-          <Col md={6}>
-            <Form.Group controlId="startDate">
-              <Form.Label>Fecha de Inicio</Form.Label>
-              <Form.Control
-                type="date"
-                name="startDate"
-                value={formData.startDate}
-                onChange={(e) =>
-                  setFormData({ ...formData, startDate: e.target.value })
-                }
-                required
-              />
-            </Form.Group>
-          </Col>
-        </Row>
 
-        <Row className="mb-3">
-          <Col md={6}>
-            <Form.Group controlId="numberOfWeeks">
-              <Form.Label>Cantidad de Semanas</Form.Label>
-              <Form.Control
-                type="number"
-                name="numberOfWeeks"
-                value={formData.numberOfWeeks}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    numberOfWeeks: parseInt(e.target.value),
-                  })
-                }
-                required
-              />
-            </Form.Group>
-          </Col>
-          <Col md={6}>
-            <Form.Group controlId="interval">
-              <Form.Label>Duración del Turno (minutos)</Form.Label>
-              <Form.Control
-                type="number"
-                name="interval"
-                value={formData.interval}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    interval: parseInt(e.target.value),
-                  })
-                }
-              />
-            </Form.Group>
-          </Col>
-        </Row>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Días de Atención</Form.Label>
-          <div className="d-flex flex-wrap">
-            {diasCastellano.map((dia) => (
-              <Form.Check
-                key={dia.key}
-                type="checkbox"
-                label={dia.label}
-                checked={formData.daysOfWeek.includes(dia.key)}
-                onChange={() => handleCheckboxChange(dia.key)}
-                className="me-3"
-              />
-            ))}
-          </div>
-        </Form.Group>
-
-        <Form.Label>Rangos Horarios</Form.Label>
-        {formData.timeRanges.map((range, index) => (
-          <Row className="mb-3" key={index}>
+      {/* Marco con borde degradado + interior blanco (estilo unificado) */}
+      <div className="form-panel">
+        <Form onSubmit={handleSubmit} noValidate>
+          <Row className="mb-3">
             <Col md={6}>
-              <InputGroup>
-                <InputGroup.Text>Desde</InputGroup.Text>
-                <Form.Control
-                  type="time"
-                  value={range.start}
+              <Form.Group controlId="idDoctor">
+                <Form.Label>Seleccionar Doctor</Form.Label>
+                <Form.Select
+                  name="idDoctor"
+                  value={formData.idDoctor}
                   onChange={(e) =>
-                    handleTimeRangeChange(index, "start", e.target.value)
+                    setFormData({ ...formData, idDoctor: e.target.value })
                   }
                   required
-                />
-              </InputGroup>
+                >
+                  <option value="">Seleccione un doctor</option>
+                  {doctors.map((doctor) => (
+                    <option key={doctor.id} value={doctor.id}>
+                      {doctor.fullName} - Matrícula {doctor.license}
+                    </option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
             </Col>
+
             <Col md={6}>
-              <InputGroup>
-                <InputGroup.Text>Hasta</InputGroup.Text>
+              <Form.Group controlId="startDate">
+                <Form.Label>Fecha de Inicio</Form.Label>
                 <Form.Control
-                  type="time"
-                  value={range.end}
+                  type="date"
+                  name="startDate"
+                  value={formData.startDate}
                   onChange={(e) =>
-                    handleTimeRangeChange(index, "end", e.target.value)
+                    setFormData({ ...formData, startDate: e.target.value })
                   }
                   required
                 />
-              </InputGroup>
+              </Form.Group>
             </Col>
           </Row>
-        ))}
-        <Button variant="secondary" onClick={addTimeRange} className="mb-3">
-          Agregar otro rango horario
-        </Button>
 
-        <div className="text-center">
-          <Button type="submit" variant="primary">
-            Crear Agenda
+          <Row className="mb-3">
+            <Col md={6}>
+              <Form.Group controlId="numberOfWeeks">
+                <Form.Label>Cantidad de Semanas</Form.Label>
+                <Form.Control
+                  type="number"
+                  name="numberOfWeeks"
+                  min={1}
+                  value={formData.numberOfWeeks}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      numberOfWeeks: parseInt(e.target.value || "1", 10),
+                    })
+                  }
+                  required
+                />
+              </Form.Group>
+            </Col>
+
+            <Col md={6}>
+              <Form.Group controlId="interval">
+                <Form.Label>Duración del Turno (minutos)</Form.Label>
+                <Form.Control
+                  type="number"
+                  name="interval"
+                  min={5}
+                  step={5}
+                  value={formData.interval}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      interval: parseInt(e.target.value || "30", 10),
+                    })
+                  }
+                />
+              
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Días de Atención</Form.Label>
+            <div className="d-flex flex-wrap">
+              {diasCastellano.map((dia) => (
+                <Form.Check
+                  key={dia.key}
+                  type="checkbox"
+                  label={dia.label}
+                  checked={formData.daysOfWeek.includes(dia.key)}
+                  onChange={() => handleCheckboxChange(dia.key)}
+                  className="me-3"
+                />
+              ))}
+            </div>
+           
+          </Form.Group>
+
+          <Form.Label>Rangos Horarios</Form.Label>
+          {formData.timeRanges.map((range, index) => (
+            <Row className="mb-3" key={index}>
+              <Col md={6}>
+                <InputGroup>
+                  <InputGroup.Text>Desde</InputGroup.Text>
+                  <Form.Control
+                    type="time"
+                    value={range.start}
+                    onChange={(e) =>
+                      handleTimeRangeChange(index, "start", e.target.value)
+                    }
+                    required
+                  />
+                </InputGroup>
+              </Col>
+              <Col md={6}>
+                <InputGroup>
+                  <InputGroup.Text>Hasta</InputGroup.Text>
+                  <Form.Control
+                    type="time"
+                    value={range.end}
+                    onChange={(e) =>
+                      handleTimeRangeChange(index, "end", e.target.value)
+                    }
+                    required
+                  />
+                </InputGroup>
+              </Col>
+            </Row>
+          ))}
+
+          <Button variant="secondary" onClick={addTimeRange} className="mb-3">
+            Agregar otro rango horario
           </Button>
-        </div>
-      </Form>
+
+          <div className="text-center">
+            <Button type="submit" bsPrefix="btn-admin" className="sm">
+              Crear Agenda
+            </Button>
+          </div>
+        </Form>
+      </div>
     </Container>
   );
 };
 
 export default CreateSchedule;
+

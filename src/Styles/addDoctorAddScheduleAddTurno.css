@@ -1,0 +1,25 @@
+.adddoctor-frame,
+.form-panel {
+  background: linear-gradient(#8fc9ca) padding-box, border-box;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+/* Inputs claros con texto oscuro (contraste) */
+.adddoctor-frame :is(.form-control, .form-select),
+.form-panel :is(.form-control, .form-select) {
+  background-color: #fff;
+  color: #0b2239;
+}
+
+/* Botón principal dentro del panel: deja el spacing visual */
+.form-panel .btn-admin.sm {
+  min-width: 240px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
+}
+
+/* Espaciado consistente entre grupos */
+.form-panel .form-text {
+  margin-top: 0.375rem;
+}

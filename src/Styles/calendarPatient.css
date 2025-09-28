@@ -1,224 +1,129 @@
-/* CalendarPatient.css */
+/* calendarPatient.css (limpio, sin degradados en btn/form/activos) */
 
-/* ====== CARD / CONTENEDOR CALENDARIO ====== */
+/* Hereda tokens desde theme.css; no redefinir :root acá */
+
+/* Contenedor */
 .calendar-container {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-  padding: 2rem 1rem;
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-  max-width: clamp(720px, 90vw, 1200px);
-  width: 100%;
+  padding-block: clamp(24px, 5vh, 40px);
 }
 
-/* Opcional: si el calendario y la lista viven lado a lado */
-.calendar-layout {
-  display: flex;
-  align-items: stretch;
-  gap: 24px;
-}
-
-/* Panel de horarios para igualar altura con el calendario y hacer scroll interno */
-.slots-panel {
-  flex: 1 1 0;
-  display: block;
-  overflow: hidden;
-}
-
-/* ====== TÍTULO ====== */
 .calendar-title {
-  color: #fff;
-  font-weight: bold;
-  margin-bottom: 2rem;
-  text-align: center;
+  margin-bottom: 0.5rem;
 }
 
-/* ====== REACT-CALENDAR (estilos base) ====== */
-.calendar-container .react-calendar {
-  width: 100%;
-  background: #06475B;                 /* 🎯 Fondo azul */
-  border-radius: 12px;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
-  padding: .5rem;
-}
-
-/* margen en pantallas md+ */
-@media (min-width: 768px) {
-  .calendar-container .react-calendar { margin-right: 24px; }
-}
-
-/* ====== Navegación del calendario ====== */
-.react-calendar__navigation {
-  display: flex;
-  height: 44px;
-  margin-bottom: .5rem;
-}
-.react-calendar__navigation button {
-  color: #fff;
-  font-weight: 600;
-  border-radius: 8px;
-  background: transparent;
-  border: 0;
-}
-.react-calendar__navigation button:hover { background: #f0faf4; }
-.react-calendar__navigation button:disabled { opacity: .4; }
-
-/* ====== Encabezados de días ====== */
-.react-calendar__month-view__weekdays {
-  text-align: center;
-  font-weight: 600;
-  color: #fff;                       /* naranja para headers */
-}
-.react-calendar__month-view__weekdays__weekday abbr {
-  text-decoration: none;
-  font-size: .85rem;
-}
-
-/* ====== Celdas (días) ====== */
-.react-calendar__tile {
-  padding: .6rem .2rem;
-  border-radius: 10px;
-  text-align: center;
-  transition: transform .06s ease, background-color .12s ease, color .12s ease, box-shadow .12s ease;
-}
-
-/* 🎯 DÍAS CON TURNOS DISPONIBLES (no deshabilitados) EN NARANJA */
-.react-calendar__tile:enabled {
-  background: #eea43d;                  /* naranja muy suave de base */
-  color: #161616;                        /* texto oscuro cálido */
-  /* aro naranja */
-}
-.react-calendar__tile:enabled:hover {
-  background: #ffe5bf;                  /* hover naranja suave */
-  transform: translateY(-1px);
-}
-
-
-
-/* Día seleccionado (se mantiene azul de marca para destacar selección) */
-.react-calendar__tile--active,
-.react-calendar__tile--hasActive {
-  background: #06475B;
-  color: #fff;
-  box-shadow: none;
-}
-
-/* Fuera de mes o deshabilitados (sin turnos) */
-.react-calendar__month-view__days__day--neighboringMonth,
-.react-calendar__tile:disabled {
-  color: #9aa7ab;
-  background: #f7f9fa;
-  box-shadow: none;
-}
-
-/* ====== GRID DE HORARIOS (ListGroup en columnas) ====== */
-.list-group.slot-grid {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 8px;
-  align-content: start;
-  padding-right: 4px;
-  border: 1px solid #e8eef0;
-  border-radius: 12px;
-  background: #ffffff;
-  overflow: auto;
-  min-height: 180px;
-}
-.list-group.slot-grid .list-group-item {
-  text-align: center;
-  border-radius: 10px;
-  border: 1px solid #e6ecec;
-  padding: 10px 8px;
-  line-height: 1.2;
-  white-space: nowrap;
-  color: #06475B; /* Azul oscuro, bien visible sobre fondo blanco */
-  font-weight: 600;
-  font-size: 1.08rem;
-}
-.list-group.slot-grid .list-group-item.active,
-.list-group.slot-grid .list-group-item.active:focus,
-.list-group.slot-grid .list-group-item.active:hover {
-  background-color: #eaf6ef !important;
-  color: #222 !important;
-  border-color: #b2da9e !important;
-}
-.list-group.slot-grid .list-group-item:hover {
-  filter: brightness(1.03);
-  cursor: pointer;
-}
-.list-group.slot-grid::-webkit-scrollbar { width: 8px; }
-.list-group.slot-grid::-webkit-scrollbar-thumb { background: #d8e6db; border-radius: 10px; }
-.list-group.slot-grid::-webkit-scrollbar-track { background: transparent; }
-
-/* ====== SELECTS (panel contenedor) ====== */
+/* Panel de selects (doctor/especialidad) — SIN gradiente */
 .select-panel {
-  background: #ffffff;
-  border: 1px solid #e8eef0;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border-muted, rgba(6, 71, 91, 0.12));
   border-radius: 12px;
-  padding: 1rem;
+  padding: 16px;
+  box-shadow: var(--shadow-1, 0 6px 18px rgba(0, 0, 0, 0.06));
 }
 
-/* ====== MODAL: fondo oscurecido + desenfocado ====== */
-.modal-backdrop.blurred-backdrop.show {
-  opacity: 1 !important;
-  background-color: rgba(6, 71, 91, 0.35) !important;
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
-}
-.glass-modal {
+/* Tarjeta de calendario (si querés degradado, aplicá .card--gradient desde el HTML) */
+.react-calendar {
+  background: var(--surface, #fff);
+  border: 0;
   border-radius: 16px;
-  border: 1px solid rgba(232, 238, 240, 0.9);
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-  overflow: hidden;
-}
-.modal-title { color: #06475B; }
-.modal-header { border-bottom-color: #e8eef0; }
-.modal-footer { border-top-color: #e8eef0; }
-
-/* ====== react-select (opcional por CSS, usando classNamePrefix="doc") ====== */
-.doc__control {
-  background-color: #f7fbfd !important;
-  border: 1px solid #cfe3e8 !important;
-  border-radius: 12px !important;
-  min-height: 42px !important;
-  box-shadow: none !important;
-}
-.doc__control--is-focused {
-  border-color: #06475B !important;
-  box-shadow: 0 0 0 .25rem rgba(6,71,91,.15) !important;
-}
-.doc__single-value { color: #06475B!important; } /* si el select queda sobre fondo azul, podés volver a #0f2e36 */
-.doc__placeholder { color: #06475B !important; }
-.doc__indicator-separator { display: none !important; }
-.doc__dropdown-indicator { color: #e8a649 !important; }
-
-.doc__menu {
-  background-color: #eef8fb !important;
-  border: 1px solid #e8eef0 !important;
-  border-radius: 12px !important;
-  overflow: hidden !important;
-}
-.doc__menu-list { padding: 8px !important; }
-.doc__option {
-  background-color: #eef8fb !important;
-  color: #0f2e36 !important;
-  border-radius: 8px !important;
-  padding: 10px 12px !important;
-}
-.doc__option--is-focused { background-color: #eaf6ef !important; }
-.doc__option--is-selected {
-  background-color: #06475B !important;
-  color: #fff !important;
+  box-shadow: var(--shadow-2, 0 10px 28px rgba(0, 0, 0, 0.12));
+  padding: 12px;
 }
 
-/* ====== Responsive ====== */
-@media (max-width: 576px) {
-  .list-group.slot-grid {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  }
+/* Navegación del calendario */
+.react-calendar__navigation button {
+  color: var(--brand, #06475B);
+  font-weight: 700;
+  border-radius: 8px;
 }
-/* Contenedor ancho en XL/XXL (coincide con breakpoints de Bootstrap) */
-@media (min-width: 1200px) { .calendar-container { max-width: 1140px; } }
-@media (min-width: 1400px) { .calendar-container { max-width: 1320px; } }
+
+/* Días del calendario */
+.react-calendar__tile {
+  border-radius: 10px;
+  padding: 10px 6px;
+}
+
+/* ===== DÍAS CON TURNOS ===== */
+/* Opción A (más precisa, si usás tileClassName -> 'has-slots'): */
+.react-calendar__tile.has-slots,
+.react-calendar__tile.has-slots:enabled:hover,
+.react-calendar__tile.has-slots:enabled:focus,
+.react-calendar__tile.has-slots:enabled:active,
+.react-calendar__tile--active.has-slots,
+.react-calendar__tile--now.has-slots,
+.react-calendar__tile--hasActive.has-slots {
+  background-color: #7fd3d4 !important;
+  color: #0b2239;
+  box-shadow: none;
+  outline: 0;
+}
+
+/* Opción B (fallback sin has-slots): colorea los días habilitados (vos deshabilitás los que no tienen turnos) */
+.react-calendar__tile:enabled {
+  background-color: #7fd3d4;
+  color: #0b2239;
+}
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus,
+.react-calendar__tile:enabled:active,
+.react-calendar__tile--active:enabled {
+  background-color: #7fd3d4;
+  color: #0b2239;
+}
+
+/* Día activo global (si no tiene turnos): no forzar otro color */
+.react-calendar__tile--active {
+  background: transparent;
+  color: inherit;
+}
+
+/* Hoy */
+.react-calendar__tile--now {
+  outline: 2px solid rgba(6, 71, 91, 0.25);
+}
+
+/* Días deshabilitados (sin turnos) */
+.react-calendar__tile:disabled {
+  background: #f3f5f7;
+  color: #9aa6af;
+}
+
+/* Panel de horarios — SIN gradiente */
+.slots-panel {
+  background: var(--surface, #fff);
+  border: 1px solid var(--border-muted, rgba(6, 71, 91, 0.12));
+  border-radius: 16px;
+  box-shadow: var(--shadow-2, 0 10px 28px rgba(0, 0, 0, 0.08));
+  padding: 16px;
+}
+
+/* Grilla de horarios */
+.slot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+/* Pastillas de horario — color fijo #7fd3d4, sin cambios por hover/active */
+.slot-grid .list-group-item {
+  border-radius: 999px;
+  text-align: center;
+  border: 1px solid rgba(6, 71, 91, 0.15);
+  background-color: #7fd3d4;
+  color: #0b2239;
+  transition:160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.slot-grid .list-group-item:hover,
+.slot-grid .list-group-item:focus,
+.slot-grid .list-group-item:active,
+.slot-grid .list-group-item.active {
+  background-color: #7fd3d4;   /* no cambia nunca */
+  color: #0b2239;
+  border-color: transparent;
+}
+
+.modal-content {
+  background-color: #c8e5e0;
+  --bs-modal-width: 600px;
+  --bs-modal-padding: 24px;
+} 

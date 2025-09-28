@@ -1,42 +1,71 @@
-// App.jsx
 import React from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  useLocation,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
-import Reports from "./Components/Reports";
-import "./Styles/reports.css";
-import "./Styles/navbar.css";
-import "./Styles/card.css";
-import "./Styles/calendarPatient.css";
-import "./Styles/home.css";
-import FourSections from "./Components/FourSections";
-import FourSectionsAdmin from "./Components/FourSectionsAdmin";
+// Components
 import CustomNavBar from "./Components/NavBar";
+import Home from "./Components/Home";
+import FourSections from "./Components/FourSections";
+import Contacto from "./Components/Contacto";
+import Preguntas from "./Components/Preguntas";
+import FourSectionsAdmin from "./Components/FourSectionsAdmin";
+import Reports from "./Components/Reports";
 import AddDoctor from "./Components/AddDoctor";
 import CreateScheduleForm from "./Components/CreateSchedule";
 import CalendarPatient from "./Components/CalendarPatient";
 import Footer from "./Components/Footer";
 
+// Styles
+import "./Styles/reports.css";
+import "./Styles/navbar.css";
+import "./Styles/calendarPatient.css";
+import "./Styles/home.css";
+import "./Styles/fourSection.css";
+import "./Styles/contacto.css";
+import "./Styles/addDoctorAddScheduleAddTurno.css";
+
 function AppRoutes() {
   const location = useLocation();
   const isHome = location.pathname === "/";
 
+  // Ocultar footer en rutas de administración y páginas internas de admin
+  const path = location.pathname.toLowerCase();
+  const adminLike = [
+    "/admin",
+    "/administracion",
+    "/crear-agenda",
+    "/agregarprofesional",
+    "/reportes",
+  ];
+  const hideFooter = adminLike.some((p) => path === p || path.startsWith(p + "/"));
+
   return (
     <div className="App d-flex flex-column min-vh-100">
-      {/* shell */}
       <CustomNavBar />
 
-      <main className={`flex-fill ${isHome ? "home-main" : ""}`}>
-        {/* ocupa el alto libre */}
+      <main className={`flex-grow-1 ${isHome ? "home-main" : ""} ${hideFooter ? "no-footer" : ""}`}>
         <Routes>
-          <Route path="/" element={<FourSections />} />
+          {/* Home: héroe + secciones + contacto */}
+          <Route
+            path="/"
+            element={
+              <>
+                <Home />
+                <FourSections />
+                <Contacto />
+              </>
+            }
+          />
+
+          {/* Preguntas */}
+          <Route path="/preguntas" element={<Preguntas />} />
+
+          {/* Admin */}
           <Route path="/admin" element={<FourSectionsAdmin />} />
           <Route path="/administracion" element={<FourSectionsAdmin />} />
-          <Route path="/turnos" element={<FourSectionsAdmin />} />
+          {/* Nota: /turnos queda como vista pública (footer visible) */}
+          {/* <Route path="/turnos" element={<FourSectionsAdmin />} /> */}
+
+          {/* Crear agenda, profesionales, reservar turno, reportes */}
           <Route path="/crear-agenda" element={<CreateScheduleForm />} />
           <Route path="/AgregarProfesional" element={<AddDoctor />} />
           <Route path="/reservar-turno" element={<CalendarPatient />} />
@@ -44,8 +73,7 @@ function AppRoutes() {
         </Routes>
       </main>
 
-      {isHome && <Footer />}
-      {/* footer solo en home */}
+      {!hideFooter && <Footer />}
     </div>
   );
 }
@@ -57,3 +85,5 @@ export default function App() {
     </Router>
   );
 }
+
+

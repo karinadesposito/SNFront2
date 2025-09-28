@@ -1,4 +1,10 @@
-.card-body{
-  background-color: rgba(126, 177, 100, 0.4);
+.card-body {
+  background: linear-gradient(#8fc9ca) padding-box, border-box;
+  border-radius: 12px;
+  padding: 1rem;
+}
 
+.card-body,
+.card-body * {
+  font-family: inherit;
 }
