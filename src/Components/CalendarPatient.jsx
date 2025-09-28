@@ -1,18 +1,16 @@
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
-import Swal from "sweetalert2";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Form,
-  Button,
-  ListGroup,
-  Modal,
-} from "react-bootstrap";
-import { useForm } from "react-hook-form";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useLayoutEffect,
+} from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { Container, Row, Col, Form, Button, ListGroup, Modal } from "react-bootstrap";
 import Select from "react-select";
+import "react-calendar/dist/Calendar.css"; 
+import Calendar from "react-calendar";
+import Swal from "sweetalert2";
 
 const selectStyles = {
   control: (base) => ({ ...base, borderRadius: 10 }),
@@ -33,6 +31,8 @@ const formatDayLocal = (dayStr /* "YYYY-MM-DD" */) => {
   const [y, m, d] = dayStr.split("-");
   return `${d}/${m}/${y}`;
 };
+
+
 
 const CalendarPatient = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
@@ -81,23 +81,91 @@ const CalendarPatient = () => {
     return () => ro.disconnect();
   }, [selectedDoctor, selectedDate, availableDates]);
 
-  // Form
+  // ====== Form (con autocompletado por DNI) ======
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
+    clearErrors,
+    setError,
     formState: { errors },
+    control,
   } = useForm();
+
+  const dniRegex = /^[1-9]\d{7}$/; // 8 dígitos, sin 0 inicial
+  const dniValue = useWatch({ control, name: "dni", defaultValue: "" });
+  const [findingPatient, setFindingPatient] = useState(false);
+  const [patientFound, setPatientFound] = useState(null); // {id, fullName, dni, email, phone} | null
+  const dniAbortRef = useRef(null);
+  const dniInputRef = useRef(null);
+
+  // Foco al abrir el modal (DNI primero)
+  useEffect(() => {
+    if (showForm) {
+      setTimeout(() => dniInputRef.current?.focus(), 50);
+    }
+  }, [showForm]);
+
+  // Debounce búsqueda de paciente por DNI
+  useEffect(() => {
+    if (!dniValue || dniValue.length < 8 || !dniRegex.test(dniValue)) {
+      setFindingPatient(false);
+      setPatientFound(null);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        setFindingPatient(true);
+        setPatientFound(null);
+
+        // Cancelar request anterior si existe
+        if (dniAbortRef.current) dniAbortRef.current.abort();
+        const controller = new AbortController();
+        dniAbortRef.current = controller;
+
+        const res = await fetch(`${apiUrl}/patient/by-dni/${dniValue}`, {
+          signal: controller.signal,
+        });
+
+        if (res.ok) {
+          const json = await res.json();
+          const payload = json?.data || json;
+          if (payload) {
+            setPatientFound(payload);
+            setValue("fullName", payload.fullName || "");
+            setValue("phone", payload.phone || "");
+            setValue("email", payload.email || "");
+            clearErrors(["fullName", "phone", "email"]);
+          }
+        } else if (res.status === 404) {
+          setPatientFound(null);
+        } else {
+          setPatientFound(null);
+        }
+      } catch {
+        setPatientFound(null);
+      } finally {
+        setFindingPatient(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dniValue, apiUrl]);
 
   // ====== RESERVA ======
   const onSubmit = async (data) => {
     try {
       if (!selectedDoctor || !selectedDate || !selectedSlot) {
-        Swal.fire(
-          "Faltan datos",
-          "Seleccioná profesional, día y horario",
-          "info"
-        );
+        Swal.fire("Faltan datos", "Seleccioná profesional, día y horario", "info");
+        return;
+      }
+
+      const dniClean = String(data.dni || "").replace(/\D+/g, "");
+      if (!dniRegex.test(dniClean)) {
+        setError("dni", { type: "manual", message: "DNI inválido (8 dígitos, sin 0 inicial)" });
         return;
       }
 
@@ -107,7 +175,7 @@ const CalendarPatient = () => {
         idSchedule: selectedSlot.idSchedule,
         patient: {
           fullName: data.fullName,
-          dni: data.dni,
+          dni: dniClean,
           phone: data.phone,
           email: data.email,
         },
@@ -120,10 +188,9 @@ const CalendarPatient = () => {
       });
 
       const result = await response.json();
-      if (!response.ok)
-        throw new Error(result?.message || "Error al reservar turno");
+      if (!response.ok) throw new Error(result?.message || "Error al reservar turno");
 
-      // Guardamos datos crudos para el 2º Swal
+      // Para el 2º Swal
       const saved = result?.data || result;
       const doctorName = saved?.doctor?.fullName || "el profesional";
       const dayStr = saved?.day; // "YYYY-MM-DD"
@@ -131,14 +198,14 @@ const CalendarPatient = () => {
       setQueuedSwal({ doctorName, dayStr, timeStr });
 
       // Actualizamos UI y cerramos modal
-      setSlots((prev) =>
-        prev.filter((t) => t.idSchedule !== selectedSlot.idSchedule)
-      );
+      setSlots((prev) => prev.filter((t) => t.idSchedule !== selectedSlot.idSchedule));
       setSelectedSlot(null);
       setShowForm(false);
       reset();
+      setFindingPatient(false);
+      setPatientFound(null);
 
-      // Refrescar disponibilidad del médico (normalizando payload)
+      // Refrescar disponibilidad del médico
       fetch(`${apiUrl}/schedules/available/by-doctor/${selectedDoctor}`)
         .then((res) => res.json())
         .then((data) => {
@@ -153,7 +220,7 @@ const CalendarPatient = () => {
     }
   };
 
-  // Carga inicial
+  // Carga inicial de catálogos
   useEffect(() => {
     fetch(`${apiUrl}/doctor`)
       .then((res) => res.json())
@@ -189,7 +256,7 @@ const CalendarPatient = () => {
 
     const formatted = toYMDLocal(date);
 
-    // Opcional: comprobar que el día exista en availableDates
+    // Comprobar que el día exista en availableDates
     const dayData = availableDates.find((item) => item.date === formatted);
     if (!dayData) {
       setSlots([]);
@@ -254,7 +321,7 @@ const CalendarPatient = () => {
       <Container fluid="xl" className="calendar-container">
         <h2 className="calendar-title">Reservar Turno</h2>
 
-        {/* Panel unificado de estilo (borde degradado + interior claro) */}
+        {/* Panel y clases tal cual tu estilo previo */}
         <div className="form-panel">
           <Form className="mb-3" noValidate>
             <Form.Check
@@ -434,6 +501,7 @@ const CalendarPatient = () => {
       </Container>
 
       <Modal
+
         show={showForm}
         onHide={() => {
           setShowForm(false);
@@ -472,7 +540,7 @@ const CalendarPatient = () => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form onSubmit={handleSubmit(onSubmit)}>
+          <Form onSubmit={handleSubmit(onSubmit)} noValidate>
             <Row>
               <Col md={12} className="mb-3">
                 <div className="text-muted small">
@@ -488,27 +556,57 @@ const CalendarPatient = () => {
                 <h5 className="mb-3">Datos del Paciente</h5>
               </Col>
 
-              <Col md={12} className="mb-3">
+              {/* DNI PRIMERO (autocompleta) */}
+              <Col md={6} className="mb-3">
+                <Form.Label>DNI</Form.Label>
+                <div className="d-flex align-items-center gap-2">
+                  <Form.Control
+                    ref={dniInputRef}
+                    autoFocus
+                    type="text"
+                    placeholder="Ej: 30111222"
+                    inputMode="numeric"
+                    maxLength={8}
+                    {...register("dni", {
+                      required: "El DNI es obligatorio",
+                      onChange: (e) => {
+                        const clean = e.target.value.replace(/\D+/g, "");
+                        setValue("dni", clean, { shouldValidate: true });
+                        if (clean.length < 8) {
+                          setPatientFound(null);
+                        }
+                      },
+                      validate: (v) =>
+                        !v || dniRegex.test(v) || "Debe tener 8 dígitos (sin 0 inicial)",
+                    })}
+                  />
+                  {findingPatient && (
+                    <span className="small text-muted d-inline-flex align-items-center">
+                      <span className="spinner-border spinner-border-sm me-1" role="status" />
+                      Buscando…
+                    </span>
+                  )}
+                  {!findingPatient && dniValue?.length === 8 && (
+                    <span className={`badge ${patientFound ? "bg-success" : "bg-secondary"}`}>
+                      {patientFound ? "Encontrado" : "No encontrado"}
+                    </span>
+                  )}
+                </div>
+                {errors.dni && (
+                  <span className="text-danger small">{errors.dni.message}</span>
+                )}
+              </Col>
+
+              {/* NOMBRE DESPUÉS */}
+              <Col md={6} className="mb-3">
                 <Form.Label>Nombre completo</Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="Ej: Juan Pérez"
-                  {...register("fullName", { required: true })}
+                  {...register("fullName", { required: "El nombre es obligatorio" })}
                 />
                 {errors.fullName && (
-                  <span className="text-danger">Este campo es obligatorio</span>
-                )}
-              </Col>
-
-              <Col md={6} className="mb-3">
-                <Form.Label>DNI</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Ej: 30111222"
-                  {...register("dni", { required: true })}
-                />
-                {errors.dni && (
-                  <span className="text-danger">Este campo es obligatorio</span>
+                  <span className="text-danger small">{errors.fullName.message}</span>
                 )}
               </Col>
 
@@ -517,28 +615,29 @@ const CalendarPatient = () => {
                 <Form.Control
                   type="text"
                   placeholder="Ej: 2215555555"
-                  {...register("phone", { required: true })}
+                  inputMode="tel"
+                  {...register("phone", { required: "El teléfono es obligatorio" })}
                 />
                 {errors.phone && (
-                  <span className="text-danger">Este campo es obligatorio</span>
+                  <span className="text-danger small">{errors.phone.message}</span>
                 )}
               </Col>
 
-              <Col md={12} className="mb-3">
+              <Col md={6} className="mb-3">
                 <Form.Label>Correo electrónico</Form.Label>
                 <Form.Control
                   type="email"
                   placeholder="Ej: paciente@email.com"
-                  {...register("email", { required: true })}
+                  {...register("email", { required: "El correo es obligatorio" })}
                 />
                 {errors.email && (
-                  <span className="text-danger">Este campo es obligatorio</span>
+                  <span className="text-danger small">{errors.email.message}</span>
                 )}
               </Col>
             </Row>
 
             <div className="d-flex justify-content-end gap-2 mt-2">
-              <Button
+              <button type="submit" className="btn-admin sm"
                 variant="outline-secondary"
                 onClick={() => {
                   setShowForm(false);
@@ -547,10 +646,11 @@ const CalendarPatient = () => {
                 disabled={loading}
               >
                 Cancelar
-              </Button>
-              <Button type="submit" className="btn-admin sm" disabled={loading}>
+            </button>
+              {/* Botón nativo con tu estilo admin */}
+              <button type="submit" className="btn-admin sm" disabled={loading}>
                 {loading ? "Confirmando..." : "Confirmar Turno"}
-              </Button>
+              </button>
             </div>
           </Form>
         </Modal.Body>

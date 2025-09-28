@@ -110,7 +110,7 @@
   border: 1px solid rgba(6, 71, 91, 0.15);
   background-color: #7fd3d4;
   color: #0b2239;
-  transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+  transition:160ms ease, color 160ms ease, border-color 160ms ease;
 }
 
 .slot-grid .list-group-item:hover,
@@ -122,3 +122,8 @@
   border-color: transparent;
 }
 
+.modal-content {
+  background-color: #c8e5e0;
+  --bs-modal-width: 600px;
+  --bs-modal-padding: 24px;
+} 
