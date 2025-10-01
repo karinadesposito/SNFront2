@@ -62,28 +62,9 @@ export default function CustomNavBar() {
             </Nav.Link>
 
             {/* MOBILE (dentro del collapse) */}
-            <div className="d-lg-none w-100 mt-3 d-flex gap-2">
-              <Button
-                as={Link}
-                to="/reservar-turno"
-                variant="link"
-                className="flex-fill btn-ghost-reserva"
-                size="sm"
-                onClick={closeMenu}
-              >
-                Reservar turnos
-              </Button>
-              <Button
-                as={Link}
-                to="/admin"
-                variant="outline-light"
-                className="flex-fill"
-                size="sm"
-                onClick={closeMenu}
-              >
-                Administración
-              </Button>
-            </div>
+       
+         
+            
           </Nav>
         </Navbar.Collapse>
 

@@ -9,8 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "imgs:opt": "node scripts/optimize-images.mjs",
-"prebuild": "npm run imgs:opt"
-
+    "prebuild": "npm run imgs:opt"
   },
   "dependencies": {
     "@nestjs/config": "^4.0.2",
@@ -23,6 +22,8 @@
     "react-bootstrap": "^2.10.5",
     "react-calendar": "^6.0.0",
     "react-dom": "^18.3.1",
+    "react-google-recaptcha": "^3.1.0",
+    "react-google-recaptcha-v3": "^1.11.0",
     "react-hook-form": "^7.62.0",
     "react-router-dom": "^7.0.1",
     "react-select": "^5.10.2",
@@ -41,5 +42,4 @@
     "sharp": "^0.34.3",
     "vite": "^5.4.10"
   }
-  
 }
