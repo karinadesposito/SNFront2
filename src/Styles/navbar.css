@@ -11,15 +11,15 @@ body.with-fixed-navbar{ padding-top: var(--nav-h); }
   position: fixed; top: 0; left: 0; right: 0;
   z-index: 1040;                   /* por encima del contenido */
   background-color: #073043;       /* fallback sólido */
-  transition: background-color .25s, box-shadow .25s, backdrop-filter .25s;
+  /* transition: background-color .25s, box-shadow .25s, backdrop-filter .25s;
   border-bottom: 1px solid rgba(0,0,0,.06);
-  backdrop-filter: saturate(110%);
+  backdrop-filter: saturate(110%); */
 }
-.app-navbar.is-scrolled{
-  background-color: #062838;       /* oscurece al scrollear */
+/* .app-navbar.is-scrolled{
+  background-color: #062838;      
   box-shadow: 0 10px 26px rgba(0,0,0,.24);
   backdrop-filter: saturate(125%) blur(2px);
-}
+} */
 
 /* Si hay soporte de color-mix, usa mezcla del color base */
 @supports (background-color: color-mix(in srgb, white, black)) {
@@ -64,14 +64,7 @@ body.with-fixed-navbar{ padding-top: var(--nav-h); }
   }
 }
 
-/* Botones sobre navbar oscura */
-.app-navbar .btn-outline-light{
-  --bs-btn-color: #eaf2f5;
-  --bs-btn-border-color: rgba(255,255,255,.6);
-  --bs-btn-hover-bg: rgba(255,255,255,.16);
-  --bs-btn-hover-border-color: rgba(255,255,255,.8);
-}
-
+/* 
 /* Logo */
 #logosaludnet{ height: 60px; width: auto; object-fit: contain; }
 
