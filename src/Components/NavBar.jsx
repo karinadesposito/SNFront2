@@ -54,17 +54,14 @@ export default function CustomNavBar() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             {/* Enlaces que cierran el menú al seleccionarse (mobile) */}
-            <Nav.Link href="/#especialidades" onClick={closeMenu}>
+            <Nav.Link as={Link} to="/especialidades" onClick={closeMenu}>
               Especialidades
             </Nav.Link>
-            <Nav.Link href="/#profesionales" onClick={closeMenu}>
+            <Nav.Link as={Link} to="/profesionales" onClick={closeMenu}>
               Profesionales
             </Nav.Link>
 
             {/* MOBILE (dentro del collapse) */}
-       
-         
-            
           </Nav>
         </Navbar.Collapse>
 
@@ -87,6 +84,3 @@ export default function CustomNavBar() {
     </Navbar>
   );
 }
-
-
-

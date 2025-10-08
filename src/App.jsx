@@ -13,15 +13,20 @@ import AddDoctor from "./Components/AddDoctor";
 import CreateScheduleForm from "./Components/CreateSchedule";
 import CalendarPatient from "./Components/CalendarPatient";
 import Footer from "./Components/Footer";
+import SpecialityList from "./Components/Speciality";
+import ProfesionalList from "./Components/Profesional";
 
 // Styles
-import "./Styles/reports.css";
-import "./Styles/navbar.css";
+import "./Styles/addDoctorAddScheduleAddTurno.css";
 import "./Styles/calendarPatient.css";
+import "./Styles/contacto.css";
 import "./Styles/home.css";
 import "./Styles/fourSection.css";
-import "./Styles/contacto.css";
-import "./Styles/addDoctorAddScheduleAddTurno.css";
+import "./Styles/navbar.css";
+import "./Styles/profesional.css"
+import "./Styles/reports.css";
+import "./Styles/speciality.css"
+
 
 function AppRoutes() {
   const location = useLocation();
@@ -70,6 +75,8 @@ function AppRoutes() {
           <Route path="/AgregarProfesional" element={<AddDoctor />} />
           <Route path="/reservar-turno" element={<CalendarPatient />} />
           <Route path="/reportes" element={<Reports />} />
+          <Route path="/especialidades" element={<SpecialityList />} />
+          <Route path="/profesionales" element={<ProfesionalList />} />
         </Routes>
       </main>
 
