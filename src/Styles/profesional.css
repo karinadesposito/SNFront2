@@ -35,3 +35,31 @@
   font-size: 2.2rem;
   color: #fff;
 }
+
+.sort-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.sort-btn {
+  background-image: var(--grad-card);
+  color: #fff;
+  border: none;
+  border-radius: 1rem;
+  padding: 0.7rem 1.5rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-2);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.sort-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+.sort-btn.active {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  opacity: 0.9;
+}

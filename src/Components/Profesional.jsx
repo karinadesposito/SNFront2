@@ -6,6 +6,7 @@ import "../Styles/profesional.css";
 
 const ProfesionalList = () => {
   const [doctors, setDoctors] = useState([]);
+  const [sortType, setSortType] = useState("name"); // por defecto: nombre
   const apiUrl = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
@@ -31,9 +32,38 @@ const ProfesionalList = () => {
     fetchDoctors();
   }, [apiUrl]);
 
+  const handleSort = (type) => {
+    setSortType(type);
+    const sorted = [...doctors].sort((a, b) => {
+      if (type === "name") {
+        return a.fullName.localeCompare(b.fullName, "es", { sensitivity: "base" });
+      } else if (type === "speciality") {
+        return a.speciality.name.localeCompare(b.speciality.name, "es", { sensitivity: "base" });
+      }
+      return 0;
+    });
+    setDoctors(sorted);
+  };
+
   return (
     <Container className="doctor-container">
       <h2 className="doctor-title">Nuestros profesionales</h2>
+
+      {/* 🔹 Botones con estilo de card */}
+      <div className="sort-buttons text-center mb-4">
+        <button
+          className={`sort-btn ${sortType === "name" ? "active" : ""}`}
+          onClick={() => handleSort("name")}
+        >
+          Ordenar por nombre
+        </button>
+        <button
+          className={`sort-btn ${sortType === "speciality" ? "active" : ""}`}
+          onClick={() => handleSort("speciality")}
+        >
+          Ordenar por especialidad
+        </button>
+      </div>
 
       {doctors.length === 0 ? (
         <p className="text-center text-white">No hay profesionales cargados.</p>
@@ -66,3 +96,4 @@ const ProfesionalList = () => {
 };
 
 export default ProfesionalList;
+

@@ -15,6 +15,7 @@ import CalendarPatient from "./Components/CalendarPatient";
 import Footer from "./Components/Footer";
 import SpecialityList from "./Components/Speciality";
 import ProfesionalList from "./Components/Profesional";
+import EditDoctor from "./Components/EditDoctor";
 
 // Styles
 import "./Styles/addDoctorAddScheduleAddTurno.css";
@@ -40,6 +41,7 @@ function AppRoutes() {
     "/crear-agenda",
     "/agregarprofesional",
     "/reportes",
+    "/editarprofesional"
   ];
   const hideFooter = adminLike.some((p) => path === p || path.startsWith(p + "/"));
 
@@ -77,6 +79,7 @@ function AppRoutes() {
           <Route path="/reportes" element={<Reports />} />
           <Route path="/especialidades" element={<SpecialityList />} />
           <Route path="/profesionales" element={<ProfesionalList />} />
+          <Route path="/editarprofesional" element={<EditDoctor />} />
         </Routes>
       </main>
 
