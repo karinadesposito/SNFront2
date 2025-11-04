@@ -30,11 +30,11 @@ const FourSectionsAdmin = () => {
                       Agregar
                     </Link>
                     <Link to="/EditarProfesional" className="btn-admin sm">
-                      Editar
+                      Administrar
                     </Link>
-                    <Link to="/EliminarProfesional" className="btn-admin sm">
+                    {/*<Link to="/EliminarProfesional" className="btn-admin sm">
                       Eliminar
-                    </Link>
+                    </Link>*/}
                   </div>
                 </div>
               </div>

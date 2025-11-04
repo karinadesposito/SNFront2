@@ -13,6 +13,7 @@ import Calendar from "react-calendar";
 import Swal from "sweetalert2";
 import ReCAPTCHA from "react-google-recaptcha";
 
+
 const selectStyles = {
   control: (base) => ({ ...base, borderRadius: 10 }),
   menu: (base) => ({ ...base, borderRadius: 10 }),
@@ -176,23 +177,48 @@ const CalendarPatient = () => {
   const onSubmit = async (data) => {
     try {
       if (!selectedDoctor || !selectedDate || !selectedSlot) {
-        Swal.fire("Faltan datos", "Seleccioná profesional, día y horario", "info");
-        return;
+        Swal.fire({
+      title: "⚠️ Faltan datos",
+      text: "Seleccioná un profesional, una fecha y un horario antes de continuar.",
+      icon: "info",
+      confirmButtonColor: "#3085d6",
+    });
+    return;
       }
 
       const dniClean = String(data.dni || "").replace(/\D+/g, "");
       if (!dniRegex.test(dniClean)) {
         setError("dni", { type: "manual", message: "DNI inválido (8 dígitos, sin 0 inicial)" });
-        return;
+        Swal.fire({
+      title: "DNI inválido",
+      text: "El DNI debe tener 8 dígitos numéricos sin ceros iniciales.",
+      icon: "error",
+      confirmButtonColor: "#d33",
+    });
+    return;
       }
 
       // reCAPTCHA requerido
       if (!captchaToken) {
-        Swal.fire("Error", "Por favor completá el reCAPTCHA", "error");
-        return;
+        Swal.fire({
+      title: "Verificación requerida",
+      text: "Por favor completá el reCAPTCHA antes de confirmar el turno.",
+      icon: "warning",
+      confirmButtonColor: "#3085d6",
+    });
+    return;
       }
 
-      setLoading(true);
+      try {
+    Swal.fire({
+      title: "Procesando reserva...",
+      text: "Por favor esperá unos segundos.",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
 
       const payload = {
         idSchedule: selectedSlot.idSchedule,
@@ -214,13 +240,24 @@ const CalendarPatient = () => {
       const result = await response.json();
       if (!response.ok) throw new Error(result?.message || "Error al reservar turno");
 
+      Swal.close();
+
       // Para el 2º Swal
       const saved = result?.data || result;
       const doctorName = saved?.doctor?.fullName || "el profesional";
       const dayStr = saved?.day; // "YYYY-MM-DD"
       const timeStr = (saved?.startTime || saved?.start_Time || "").slice(0, 5); // "HH:mm"
-      setQueuedSwal({ doctorName, dayStr, timeStr });
-
+      Swal.fire({
+      title: "✅ ¡Turno confirmado!",
+      html: `
+        <p><b>Profesional:</b> ${doctorName}</p>
+        <p><b>Fecha:</b> ${dayStr}</p>
+        <p><b>Hora:</b> ${timeStr}</p>
+      `,
+      icon: "success",
+      confirmButtonText: "Aceptar",
+      confirmButtonColor: "#3085d6",
+    });
       // Actualizamos UI y cerramos modal
       setSlots((prev) => prev.filter((t) => t.idSchedule !== selectedSlot.idSchedule));
       setSelectedSlot(null);
@@ -229,7 +266,14 @@ const CalendarPatient = () => {
       setFindingPatient(false);
       setPatientFound(null);
     } catch (error) {
-      Swal.fire("Error", error.message, "error");
+      Swal.close();
+    Swal.fire({
+      title: "❌ Error al reservar turno",
+      text: error.message || "Ocurrió un error inesperado. Intentalo nuevamente.",
+      icon: "error",
+      confirmButtonColor: "#d33",
+    });
+
     } finally {
       setLoading(false);
       // reset del captcha tras cada intento (éxito o error)
@@ -247,7 +291,15 @@ const CalendarPatient = () => {
           .catch(() => {});
       }
     }
-  };
+  }catch (outerError) {
+    console.error("Error inesperado en onSubmit:", outerError);
+    Swal.fire({
+      title: "❌ Error inesperado",
+      text: "Ocurrió un error al procesar la reserva. Intentalo nuevamente.",
+      icon: "error",
+      confirmButtonColor: "#d33",
+    });
+  } 
 
   // Carga inicial de catálogos
   useEffect(() => {
@@ -344,7 +396,7 @@ const CalendarPatient = () => {
 
   const selectedSpecialityOption =
     specialityOptions.find((o) => o.value === selectedSpeciality) || null;
-
+  }
 
 
   return (

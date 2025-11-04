@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Tabs, Tab, Container } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
+import Swal from "sweetalert2";
 
 // --- Subcomponente para Turnos ---
 const TurnosReport = () => {
@@ -48,10 +49,20 @@ const TurnosReport = () => {
         } else if (Array.isArray(result)) {
           setDoctors(result);
         } else {
-          console.error("Los datos de doctor no están en el formato esperado");
+          Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Los datos de doctor no están en el formato esperado.",
+          confirmButtonColor: "#0d6efd",
+        });
         }
       } catch (error) {
-        console.error("Error fetching doctor:", error);
+       Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "No se pudieron cargar los doctores.",
+          confirmButtonColor: "#0d6efd",
+        });
       }
     };
     fetchDoctors();
@@ -88,14 +99,24 @@ const TurnosReport = () => {
   const fetchReports = async () => {
     // Validación de rango de fechas
     if (startDate && endDate && startDate > endDate) {
-      alert("La fecha de inicio no puede ser mayor que la fecha de fin.");
+      Swal.fire({
+        icon: "warning",
+        title: "Rango de fechas inválido",
+        text: "La fecha de inicio no puede ser mayor que la fecha de fin.",
+        confirmButtonColor: "#0d6efd",
+      });
       return;
     }
 
     // Validación de DNI (8 dígitos, sin 0 inicial)
     const dniRegex = /^[1-9]\d{7}$/;
     if (patientDni && !dniRegex.test(patientDni)) {
-      alert("El DNI debe tener 8 dígitos, sin puntos ni 0 inicial.");
+       Swal.fire({
+        icon: "warning",
+        title: "DNI inválido",
+        text: "El DNI debe tener 8 dígitos, sin puntos ni 0 inicial.",
+        confirmButtonColor: "#0d6efd",
+      });
       return;
     }
 
@@ -126,8 +147,13 @@ const TurnosReport = () => {
 
       setData(filtered);
     } catch (error) {
-      console.error("Error fetching data:", error);
       setData([]);
+      Swal.fire({
+        icon: "error",
+        title: "Error de conexión",
+        text: "No se pudieron obtener los datos de los turnos.",
+        confirmButtonColor: "#0d6efd",
+      });
     } finally {
       setLoading(false);
     }
@@ -141,7 +167,28 @@ const TurnosReport = () => {
   };
 
   const updateSelectedReports = async (nuevoEstado) => {
-    if (selectedReports.size === 0) return;
+    if (selectedReports.size === 0) {
+      Swal.fire({
+        icon: "info",
+        title: "Sin selección",
+        text: "Selecciona al menos un turno para actualizar.",
+        confirmButtonColor: "#0d6efd",
+      });
+      return;
+    }
+
+    const confirmResult = await Swal.fire({
+      icon: "question",
+      title: "¿Confirmar acción?",
+      text: `¿Deseas actualizar ${selectedReports.size} turno(s) a estado ${nuevoEstado}?`,
+      showCancelButton: true,
+      confirmButtonText: "Sí, confirmar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: "#0d6efd",
+      cancelButtonColor: "#6c757d",
+    });
+
+    if (!confirmResult.isConfirmed) return;
 
     const errores = [];
     try {
@@ -180,15 +227,33 @@ const TurnosReport = () => {
       fetchReports();
 
       if (errores.length > 0) {
-        alert(
-          "Algunos turnos no pudieron actualizarse:\n\n" + errores.join("\n")
-        );
+        Swal.fire({
+          icon: "warning",
+          title: "Actualización parcial",
+          html:
+            "<b>Algunos turnos no pudieron actualizarse:</b><br><br>" +
+            errores.join("<br>"),
+          confirmButtonColor: "#0d6efd",
+        });
+      } else {
+        Swal.fire({
+          icon: "success",
+          title: "Actualización exitosa",
+          text: "Los turnos fueron actualizados correctamente.",
+          confirmButtonColor: "#0d6efd",
+        });
       }
     } catch (error) {
       console.error("Error en la petición:", error);
-      alert("No se pudo conectar con el servidor.");
+      Swal.fire({
+        icon: "error",
+        title: "Error de conexión",
+        text: "No se pudo conectar con el servidor.",
+        confirmButtonColor: "#0d6efd",
+      });
     }
   };
+
 
   return (
     <div>

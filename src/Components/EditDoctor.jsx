@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, Modal, Form, Container } from "react-bootstrap";
+import Swal from "sweetalert2";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 
@@ -13,7 +14,7 @@ const ProfesionalTable = () => {
   // 🔹 Obtener doctores
   const fetchDoctors = async () => {
     try {
-      const response = await fetch(`${apiUrl}/doctor`);
+      const response = await fetch(`${apiUrl}/doctor/all-with-deleted`);
       const data = await response.json();
       const result = Array.isArray(data)
         ? data
@@ -26,7 +27,12 @@ const ProfesionalTable = () => {
       );
       setDoctors(result);
     } catch (error) {
-      console.error("Error al obtener doctores:", error);
+      Swal.fire({
+        title: "❌ Error",
+        text: "No se pudieron obtener los profesionales.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+      });
       setDoctors([]);
     }
   };
@@ -38,7 +44,12 @@ const ProfesionalTable = () => {
       const data = await response.json();
       setSpecialities(Array.isArray(data) ? data : data.data ?? []);
     } catch (error) {
-      console.error("Error al obtener especialidades:", error);
+      Swal.fire({
+        title: "❌ Error",
+        text: "No se pudieron cargar las especialidades.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+      });
       setSpecialities([]);
     }
   };
@@ -58,7 +69,12 @@ const ProfesionalTable = () => {
   const handleSave = async () => {
   try {
     if (!selectedDoctor || !selectedDoctor.id) {
-      alert("Error: no se seleccionó un doctor válido.");
+      Swal.fire({
+        title: "⚠️ Error",
+        text: "No se seleccionó un profesional válido.",
+        icon: "warning",
+        confirmButtonColor: "#3085d6",
+      });
       return;
     }
 
@@ -78,39 +94,132 @@ const ProfesionalTable = () => {
     });
 
     if (response.ok) {
-      alert("Datos actualizados correctamente");
+      await Swal.fire({
+          title: "✅ Datos actualizados",
+          text: "El profesional fue actualizado correctamente.",
+          icon: "success",
+          confirmButtonColor: "#3085d6",
+        });
       setShowModal(false);
       fetchDoctors();
     } else {
-      const err = await response.json().catch(() => ({}));
-      alert("Error al actualizar: " + (err.message || "Error desconocido"));
+      await Swal.fire({
+          title: "⚠️ Error al actualizar",
+          text: data.message || "No se pudo actualizar el profesional.",
+          icon: "error",
+          confirmButtonColor: "#d33",
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        title: "❌ Error de conexión",
+        text: "No se pudo conectar con el servidor.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+      });
     }
-  } catch (error) {
-    console.error("Error en handleSave:", error);
-    alert("Error de conexión con el servidor");
-  }
-};
+  };
+
   // 🔹 Eliminar doctor
   const handleDelete = async (id) => {
-    if (!window.confirm("¿Seguro que deseas eliminar este profesional?")) return;
+    const confirm = await Swal.fire({
+      title: "¿Eliminar profesional?",
+      text: "¿Estás seguro de que deseas eliminar este profesional?.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+    });
+
+    if (!confirm.isConfirmed) return;
+
     try {
       const response = await fetch(`${apiUrl}/doctor/${id}`, {
         method: "DELETE",
       });
+
       if (response.ok) {
+        await Swal.fire({
+          title: "✅ Eliminado",
+          text: "El profesional fue eliminado correctamente.",
+          icon: "success",
+          confirmButtonColor: "#3085d6",
+        });
         fetchDoctors();
       } else {
-        alert("Error al eliminar el profesional.");
+        const data = await response.json().catch(() => ({}));
+        Swal.fire({
+          title: "⚠️ Error",
+          text: data.message || "No se pudo eliminar el profesional.",
+          icon: "error",
+          confirmButtonColor: "#d33",
+        });
       }
     } catch {
-      alert("Error de conexión con el servidor.");
+      Swal.fire({
+        title: "❌ Error de conexión",
+        text: "No se pudo conectar con el servidor.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+      });
     }
   };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setSelectedDoctor({ ...selectedDoctor, [name]: value });
   };
+
+   const handleRestore = async (id) => {
+    const confirm = await Swal.fire({
+      title: "¿Reactivar profesional?",
+      text: "El profesional volverá a estar disponible.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, reactivar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#aaa",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      const response = await fetch(`${apiUrl}/doctor/restore/${id}`, {
+        method: "PATCH",
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        await Swal.fire({
+          title: "✅ Restaurado",
+          text: data.message || "El profesional fue reactivado correctamente.",
+          icon: "success",
+          confirmButtonColor: "#3085d6",
+        });
+        fetchDoctors();
+      } else {
+        await Swal.fire({
+          title: "⚠️ Error",
+          text: data.message || "No se pudo restaurar el profesional.",
+          icon: "error",
+          confirmButtonColor: "#d33",
+        });
+      }
+    } catch (error) {
+      console.error("Error al restaurar doctor:", error);
+      Swal.fire({
+        title: "❌ Error de conexión",
+        text: "No se pudo conectar con el servidor.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+      });
+    }
+  };
+
 
   return (
     <div>
@@ -131,13 +240,15 @@ const ProfesionalTable = () => {
           <tbody>
             {doctors.length > 0 ? (
               doctors.map((doc) => (
-                <tr key={doc.id}>
+                <tr key={doc.id} className={doc.deletedAt ? "table-secondary" : ""}>
                   <td>{doc.fullName}</td>
                   <td>{doc.speciality.name}</td>
                   <td>{doc.license}</td>
                   <td>{doc.phone || "-"}</td>
                   <td>{doc.email || "-"}</td>
                   <td>
+                  {!doc.deletedAt ? (
+    <>
                     <Button
                       className="sort-btn"
                       onClick={() => handleEdit(doc)}
@@ -150,6 +261,16 @@ const ProfesionalTable = () => {
                     >
                       Eliminar
                     </Button>
+                     </>
+  ) : (
+    <Button
+      variant="success"
+      className="sort-btn"
+      onClick={() => handleRestore(doc.id)}
+    >
+      Restaurar
+    </Button>
+  )}
                   </td>
                 </tr>
               ))

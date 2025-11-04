@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Container, Form, Button, Row, Col, InputGroup } from "react-bootstrap";
+import Swal from "sweetalert2";
 
 const diasCastellano = [
   { key: "monday", label: "Lunes" },
@@ -25,18 +26,31 @@ const CreateSchedule = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    fetch(`${apiUrl}/doctor`)
-      .then((res) => res.json())
-      .then((data) => {
+    const fetchDoctors = async () => {
+      try {
+        const res = await fetch(`${apiUrl}/doctor`);
+        const data = await res.json();
         const doctorList = data?.data || data;
+
         if (Array.isArray(doctorList)) {
           setDoctors(doctorList);
         } else {
-          console.error("El formato de doctores no es el esperado", data);
+          throw new Error("El formato de doctores no es el esperado");
         }
-      })
-      .catch(() => alert("No se pudieron cargar los doctores"));
+      } catch (error) {
+        console.error(error);
+        Swal.fire({
+          title: "❌ Error",
+          text: "No se pudieron cargar los doctores.",
+          icon: "error",
+          confirmButtonColor: "#d33",
+        });
+      }
+    };
+
+    fetchDoctors();
   }, [apiUrl]);
+
 
   const handleCheckboxChange = (dayKey) => {
     const updated = formData.daysOfWeek.includes(dayKey)
@@ -60,6 +74,15 @@ const CreateSchedule = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.idDoctor || !formData.startDate || formData.daysOfWeek.length === 0) {
+      Swal.fire({
+        title: "⚠️ Campos incompletos",
+        text: "Selecciona un doctor, una fecha de inicio y al menos un día de atención.",
+        icon: "warning",
+        confirmButtonColor: "#3085d6",
+      });
+      return;
+    }
     try {
       const response = await fetch(`${apiUrl}/schedules/bulk-create`, {
         method: "POST",
@@ -73,7 +96,12 @@ const CreateSchedule = () => {
       const result = await response.json();
 
       if (response.ok) {
-        alert("Agenda generada correctamente");
+        await Swal.fire({
+          title: "✅ Agenda generada",
+          text: "La agenda de turnos fue creada correctamente.",
+          icon: "success",
+          confirmButtonColor: "#3085d6",
+        });
         setFormData({
           idDoctor: "",
           daysOfWeek: [],
@@ -83,12 +111,20 @@ const CreateSchedule = () => {
           timeRanges: [{ start: "", end: "" }],
         });
       } else {
-        console.error("Error al crear la agenda:", result);
-        alert("Error: " + (result.message || "No se pudo crear la agenda"));
+        await Swal.fire({
+          title: "⚠️ Error al crear agenda",
+          text: result.message || "No se pudo crear la agenda.",
+          icon: "error",
+          confirmButtonColor: "#d33",
+        });
       }
     } catch (err) {
-      console.error("Error de conexión con el servidor:", err);
-      alert("Error de conexión con el servidor");
+      await Swal.fire({
+        title: "❌ Error de conexión",
+        text: "No se pudo conectar con el servidor.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+      });
     }
   };
 

@@ -10,6 +10,7 @@ import {
   faPills,
   faStethoscope,
 } from "@fortawesome/free-solid-svg-icons";
+import Swal from "sweetalert2";
 
 import "../Styles/speciality.css";
 
@@ -44,8 +45,13 @@ const SpecialityList = () => {
 
     setSpecialities(sorted);
       } catch (error) {
-        console.error("Error al obtener especialidades:", error);
         setSpecialities([]);
+        Swal.fire({
+          icon: "error",
+          title: "Error al cargar las especialidades",
+          text: "No se pudo conectar con el servidor o la lista está vacía.",
+          confirmButtonColor: "#0d6efd",
+        });
       }
     };
     fetchSpecialities();

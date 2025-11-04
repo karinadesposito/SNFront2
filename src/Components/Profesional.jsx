@@ -3,6 +3,7 @@ import { Container, Row, Col, Card } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserDoctor } from "@fortawesome/free-solid-svg-icons";
 import "../Styles/profesional.css";
+import Swal from "sweetalert2";
 
 const ProfesionalList = () => {
   const [doctors, setDoctors] = useState([]);
@@ -25,7 +26,12 @@ const ProfesionalList = () => {
         );
         setDoctors(sorted);
       } catch (error) {
-        console.error("Error al obtener los profesionales:", error);
+        Swal.fire({
+          title: "❌ Error al cargar profesionales",
+          text: "No se pudieron obtener los datos del servidor. Intenta nuevamente más tarde.",
+          icon: "error",
+          confirmButtonColor: "#3085d6",
+        });
         setDoctors([]);
       }
     };

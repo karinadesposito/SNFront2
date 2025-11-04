@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 
 const AddDoctor = () => {
@@ -24,7 +25,11 @@ const AddDoctor = () => {
         const data = await response.json();
         setSpecialities(Array.isArray(data) ? data : (data?.data ?? []));
       } catch (error) {
-        console.error("Error al cargar especialidades:", error);
+        Swal.fire({
+          text: "No se pudo obtener la lista de especialidades",
+          icon: "error",
+          confirmButtonColor: "#3085d6"
+        });
         setSpecialities([]);
       }
     };
@@ -33,7 +38,6 @@ const AddDoctor = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Dejo al usuario escribir libre; normalizo en el submit
     setFormData({ ...formData, [name]: value });
   };
 
@@ -56,20 +60,49 @@ const AddDoctor = () => {
         body: JSON.stringify(payload),
       });
 
+      const data = await response.json().catch(() => ({}));
+
       if (response.ok) {
-        alert("Profesional creado exitosamente");
-        navigate("/admin");
+        Swal.fire({
+          title: "✅ Profesional creado",
+          text: "El profesional fue agregado exitosamente.",
+          icon: "success",
+          confirmButtonText: "Aceptar",
+          confirmButtonColor: "#3085d6",
+        }).then(() => navigate("/admin"));
       } else {
-        const error = await response.json().catch(() => ({}));
-        const msg = Array.isArray(error?.message)
-          ? error.message.join(" | ")
-          : error?.message || "Error desconocido";
-        alert("Error al crear profesional: " + msg);
+        let errorMessage = "Error al crear el profesional.";
+
+    if (response.status === 409) {
+      if (data.message?.toLowerCase().includes("matricula")) {
+        errorMessage = "Ya existe un profesional con esa matrícula.";
+      } else if (data.message?.toLowerCase().includes("dni")) {
+        errorMessage = "Ya existe un profesional con ese DNI.";
+      } else {
+        errorMessage = data.message || "Conflicto: el profesional ya existe.";
       }
-    } catch {
-      alert("Error de conexión con el servidor");
+    } else if (response.status === 404) {
+      errorMessage = data.message || "No se encontró la especialidad seleccionada.";
+    } else {
+      errorMessage = data.message || "Error desconocido del servidor.";
     }
-  };
+
+    await Swal.fire({
+      title: "⚠️ No se pudo crear el profesional",
+      text: errorMessage,
+      icon: "error",
+      confirmButtonColor: "#d33",
+    });
+  }
+  } catch {
+    await Swal.fire({
+      title: "❌ Error de conexión",
+      text: "No se pudo conectar con el servidor.",
+      icon: "error",
+      confirmButtonColor: "#d33",
+    });
+  }
+}
 
   return (
     <Container className="my-4">
