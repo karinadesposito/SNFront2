@@ -1,10 +1,11 @@
 .card-body {
   background: linear-gradient(#8fc9ca) padding-box, border-box;
-  border-radius: 12px;
+  border-radius: 5px;
   padding: 1rem;
 }
 
 .card-body,
 .card-body * {
+
   font-family: inherit;
 }

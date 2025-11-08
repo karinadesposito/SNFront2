@@ -1,7 +1,7 @@
 .adddoctor-frame,
 .form-panel {
   background: linear-gradient(#8fc9ca) padding-box, border-box;
-  border: 2px solid transparent;
+ 
   border-radius: 12px;
   padding: 1rem;
 }

@@ -6,7 +6,7 @@ import React, {
   useLayoutEffect,
 } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { Container, Row, Col, Form, Button, ListGroup, Modal } from "react-bootstrap";
+import { Container, Row, Col, Form, ListGroup, Modal } from "react-bootstrap";
 import Select from "react-select";
 import "react-calendar/dist/Calendar.css";
 import Calendar from "react-calendar";
@@ -46,14 +46,7 @@ const CalendarPatient = () => {
   const recaptchaRef = useRef(null);
   const [captchaToken, setCaptchaToken] = useState(null);
 
-  // Handlers del captcha (listos para conectar en el JSX)
-  const handleCaptchaChange = (token) => {
-    setCaptchaToken(token || null);
-  };
-  const handleCaptchaExpired = () => {
-    setCaptchaToken(null);
-  };
-
+  // ====== Catálogos y filtros ======
   const [doctors, setDoctors] = useState([]);
   const [specialities, setSpecialities] = useState([]);
 
@@ -345,8 +338,6 @@ const CalendarPatient = () => {
   const selectedSpecialityOption =
     specialityOptions.find((o) => o.value === selectedSpeciality) || null;
 
-
-
   return (
     <>
       <Container fluid="xl" className="calendar-container">
@@ -532,187 +523,187 @@ const CalendarPatient = () => {
       </Container>
 
       <Modal
-  show={showForm}
-  onHide={() => {
-    setShowForm(false);
-    setSelectedSlot(null);
-    // reset de reCAPTCHA al cerrar
-    recaptchaRef.current?.reset();
-    setCaptchaToken(null);
-  }}
-  onExited={() => {
-    if (queuedSwal) {
-      const { doctorName, dayStr, timeStr } = queuedSwal;
-      const fecha = formatDayLocal(dayStr);
-
-      Swal.fire("¡Turno confirmado!", "", "success").then(() => {
-        Swal.fire({
-          icon: "info",
-          title: "Detalle del turno",
-          html: `Con <b>${doctorName}</b> el <b>${fecha}</b> a las <b>${timeStr}</b>`,
-          timer: 6000,
-          showConfirmButton: false,
-          timerProgressBar: true,
-        });
-      });
-
-      setQueuedSwal(null);
-    }
-  }}
-  enforceFocus={false}
-  restoreFocus={false}
-  centered
-  size="lg"
-  backdrop
-  scrollable
->
-  <Modal.Header closeButton>
-    <Modal.Title>
-      Confirmar turno — {selectedDate?.toLocaleDateString()}{" "}
-      {selectedSlot ? `• ${selectedSlot.time}` : ""}
-    </Modal.Title>
-  </Modal.Header>
-
-      <Modal.Body>
-  <Form onSubmit={handleSubmit(onSubmit)} noValidate>
-    <Row>
-      <Col md={12} className="mb-3">
-        <div className="text-muted small">
-          <strong>Médico:</strong>{" "}
-          {doctors?.length
-            ? doctors.find((d) => d.id === selectedDoctor)?.fullName || "—"
-            : selectedDoctor ?? "—"}
-        </div>
-      </Col>
-
-      <Col md={12}>
-        <h5 className="mb-3">Datos del Paciente</h5>
-      </Col>
-
-      {/* DNI PRIMERO (autocompleta) */}
-      <Col md={6} className="mb-3">
-        <Form.Label>DNI</Form.Label>
-        <div className="d-flex align-items-center gap-2">
-          <Form.Control
-            ref={dniInputRef}
-            autoFocus
-            type="text"
-            placeholder="Ej: 30111222"
-            inputMode="numeric"
-            maxLength={8}
-            {...register("dni", {
-              required: "El DNI es obligatorio",
-              onChange: (e) => {
-                const clean = e.target.value.replace(/\D+/g, "");
-                setValue("dni", clean, { shouldValidate: true });
-                if (clean.length < 8) setPatientFound(null);
-              },
-              validate: (v) =>
-                !v || dniRegex.test(v) || "Debe tener 8 dígitos (sin 0 inicial)",
-            })}
-          />
-          {findingPatient && (
-            <span className="small text-muted d-inline-flex align-items-center">
-              <span className="spinner-border spinner-border-sm me-1" role="status" />
-              Buscando…
-            </span>
-          )}
-          {!findingPatient && dniValue?.length === 8 && (
-            <span className={`badge ${patientFound ? "bg-success" : "bg-secondary"}`}>
-              {patientFound ? "Encontrado" : "No encontrado"}
-            </span>
-          )}
-        </div>
-        {errors.dni && (
-          <span className="text-danger small">{errors.dni.message}</span>
-        )}
-      </Col>
-
-      {/* NOMBRE DESPUÉS */}
-      <Col md={6} className="mb-3">
-        <Form.Label>Nombre completo</Form.Label>
-        <Form.Control
-          type="text"
-          placeholder="Ej: Juan Pérez"
-          {...register("fullName", { required: "El nombre es obligatorio" })}
-        />
-        {errors.fullName && (
-          <span className="text-danger small">{errors.fullName.message}</span>
-        )}
-      </Col>
-
-      <Col md={6} className="mb-3">
-        <Form.Label>Teléfono</Form.Label>
-        <Form.Control
-          type="text"
-          placeholder="Ej: 2215555555"
-          inputMode="tel"
-          {...register("phone", { required: "El teléfono es obligatorio" })}
-        />
-        {errors.phone && (
-          <span className="text-danger small">{errors.phone.message}</span>
-        )}
-      </Col>
-
-      <Col md={6} className="mb-3">
-        <Form.Label>Correo electrónico</Form.Label>
-        <Form.Control
-          type="email"
-          placeholder="Ej: paciente@email.com"
-          {...register("email", { required: "El correo es obligatorio" })}
-        />
-        {errors.email && (
-          <span className="text-danger small">{errors.email.message}</span>
-        )}
-      </Col>
-    </Row>
-
-    {/* reCAPTCHA */}
-    <div className="mt-2">
-      <ReCAPTCHA
-        ref={recaptchaRef}
-        sitekey={recaptchaSiteKey}
-        onChange={(token) => setCaptchaToken(token)}
-        onExpired={() => setCaptchaToken(null)}
-        onErrored={() => setCaptchaToken(null)}
-      />
-      {recaptchaSiteKey.includes("6LeIxAcT") && (
-        <div className="text-muted small">Usando clave de prueba (solo dev).</div>
-      )}
-    </div>
-
-    <div className="d-flex justify-content-end gap-2 mt-2">
-      {/* Botón cancelar (no debe enviar el form) */}
-      <button
-        type="button"
-        className="btn-admin sm"
-        onClick={() => {
+        show={showForm}
+        onHide={() => {
           setShowForm(false);
           setSelectedSlot(null);
+          // reset de reCAPTCHA al cerrar
           recaptchaRef.current?.reset();
           setCaptchaToken(null);
         }}
-        disabled={loading}
-      >
-        Cancelar
-      </button>
+        onExited={() => {
+          if (queuedSwal) {
+            const { doctorName, dayStr, timeStr } = queuedSwal;
+            const fecha = formatDayLocal(dayStr);
 
-      {/* Botón confirmar */}
-      <button
-        type="submit"
-        className="btn-admin sm"
-        disabled={loading || !captchaToken}
-      >
-        {loading ? "Confirmando..." : "Confirmar Turno"}
-      </button>
-    </div>
-  </Form>
-</Modal.Body>
+            Swal.fire("¡Turno confirmado!", "", "success").then(() => {
+              Swal.fire({
+                icon: "info",
+                title: "Detalle del turno",
+                html: `Con <b>${doctorName}</b> el <b>${fecha}</b> a las <b>${timeStr}</b>`,
+                timer: 6000,
+                showConfirmButton: false,
+                timerProgressBar: true,
+              });
+            });
 
+            setQueuedSwal(null);
+          }
+        }}
+        enforceFocus={false}
+        restoreFocus={false}
+        centered
+        size="lg"
+        backdrop
+        scrollable
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Confirmar turno — {selectedDate?.toLocaleDateString()}{" "}
+            {selectedSlot ? `• ${selectedSlot.time}` : ""}
+          </Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          <Form onSubmit={handleSubmit(onSubmit)} noValidate>
+            <Row>
+              <Col md={12} className="mb-3">
+                <div className="text-muted small">
+                  <strong>Médico:</strong>{" "}
+                  {doctors?.length
+                    ? doctors.find((d) => d.id === selectedDoctor)?.fullName || "—"
+                    : selectedDoctor ?? "—"}
+                </div>
+              </Col>
+
+              <Col md={12}>
+                <h5 className="mb-3">Datos del Paciente</h5>
+              </Col>
+
+              {/* DNI PRIMERO (autocompleta) */}
+              <Col md={6} className="mb-3">
+                <Form.Label>DNI</Form.Label>
+                <div className="d-flex align-items-center gap-2">
+                  <Form.Control
+                    ref={dniInputRef}
+                    autoFocus
+                    type="text"
+                    placeholder="Ej: 30111222"
+                    inputMode="numeric"
+                    maxLength={8}
+                    {...register("dni", {
+                      required: "El DNI es obligatorio",
+                      onChange: (e) => {
+                        const clean = e.target.value.replace(/\D+/g, "");
+                        setValue("dni", clean, { shouldValidate: true });
+                        if (clean.length < 8) setPatientFound(null);
+                      },
+                      validate: (v) =>
+                        !v || dniRegex.test(v) || "Debe tener 8 dígitos (sin 0 inicial)",
+                    })}
+                  />
+                  {findingPatient && (
+                    <span className="small text-muted d-inline-flex align-items-center">
+                      <span className="spinner-border spinner-border-sm me-1" role="status" />
+                      Buscando…
+                    </span>
+                  )}
+                  {!findingPatient && dniValue?.length === 8 && (
+                    <span className={`badge ${patientFound ? "bg-success" : "bg-secondary"}`}>
+                      {patientFound ? "Encontrado" : "No encontrado"}
+                    </span>
+                  )}
+                </div>
+                {errors.dni && (
+                  <span className="text-danger small">{errors.dni.message}</span>
+                )}
+              </Col>
+
+              {/* NOMBRE DESPUÉS */}
+              <Col md={6} className="mb-3">
+                <Form.Label>Nombre completo</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Ej: Juan Pérez"
+                  {...register("fullName", { required: "El nombre es obligatorio" })}
+                />
+                {errors.fullName && (
+                  <span className="text-danger small">{errors.fullName.message}</span>
+                )}
+              </Col>
+
+              <Col md={6} className="mb-3">
+                <Form.Label>Teléfono</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Ej: 2215555555"
+                  inputMode="tel"
+                  {...register("phone", { required: "El teléfono es obligatorio" })}
+                />
+                {errors.phone && (
+                  <span className="text-danger small">{errors.phone.message}</span>
+                )}
+              </Col>
+
+              <Col md={6} className="mb-3">
+                <Form.Label>Correo electrónico</Form.Label>
+                <Form.Control
+                  type="email"
+                  placeholder="Ej: paciente@email.com"
+                  {...register("email", { required: "El correo es obligatorio" })}
+                />
+                {errors.email && (
+                  <span className="text-danger small">{errors.email.message}</span>
+                )}
+              </Col>
+            </Row>
+
+            {/* reCAPTCHA */}
+            <div className="mt-2">
+              <ReCAPTCHA
+                ref={recaptchaRef}
+                sitekey={recaptchaSiteKey}
+                onChange={(token) => setCaptchaToken(token)}
+                onExpired={() => setCaptchaToken(null)}
+                onErrored={() => setCaptchaToken(null)}
+              />
+              {recaptchaSiteKey.includes("6LeIxAcT") && (
+                <div className="text-muted small">Usando clave de prueba (solo dev).</div>
+              )}
+            </div>
+
+            <div className="d-flex justify-content-end gap-2 mt-2">
+              {/* Botón cancelar (no debe enviar el form) */}
+              <button
+                type="button"
+                className="btn-admin sm"
+                onClick={() => {
+                  setShowForm(false);
+                  setSelectedSlot(null);
+                  recaptchaRef.current?.reset();
+                  setCaptchaToken(null);
+                }}
+                disabled={loading}
+              >
+                Cancelar
+              </button>
+
+              {/* Botón confirmar */}
+              <button
+                type="submit"
+                className="btn-admin sm"
+                disabled={loading || !captchaToken}
+              >
+                {loading ? "Confirmando..." : "Confirmar Turno"}
+              </button>
+            </div>
+          </Form>
+        </Modal.Body>
       </Modal>
     </>
   );
 };
 
 export default CalendarPatient;
+
 

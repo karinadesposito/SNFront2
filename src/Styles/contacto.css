@@ -135,3 +135,6 @@
   opacity: .85;
   color: #fff;
 }
+.card-title2{
+  font-size: clamp(1.4rem, 1.8vw, 1.40rem);
+}
