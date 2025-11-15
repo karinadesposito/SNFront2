@@ -1,136 +1,79 @@
-:root{
-  --nav-bg: #06475B;   /* color base de tu navbar */
-  --nav-h: 64px;       /* se actualiza en runtime desde NavBar.jsx */
+:root {
+  --nav-bg: #06475b; /* color base de tu navbar */
+  --nav-h: 64px; /* se actualiza en runtime desde NavBar.jsx */
 }
 
 /* Evita que la navbar fija tape el contenido */
-body.with-fixed-navbar{ padding-top: var(--nav-h); }
+body.with-fixed-navbar {
+  padding-top: var(--nav-h);
+}
 
 /* ========= Base de la navbar fija ========= */
-.app-navbar{
-  position: fixed; top: 0; left: 0; right: 0;
-  z-index: 1040;                   /* por encima del contenido */
-  background-color: #073043;       /* fallback sólido */
-  /* transition: background-color .25s, box-shadow .25s, backdrop-filter .25s;
-  border-bottom: 1px solid rgba(0,0,0,.06);
-  backdrop-filter: saturate(110%); */
-}
-/* .app-navbar.is-scrolled{
-  background-color: #062838;      
-  box-shadow: 0 10px 26px rgba(0,0,0,.24);
-  backdrop-filter: saturate(125%) blur(2px);
-} */
-
-/* Si hay soporte de color-mix, usa mezcla del color base */
-@supports (background-color: color-mix(in srgb, white, black)) {
-  .app-navbar{
-    background-color: color-mix(in srgb, var(--nav-bg) 92%, #000 8%);
-  }
-  .app-navbar.is-scrolled{
-    background-color: color-mix(in srgb, var(--nav-bg) 85%, #000 15%);
-  }
-}
-/* === Botón “ghost” sin fondo para Reservar turnos en la navbar === */
-.app-navbar .btn-ghost-reserva{
-  background: transparent !important;
-  border: 1px solid transparent !important;
-  color: #fff !important;
-
-  line-height: 1.50;
-  padding: .375rem .75rem;            /* tamaño botón */
-  transform: translateZ(0);            /* evita borrones al escalar */
-  transition: transform .15s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease;
-  text-decoration: none !important;
-}
-.app-navbar .btn-ghost-reserva:hover,
-.app-navbar .btn-ghost-reserva:focus{
-  transform: scale(1.06);
-       /* leve acento en hover */
-  border-color: rgba(255,255,255,.28) !important; /* contorno sutil */
-  box-shadow: none;
-}
-.app-navbar .btn-ghost-reserva:active{
-  transform: scale(0.98);
+.app-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1040; /* por encima del contenido */
+  background-color: #073043; /* fallback sólido */
 }
 
-/* Evita que el hover mueva elementos adyacentes */
-.app-navbar .btn-ghost-reserva{ transform-origin: center; }
-
-/* En mobile (colapsado) mantenemos el estilo ghost sin fondo */
-@media (max-width: 991.98px){
-  .app-navbar .btn-ghost-reserva.flex-fill{
-    width: 100%;
-    text-align: center;
-  }
+#logosaludnet {
+  height: 60px;
+  width: auto;
+  object-fit: contain;
 }
-
-/* 
-/* Logo */
-#logosaludnet{ height: 60px; width: auto; object-fit: contain; }
 
 /* Links */
-.navbar-dark .navbar-nav .nav-link{ color:#fff; padding:.5rem 1rem; }
-.navbar-dark .navbar-nav .nav-link:hover{ color:#9bea7e; }
+.navbar-dark .navbar-nav .nav-link {
+  color: #fff;
+  padding: 0.5rem 1rem;
+  font-weight: 500; /* un toque más fuerte */
+  letter-spacing: 0.04em;
+}
+.navbar-dark .navbar-nav .nav-link:hover {
+  color: #80e7e9;
+
+}
 
 /* Dropdown (tu color) */
-.dropdown-menu{
+.dropdown-menu {
   background-color: rgb(178, 218, 158);
-  margin:0; padding:10px;
+  margin: 0;
+  padding: 10px;
 }
 
 /* Responsive */
-@media (max-width: 800px){
-  #logosaludnet{ max-height:55px; margin-right:.5rem; margin-left:.2rem; }
-  .saludnet-text{ display:none; }
+@media (max-width: 800px) {
+  #logosaludnet {
+    max-height: 55px;
+    margin-right: 0.5rem;
+    margin-left: 0.2rem;
+  }
+  .saludnet-text {
+    display: none;
+  }
 }
-@media (max-width: 320px){
-  #logosaludnet{ max-width:28px; max-height:24px; }
+@media (max-width: 320px) {
+  #logosaludnet {
+    max-width: 28px;
+    max-height: 24px;
+  }
 }
-/* === Botón “ghost” reutilizable (secciones y navbar) === */
-.btn-ghost-reserva{
-  background: transparent !important;
-  border: 1px solid transparent !important;
-  color: var(--nav-bg, #062d38) !important;  /* contraste en secciones */
-  font-weight: 600;
-  line-height: 1.25;
-  padding: .375rem .75rem;
-  transform: translateZ(0);
-  transition: transform .15s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease;
-  text-decoration: none !important;
-}
-.btn-ghost-reserva:hover,
-.btn-ghost-reserva:focus{
-  transform: scale(1.06);
-  border-color: color-mix(in srgb, var(--nav-bg, #062d38) 25%, #ffffff); /* contorno sutil */
-}
-.btn-ghost-reserva:active{ transform: scale(0.98); }
 
-/* — Overrides específicos cuando el botón está dentro de la navbar oscura — */
-.app-navbar .btn-ghost-reserva{
-  color: #fff !important;
-}
-.app-navbar .btn-ghost-reserva:hover,
-.app-navbar .btn-ghost-reserva:focus{
-  color: #9bea7e !important;                      /* acento en navbar */
-  border-color: rgba(255,255,255,.28) !important; /* contorno sutil */
-}
-/* Alternativa con degradé, ocupa todo el ancho de la navbar */
-.navbar.navbar-dark {
-  position: relative;
-  border-bottom: none !important;
-  box-shadow: none !important; /* para no duplicar si probaste la otra */
-}
 .navbar.navbar-dark::after {
   content: "";
   position: absolute;
-  left: 0; right: 0; bottom: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   height: 1px;
   background: linear-gradient(
     to right,
-    rgba(255,255,255,0) 0%,
-    rgba(255,255,255,0.8) 20%,
-    rgba(255,255,255,0.8) 80%,
-    rgba(255,255,255,0) 100%
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.8) 20%,
+    rgba(255, 255, 255, 0.8) 80%,
+    rgba(255, 255, 255, 0) 100%
   );
   pointer-events: none; /* no interfiere con clics */
 }

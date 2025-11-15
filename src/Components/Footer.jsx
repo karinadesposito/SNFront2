@@ -51,7 +51,10 @@ export default function Footer() {
           </Col>
 
           <Col xs={12} md={4} className="d-flex justify-content-center justify-content-md-end">
-            <img src={pixeliaBlanco} alt="Pixelia" id="pixeliaBlanco" />
+            {/* <img src={pixeliaBlanco} alt="Pixelia" id="pixeliaBlanco" /> */}
+           <span className="brand-first ms-2">
+                Developed by JuarezDevs
+              </span>
           </Col>
         </Row>
       </Container>

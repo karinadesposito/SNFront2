@@ -17,7 +17,7 @@ import SpecialityList from "./Components/Speciality";
 import ProfesionalList from "./Components/Profesional";
 import EditDoctor from "./Components/EditDoctor";
 
-// Styles
+import "./Styles/theme.css"
 import "./Styles/addDoctorAddScheduleAddTurno.css";
 import "./Styles/calendarPatient.css";
 import "./Styles/contacto.css";

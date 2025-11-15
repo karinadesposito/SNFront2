@@ -6,13 +6,12 @@ import React, {
   useLayoutEffect,
 } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { Container, Row, Col, Form, Button, ListGroup, Modal } from "react-bootstrap";
+import { Container, Row, Col, Form, ListGroup, Modal } from "react-bootstrap";
 import Select from "react-select";
 import "react-calendar/dist/Calendar.css";
 import Calendar from "react-calendar";
 import Swal from "sweetalert2";
-import ReCAPTCHA from "react-google-recaptcha";
-
+// import ReCAPTCHA from "react-google-recaptcha"; // ⬅️ Comentado temporalmente
 
 const selectStyles = {
   control: (base) => ({ ...base, borderRadius: 10 }),
@@ -28,7 +27,7 @@ const toYMDLocal = (d) => {
 };
 
 // Helper: formatea "YYYY-MM-DD" a "DD/MM/YYYY" SIN crear Date
-const formatDayLocal = (dayStr /* "YYYY-MM-DD" */) => {
+const formatDayLocal = (dayStr) => {
   if (!dayStr) return "";
   const [y, m, d] = dayStr.split("-");
   return `${d}/${m}/${y}`;
@@ -37,23 +36,19 @@ const formatDayLocal = (dayStr /* "YYYY-MM-DD" */) => {
 const CalendarPatient = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
 
-  // ⚠️ Clave de sitio NO-Enterprise (consola normal de reCAPTCHA)
-  const recaptchaSiteKey =
-    import.meta.env.VITE_RECAPTCHA_SITE_KEY ||
-    "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"; // fallback SOLO dev
-  console.info("reCAPTCHA SITE KEY ►", recaptchaSiteKey);
+  // // ⚠️ Clave de sitio NO-Enterprise (consola normal de reCAPTCHA)
+  // const recaptchaSiteKey =
+  //   import.meta.env.VITE_RECAPTCHA_SITE_KEY ||
+  //   "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"; // fallback SOLO dev
+  // console.info("reCAPTCHA SITE KEY ►", recaptchaSiteKey);
 
-  // reCAPTCHA
-  const recaptchaRef = useRef(null);
-  const [captchaToken, setCaptchaToken] = useState(null);
+  // // reCAPTCHA
+  // const recaptchaRef = useRef(null);
+  // const [captchaToken, setCaptchaToken] = useState(null);
 
-  // Handlers del captcha (listos para conectar en el JSX)
-  const handleCaptchaChange = (token) => {
-    setCaptchaToken(token || null);
-  };
-  const handleCaptchaExpired = () => {
-    setCaptchaToken(null);
-  };
+  // // Handlers del captcha
+  // const handleCaptchaChange = (token) => setCaptchaToken(token || null);
+  // const handleCaptchaExpired = () => setCaptchaToken(null);
 
   const [doctors, setDoctors] = useState([]);
   const [specialities, setSpecialities] = useState([]);
@@ -62,9 +57,7 @@ const CalendarPatient = () => {
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [selectedSpeciality, setSelectedSpeciality] = useState("");
 
-  // [{ date: 'YYYY-MM-DD', timeSlots: ['HH:mm:ss', ...] }]
   const [availableDates, setAvailableDates] = useState([]);
-  // Set con fechas disponibles para pintar el calendario en O(1)
   const availableDateSet = useMemo(() => {
     const s = new Set();
     for (const it of availableDates || []) if (it?.date) s.add(it.date);
@@ -72,16 +65,13 @@ const CalendarPatient = () => {
   }, [availableDates]);
 
   const [selectedDate, setSelectedDate] = useState(null);
-
-  // [{ idSchedule, time:'HH:mm' }]
-  const [slots, setSlots] = useState([]);
+  const [slots, setSlots] = useState([]); // [{ idSchedule, time:'HH:mm' }]
   const [selectedSlot, setSelectedSlot] = useState(null);
 
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Cola para abrir Swal después de cerrar el Modal
-  const [queuedSwal, setQueuedSwal] = useState(null);
+  const [queuedSwal, setQueuedSwal] = useState(null); // si luego querés usar el flujo en onExited
 
   // Ajuste de altura para panel de horarios
   const calWrapRef = useRef(null);
@@ -114,7 +104,7 @@ const CalendarPatient = () => {
   const dniRegex = /^[1-9]\d{7}$/; // 8 dígitos, sin 0 inicial
   const dniValue = useWatch({ control, name: "dni", defaultValue: "" });
   const [findingPatient, setFindingPatient] = useState(false);
-  const [patientFound, setPatientFound] = useState(null); // {id, fullName, dni, email, phone} | null
+  const [patientFound, setPatientFound] = useState(null);
   const dniAbortRef = useRef(null);
   const dniInputRef = useRef(null);
 
@@ -138,7 +128,6 @@ const CalendarPatient = () => {
         setFindingPatient(true);
         setPatientFound(null);
 
-        // Cancelar request anterior si existe
         if (dniAbortRef.current) dniAbortRef.current.abort();
         const controller = new AbortController();
         dniAbortRef.current = controller;
@@ -178,128 +167,126 @@ const CalendarPatient = () => {
     try {
       if (!selectedDoctor || !selectedDate || !selectedSlot) {
         Swal.fire({
-      title: "⚠️ Faltan datos",
-      text: "Seleccioná un profesional, una fecha y un horario antes de continuar.",
-      icon: "info",
-      confirmButtonColor: "#3085d6",
-    });
-    return;
+          title: "⚠️ Faltan datos",
+          text: "Seleccioná un profesional, una fecha y un horario antes de continuar.",
+          icon: "info",
+          confirmButtonColor: "#3085d6",
+        });
+        return;
       }
 
       const dniClean = String(data.dni || "").replace(/\D+/g, "");
       if (!dniRegex.test(dniClean)) {
         setError("dni", { type: "manual", message: "DNI inválido (8 dígitos, sin 0 inicial)" });
         Swal.fire({
-      title: "DNI inválido",
-      text: "El DNI debe tener 8 dígitos numéricos sin ceros iniciales.",
-      icon: "error",
-      confirmButtonColor: "#d33",
-    });
-    return;
+          title: "DNI inválido",
+          text: "El DNI debe tener 8 dígitos numéricos sin ceros iniciales.",
+          icon: "error",
+          confirmButtonColor: "#d33",
+        });
+        return;
       }
 
-      // reCAPTCHA requerido
-      if (!captchaToken) {
-        Swal.fire({
-      title: "Verificación requerida",
-      text: "Por favor completá el reCAPTCHA antes de confirmar el turno.",
-      icon: "warning",
-      confirmButtonColor: "#3085d6",
-    });
-    return;
-      }
+      // // reCAPTCHA requerido
+      // if (!captchaToken) {
+      //   Swal.fire({
+      //     title: "Verificación requerida",
+      //     text: "Por favor completá el reCAPTCHA antes de confirmar el turno.",
+      //     icon: "warning",
+      //     confirmButtonColor: "#3085d6",
+      //   });
+      //   return;
+      // }
 
       try {
-    Swal.fire({
-      title: "Procesando reserva...",
-      text: "Por favor esperá unos segundos.",
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
+        Swal.fire({
+          title: "Procesando reserva...",
+          text: "Por favor esperá unos segundos.",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
 
-      const payload = {
-        idSchedule: selectedSlot.idSchedule,
-        recaptchaToken: captchaToken, // ⬅️ enviar al backend para verificación
-        patient: {
-          fullName: data.fullName,
-          dni: dniClean,
-          phone: data.phone,
-          email: data.email,
-        },
-      };
+        const payload = {
+          idSchedule: selectedSlot.idSchedule,
+          // recaptchaToken: captchaToken, // ⬅️ comentado temporalmente
+          patient: {
+            fullName: data.fullName,
+            dni: dniClean,
+            phone: data.phone,
+            email: data.email,
+          },
+        };
 
-      const response = await fetch(`${apiUrl}/schedules/book`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+        const response = await fetch(`${apiUrl}/schedules/book`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
 
-      const result = await response.json();
-      if (!response.ok) throw new Error(result?.message || "Error al reservar turno");
+        const result = await response.json();
+        if (!response.ok) throw new Error(result?.message || "Error al reservar turno");
 
-      Swal.close();
+        Swal.close();
 
-      // Para el 2º Swal
-      const saved = result?.data || result;
-      const doctorName = saved?.doctor?.fullName || "el profesional";
-      const dayStr = saved?.day; // "YYYY-MM-DD"
-      const timeStr = (saved?.startTime || saved?.start_Time || "").slice(0, 5); // "HH:mm"
-      Swal.fire({
-      title: "✅ ¡Turno confirmado!",
-      html: `
-        <p><b>Profesional:</b> ${doctorName}</p>
-        <p><b>Fecha:</b> ${dayStr}</p>
-        <p><b>Hora:</b> ${timeStr}</p>
-      `,
-      icon: "success",
-      confirmButtonText: "Aceptar",
-      confirmButtonColor: "#3085d6",
-    });
-      // Actualizamos UI y cerramos modal
-      setSlots((prev) => prev.filter((t) => t.idSchedule !== selectedSlot.idSchedule));
-      setSelectedSlot(null);
-      setShowForm(false);
-      reset();
-      setFindingPatient(false);
-      setPatientFound(null);
-    } catch (error) {
-      Swal.close();
-    Swal.fire({
-      title: "❌ Error al reservar turno",
-      text: error.message || "Ocurrió un error inesperado. Intentalo nuevamente.",
-      icon: "error",
-      confirmButtonColor: "#d33",
-    });
+        const saved = result?.data || result;
+        const doctorName = saved?.doctor?.fullName || "el profesional";
+        const dayStr = saved?.day;
+        const timeStr = (saved?.startTime || saved?.start_Time || "").slice(0, 5);
+        Swal.fire({
+          title: "✅ ¡Turno confirmado!",
+          html: `
+            <p><b>Profesional:</b> ${doctorName}</p>
+            <p><b>Fecha:</b> ${dayStr}</p>
+            <p><b>Hora:</b> ${timeStr}</p>
+          `,
+          icon: "success",
+          confirmButtonText: "Aceptar",
+          confirmButtonColor: "#3085d6",
+        });
 
-    } finally {
-      setLoading(false);
-      // reset del captcha tras cada intento (éxito o error)
-      recaptchaRef.current?.reset();
-      setCaptchaToken(null);
+        setSlots((prev) => prev.filter((t) => t.idSchedule !== selectedSlot.idSchedule));
+        setSelectedSlot(null);
+        setShowForm(false);
+        reset();
+        setFindingPatient(false);
+        setPatientFound(null);
+      } catch (error) {
+        Swal.close();
+        Swal.fire({
+          title: "❌ Error al reservar turno",
+          text: error.message || "Ocurrió un error inesperado. Intentalo nuevamente.",
+          icon: "error",
+          confirmButtonColor: "#d33",
+        });
+      } finally {
+        setLoading(false);
+        // // reset del captcha tras cada intento
+        // recaptchaRef.current?.reset();
+        // setCaptchaToken(null);
 
-      // Refrescar disponibilidad del médico (fuera del try para que se ejecute siempre)
-      if (selectedDoctor) {
-        fetch(`${apiUrl}/schedules/available/by-doctor/${selectedDoctor}`)
-          .then((res) => res.json())
-          .then((data) => {
-            const payload = data?.data || data;
-            setAvailableDates(Array.isArray(payload) ? payload : []);
-          })
-          .catch(() => {});
+        if (selectedDoctor) {
+          fetch(`${apiUrl}/schedules/available/by-doctor/${selectedDoctor}`)
+            .then((res) => res.json())
+            .then((data) => {
+              const payload = data?.data || data;
+              setAvailableDates(Array.isArray(payload) ? payload : []);
+            })
+            .catch(() => {});
+        }
       }
+    } catch (outerError) {
+      console.error("Error inesperado en onSubmit:", outerError);
+      Swal.fire({
+        title: "❌ Error inesperado",
+        text: "Ocurrió un error al procesar la reserva. Intentalo nuevamente.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+      });
     }
-  }catch (outerError) {
-    console.error("Error inesperado en onSubmit:", outerError);
-    Swal.fire({
-      title: "❌ Error inesperado",
-      text: "Ocurrió un error al procesar la reserva. Intentalo nuevamente.",
-      icon: "error",
-      confirmButtonColor: "#d33",
-    });
-  } 
+  };
 
   // Carga inicial de catálogos
   useEffect(() => {
@@ -336,15 +323,12 @@ const CalendarPatient = () => {
     setSelectedSlot(null);
 
     const formatted = toYMDLocal(date);
-
-    // Comprobar que el día exista en availableDates
     const dayData = availableDates.find((item) => item.date === formatted);
     if (!dayData) {
       setSlots([]);
       return;
     }
 
-    // Traer slots con idSchedule para ese día
     fetch(
       `${apiUrl}/schedules/report/DISPONIBLE?idDoctor=${selectedDoctor}&startDate=${formatted}&endDate=${formatted}`
     )
@@ -354,7 +338,7 @@ const CalendarPatient = () => {
         const slotsArr = Array.isArray(list)
           ? list.map((s) => ({
               idSchedule: s.idSchedule,
-              time: (s.startTime || s.start_Time || "").slice(0, 5), // HH:mm
+              time: (s.startTime || s.start_Time || "").slice(0, 5),
             }))
           : [];
         setSlots(slotsArr);
@@ -396,15 +380,12 @@ const CalendarPatient = () => {
 
   const selectedSpecialityOption =
     specialityOptions.find((o) => o.value === selectedSpeciality) || null;
-  }
-
 
   return (
     <>
       <Container fluid="xl" className="calendar-container">
         <h2 className="calendar-title">Reservar Turno</h2>
 
-        {/* Panel y clases tal cual tu estilo previo */}
         <div className="form-panel">
           <Form className="mb-3" noValidate>
             <Form.Check
@@ -526,7 +507,6 @@ const CalendarPatient = () => {
                     onChange={handleDateChange}
                     value={selectedDate}
                     tileDisabled={tileDisabled}
-                    /* Marca con clase los días que tienen turnos disponibles */
                     tileClassName={({ date, view }) =>
                       view === "month" && availableDateSet.has(toYMDLocal(date))
                         ? "has-slots"
@@ -558,9 +538,7 @@ const CalendarPatient = () => {
                           <ListGroup.Item
                             key={slot.idSchedule}
                             action
-                            active={
-                              selectedSlot?.idSchedule === slot.idSchedule
-                            }
+                            active={selectedSlot?.idSchedule === slot.idSchedule}
                             onClick={() => {
                               setSelectedSlot(slot);
                               setShowForm(true);
@@ -584,187 +562,186 @@ const CalendarPatient = () => {
       </Container>
 
       <Modal
-  show={showForm}
-  onHide={() => {
-    setShowForm(false);
-    setSelectedSlot(null);
-    // reset de reCAPTCHA al cerrar
-    recaptchaRef.current?.reset();
-    setCaptchaToken(null);
-  }}
-  onExited={() => {
-    if (queuedSwal) {
-      const { doctorName, dayStr, timeStr } = queuedSwal;
-      const fecha = formatDayLocal(dayStr);
-
-      Swal.fire("¡Turno confirmado!", "", "success").then(() => {
-        Swal.fire({
-          icon: "info",
-          title: "Detalle del turno",
-          html: `Con <b>${doctorName}</b> el <b>${fecha}</b> a las <b>${timeStr}</b>`,
-          timer: 6000,
-          showConfirmButton: false,
-          timerProgressBar: true,
-        });
-      });
-
-      setQueuedSwal(null);
-    }
-  }}
-  enforceFocus={false}
-  restoreFocus={false}
-  centered
-  size="lg"
-  backdrop
-  scrollable
->
-  <Modal.Header closeButton>
-    <Modal.Title>
-      Confirmar turno — {selectedDate?.toLocaleDateString()}{" "}
-      {selectedSlot ? `• ${selectedSlot.time}` : ""}
-    </Modal.Title>
-  </Modal.Header>
-
-      <Modal.Body>
-  <Form onSubmit={handleSubmit(onSubmit)} noValidate>
-    <Row>
-      <Col md={12} className="mb-3">
-        <div className="text-muted small">
-          <strong>Médico:</strong>{" "}
-          {doctors?.length
-            ? doctors.find((d) => d.id === selectedDoctor)?.fullName || "—"
-            : selectedDoctor ?? "—"}
-        </div>
-      </Col>
-
-      <Col md={12}>
-        <h5 className="mb-3">Datos del Paciente</h5>
-      </Col>
-
-      {/* DNI PRIMERO (autocompleta) */}
-      <Col md={6} className="mb-3">
-        <Form.Label>DNI</Form.Label>
-        <div className="d-flex align-items-center gap-2">
-          <Form.Control
-            ref={dniInputRef}
-            autoFocus
-            type="text"
-            placeholder="Ej: 30111222"
-            inputMode="numeric"
-            maxLength={8}
-            {...register("dni", {
-              required: "El DNI es obligatorio",
-              onChange: (e) => {
-                const clean = e.target.value.replace(/\D+/g, "");
-                setValue("dni", clean, { shouldValidate: true });
-                if (clean.length < 8) setPatientFound(null);
-              },
-              validate: (v) =>
-                !v || dniRegex.test(v) || "Debe tener 8 dígitos (sin 0 inicial)",
-            })}
-          />
-          {findingPatient && (
-            <span className="small text-muted d-inline-flex align-items-center">
-              <span className="spinner-border spinner-border-sm me-1" role="status" />
-              Buscando…
-            </span>
-          )}
-          {!findingPatient && dniValue?.length === 8 && (
-            <span className={`badge ${patientFound ? "bg-success" : "bg-secondary"}`}>
-              {patientFound ? "Encontrado" : "No encontrado"}
-            </span>
-          )}
-        </div>
-        {errors.dni && (
-          <span className="text-danger small">{errors.dni.message}</span>
-        )}
-      </Col>
-
-      {/* NOMBRE DESPUÉS */}
-      <Col md={6} className="mb-3">
-        <Form.Label>Nombre completo</Form.Label>
-        <Form.Control
-          type="text"
-          placeholder="Ej: Juan Pérez"
-          {...register("fullName", { required: "El nombre es obligatorio" })}
-        />
-        {errors.fullName && (
-          <span className="text-danger small">{errors.fullName.message}</span>
-        )}
-      </Col>
-
-      <Col md={6} className="mb-3">
-        <Form.Label>Teléfono</Form.Label>
-        <Form.Control
-          type="text"
-          placeholder="Ej: 2215555555"
-          inputMode="tel"
-          {...register("phone", { required: "El teléfono es obligatorio" })}
-        />
-        {errors.phone && (
-          <span className="text-danger small">{errors.phone.message}</span>
-        )}
-      </Col>
-
-      <Col md={6} className="mb-3">
-        <Form.Label>Correo electrónico</Form.Label>
-        <Form.Control
-          type="email"
-          placeholder="Ej: paciente@email.com"
-          {...register("email", { required: "El correo es obligatorio" })}
-        />
-        {errors.email && (
-          <span className="text-danger small">{errors.email.message}</span>
-        )}
-      </Col>
-    </Row>
-
-    {/* reCAPTCHA */}
-    <div className="mt-2">
-      <ReCAPTCHA
-        ref={recaptchaRef}
-        sitekey={recaptchaSiteKey}
-        onChange={(token) => setCaptchaToken(token)}
-        onExpired={() => setCaptchaToken(null)}
-        onErrored={() => setCaptchaToken(null)}
-      />
-      {recaptchaSiteKey.includes("6LeIxAcT") && (
-        <div className="text-muted small">Usando clave de prueba (solo dev).</div>
-      )}
-    </div>
-
-    <div className="d-flex justify-content-end gap-2 mt-2">
-      {/* Botón cancelar (no debe enviar el form) */}
-      <button
-        type="button"
-        className="btn-admin sm"
-        onClick={() => {
+        show={showForm}
+        onHide={() => {
           setShowForm(false);
           setSelectedSlot(null);
-          recaptchaRef.current?.reset();
-          setCaptchaToken(null);
+          // recaptchaRef.current?.reset();
+          // setCaptchaToken(null);
         }}
-        disabled={loading}
-      >
-        Cancelar
-      </button>
+        onExited={() => {
+          if (queuedSwal) {
+            const { doctorName, dayStr, timeStr } = queuedSwal;
+            const fecha = formatDayLocal(dayStr);
 
-      {/* Botón confirmar */}
-      <button
-        type="submit"
-        className="btn-admin sm"
-        disabled={loading || !captchaToken}
-      >
-        {loading ? "Confirmando..." : "Confirmar Turno"}
-      </button>
-    </div>
-  </Form>
-</Modal.Body>
+            Swal.fire("¡Turno confirmado!", "", "success").then(() => {
+              Swal.fire({
+                icon: "info",
+                title: "Detalle del turno",
+                html: `Con <b>${doctorName}</b> el <b>${fecha}</b> a las <b>${timeStr}</b>`,
+                timer: 6000,
+                showConfirmButton: false,
+                timerProgressBar: true,
+              });
+            });
 
+            setQueuedSwal(null);
+          }
+        }}
+        enforceFocus={false}
+        restoreFocus={false}
+        centered
+        size="lg"
+        backdrop
+        scrollable
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Confirmar turno — {selectedDate?.toLocaleDateString()}{" "}
+            {selectedSlot ? `• ${selectedSlot.time}` : ""}
+          </Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          <Form onSubmit={handleSubmit(onSubmit)} noValidate>
+            <Row>
+              <Col md={12} className="mb-3">
+                <div className="text-muted small">
+                  <strong>Médico:</strong>{" "}
+                  {doctors?.length
+                    ? doctors.find((d) => d.id === selectedDoctor)?.fullName || "—"
+                    : selectedDoctor ?? "—"}
+                </div>
+              </Col>
+
+              <Col md={12}>
+                <h5 className="mb-3">Datos del Paciente</h5>
+              </Col>
+
+              {/* DNI */}
+              <Col md={6} className="mb-3">
+                <Form.Label>DNI</Form.Label>
+                <div className="d-flex align-items-center gap-2">
+                  <Form.Control
+                    ref={dniInputRef}
+                    autoFocus
+                    type="text"
+                    placeholder="Ej: 30111222"
+                    inputMode="numeric"
+                    maxLength={8}
+                    {...register("dni", {
+                      required: "El DNI es obligatorio",
+                      onChange: (e) => {
+                        const clean = e.target.value.replace(/\D+/g, "");
+                        setValue("dni", clean, { shouldValidate: true });
+                        if (clean.length < 8) setPatientFound(null);
+                      },
+                      validate: (v) =>
+                        !v || dniRegex.test(v) || "Debe tener 8 dígitos (sin 0 inicial)",
+                    })}
+                  />
+                  {findingPatient && (
+                    <span className="small text-muted d-inline-flex align-items-center">
+                      <span
+                        className="spinner-border spinner-border-sm me-1"
+                        role="status"
+                      />
+                      Buscando…
+                    </span>
+                  )}
+                  {!findingPatient && dniValue?.length === 8 && (
+                    <span className={`badge ${patientFound ? "bg-success" : "bg-secondary"}`}>
+                      {patientFound ? "Encontrado" : "No encontrado"}
+                    </span>
+                  )}
+                </div>
+                {errors.dni && (
+                  <span className="text-danger small">{errors.dni.message}</span>
+                )}
+              </Col>
+
+              {/* NOMBRE */}
+              <Col md={6} className="mb-3">
+                <Form.Label>Nombre completo</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Ej: Juan Pérez"
+                  {...register("fullName", { required: "El nombre es obligatorio" })}
+                />
+                {errors.fullName && (
+                  <span className="text-danger small">{errors.fullName.message}</span>
+                )}
+              </Col>
+
+              <Col md={6} className="mb-3">
+                <Form.Label>Teléfono</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Ej: 2215555555"
+                  inputMode="tel"
+                  {...register("phone", { required: "El teléfono es obligatorio" })}
+                />
+                {errors.phone && (
+                  <span className="text-danger small">{errors.phone.message}</span>
+                )}
+              </Col>
+
+              <Col md={6} className="mb-3">
+                <Form.Label>Correo electrónico</Form.Label>
+                <Form.Control
+                  type="email"
+                  placeholder="Ej: paciente@email.com"
+                  {...register("email", { required: "El correo es obligatorio" })}
+                />
+                {errors.email && (
+                  <span className="text-danger small">{errors.email.message}</span>
+                )}
+              </Col>
+            </Row>
+
+            {/* reCAPTCHA — totalmente comentado
+            <div className="mt-2">
+              <ReCAPTCHA
+                ref={recaptchaRef}
+                sitekey={recaptchaSiteKey}
+                onChange={(token) => setCaptchaToken(token)}
+                onExpired={() => setCaptchaToken(null)}
+                onErrored={() => setCaptchaToken(null)}
+              />
+              {recaptchaSiteKey.includes("6LeIxAcT") && (
+                <div className="text-muted small">Usando clave de prueba (solo dev).</div>
+              )}
+            </div>
+            */}
+
+            <div className="d-flex justify-content-end gap-2 mt-2">
+              <button
+                type="button"
+                className="btn-admin sm"
+                onClick={() => {
+                  setShowForm(false);
+                  setSelectedSlot(null);
+                  // recaptchaRef.current?.reset();
+                  // setCaptchaToken(null);
+                }}
+                disabled={loading}
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="submit"
+                className="btn-admin sm"
+                disabled={loading}
+              >
+                {loading ? "Confirmando..." : "Confirmar Turno"}
+              </button>
+            </div>
+          </Form>
+        </Modal.Body>
       </Modal>
     </>
   );
 };
 
 export default CalendarPatient;
-
