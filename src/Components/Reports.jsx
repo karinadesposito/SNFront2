@@ -257,9 +257,7 @@ const TurnosReport = () => {
 
   return (
     <div>
-      <h2 className="text-center mb-4 text-white">Reportes de Turnos</h2>
-
-      <div className="adddoctor-frame">
+       <div className="adddoctor-frame">
         <form className="row g-3">
           <div className="col-md-3">
             <label htmlFor="estado" className="form-label">
@@ -358,38 +356,59 @@ const TurnosReport = () => {
             </div>
           </div>
 
-          <div className="col-md-12 d-flex gap-2 justify-content-between">
-            <button
-              type="button"
-              className="btn btn-warning"
-              onClick={fetchReports}
-              disabled={loading}
-            >
-              {loading ? "Cargando..." : "Obtener Reportes"}
-            </button>
-            <div className="d-flex gap-2">
-              <button
-                type="button"
-                className="btn btn-success"
-                onClick={() => updateSelectedReports("EJECUTADO")}
-                disabled={selectedReports.size === 0}
-              >
-                Pacientes confirmados
-              </button>
-              <button
-                type="button"
-                className="btn btn-danger"
-                onClick={() => updateSelectedReports("ELIMINADO")}
-                disabled={selectedReports.size === 0}
-              >
-                Eliminar Seleccionados
-              </button>
-            </div>
-          </div>
+     <div className="col-md-12 d-flex gap-2 justify-content-between">
+  <button
+    type="button"
+    className="btn btn-warning"
+    onClick={fetchReports}
+    disabled={loading}
+  >
+    {loading ? "Cargando..." : "Obtener Reportes"}
+  </button>
+
+  <div className="d-flex flex-wrap gap-2 justify-content-end">
+    <button
+      type="button"
+      className="btn btn-success"
+      onClick={() => updateSelectedReports("EJECUTADO")}
+      disabled={selectedReports.size === 0}
+    >
+      Ejecutar seleccionados
+    </button>
+
+    <button
+      type="button"
+      className="btn btn-info"
+      onClick={() => updateSelectedReports("NO_ASISTIDO")}
+      disabled={selectedReports.size === 0}
+    >
+      Marcar como no asistidos
+    </button>
+
+    <button
+      type="button"
+      className="btn btn-light"
+      onClick={() => updateSelectedReports("CANCELADO")}
+      disabled={selectedReports.size === 0}
+    >
+      Cancelar seleccionados
+    </button>
+
+    <button
+      type="button"
+      className="btn btn-danger"
+      onClick={() => updateSelectedReports("ELIMINADO")}
+      disabled={selectedReports.size === 0}
+    >
+      Eliminar seleccionados
+    </button>
+  </div>
+</div>
+
         </form>
       </div>
 
-      <div className="adddoctor-frame">
+     <div className="turnos-table-wrapper">
         <table className="table table-hover">
           <thead className="table-light">
             <tr>
@@ -474,9 +493,9 @@ const DoctoresReport = () => {
   }, [apiUrl]);
 
   return (
-    <div>
-      <h3 className="mb-3">Listado de Doctores</h3>
-      <div className="card shadow">
+  
+ 
+    
         <div className="card-body">
           <table className="table table-hover">
             <thead className="table-light">
@@ -513,8 +532,8 @@ const DoctoresReport = () => {
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
+   
+  
   );
 };
 
