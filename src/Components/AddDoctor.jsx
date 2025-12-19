@@ -12,6 +12,7 @@ const AddDoctor = () => {
     email: "",
     phone: "",
     specialityId: "",
+    alias:"",
   });
 
   const [specialities, setSpecialities] = useState([]);
@@ -51,7 +52,9 @@ const AddDoctor = () => {
       email: formData.email.trim().toLowerCase(),
       phone: formData.phone.trim(), // + opcional, 7–15 dígitos
       specialityId: formData.specialityId,
-    };
+       ...(formData.alias.trim() ? { alias: formData.alias.trim() } : {}), // ✅ nuevo (no envía si está vacío)
+};
+   
 
     try {
       const response = await fetch(`${apiUrl}/doctor`, {
@@ -198,6 +201,18 @@ const AddDoctor = () => {
                 </Form.Text>
               </Form.Group>
             </Col>
+  <Col md={6}>
+    <Form.Group controlId="formAlias">
+      <Form.Label>Alias</Form.Label>
+      <Form.Control
+        type="text"
+        name="alias"
+        value={formData.alias}
+        onChange={handleChange}
+      />
+      <Form.Text muted>Opcional.</Form.Text>
+    </Form.Group>
+  </Col>
 
             <Col md={6}>
               <Form.Group controlId="formEmail">
