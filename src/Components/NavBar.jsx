@@ -40,8 +40,8 @@ export default function CustomNavBar() {
       <Container>
         <Navbar.Brand as={Link} to="/" onClick={closeMenu}>
           <div className="navbar-logo-text">
-            <img src={logosaludnet} alt="Logo SaludNet" id="logosaludnet" />
-            <span className="saludnet-text">SALUD NET</span>
+            {/* <img src={logosaludnet} alt="Logo SaludNet" id="logosaludnet" /> */}
+            <span className="saludnet-text">JS</span>
           </div>
         </Navbar.Brand>
 

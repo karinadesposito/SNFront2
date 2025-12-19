@@ -1,7 +1,5 @@
 .card-body {
   background: linear-gradient(#8fc9ca) padding-box, border-box;
-  border-radius: 12px;
-  padding: 1rem;
 }
 
 .card-body,
@@ -10,9 +8,9 @@
 }
 /* Limita la altura de la tabla y permite scroll dentro de la card */
 .card-body {
-  max-height: 400px;      /* ajustá la altura a gusto */
-  overflow-y: auto;       /* la tabla scrollea dentro de la card */
-  padding: 0.75rem 1rem;  /* opcional: ajusta si ves raro el padding */
+  max-height: 100%; /* ajustá la altura a gusto */
+  overflow-y: auto; /* la tabla scrollea dentro de la card */
+  padding: 0.75rem 1rem; /* opcional: ajusta si ves raro el padding */
 }
 
 /* Marco de filtros (panel turquesa) - sin scroll interno */
@@ -23,10 +21,10 @@
 
 /* Wrapper de la tabla de turnos: scroll propio */
 .turnos-table-wrapper {
-  max-height: 420px;            /* ajustá a gusto */
+  max-height: 420px; /* ajustá a gusto */
   overflow-y: auto;
-  background-color: #ffffff;    /* fondo propio para que no se vea el turquesa por detrás */
- /* opcional, para suavizar bordes inferiores */
+  background-color: #ffffff; /* fondo propio para que no se vea el turquesa por detrás */
+  /* opcional, para suavizar bordes inferiores */
 }
 
 /* Que la tabla no deje un espacio gigante abajo */
@@ -39,7 +37,6 @@
   background-color: #e0f2f4;
   color: #12343b;
   font-weight: 600;
-
 
   position: sticky;
   top: 0;

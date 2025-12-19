@@ -11,7 +11,8 @@ const ProfesionalTable = () => {
 
   // selección múltiple (como Reports)
   const [selectedIds, setSelectedIds] = useState(new Set());
-  const isAllSelected = selectedIds.size === doctors.length && doctors.length > 0;
+  const isAllSelected =
+    selectedIds.size === doctors.length && doctors.length > 0;
 
   const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -20,7 +21,11 @@ const ProfesionalTable = () => {
     try {
       const response = await fetch(`${apiUrl}/doctor/all-with-deleted`);
       const data = await response.json();
-      const result = Array.isArray(data) ? data : Array.isArray(data.data) ? data.data : [];
+      const result = Array.isArray(data)
+        ? data
+        : Array.isArray(data.data)
+        ? data.data
+        : [];
       result.sort((a, b) =>
         a.fullName.localeCompare(b.fullName, "es", { sensitivity: "base" })
       );
@@ -78,7 +83,11 @@ const ProfesionalTable = () => {
   // ====== Editar ======
   const handleEdit = (doctor) => {
     if (!doctor) return;
-    setSelectedDoctor({ ...doctor, specialityId: doctor.speciality?.id ?? "" });
+    setSelectedDoctor({
+      ...doctor,
+      specialityId: doctor.speciality?.id ?? "",
+      alias: doctor.alias ?? "",
+    });
     setShowModal(true);
   };
 
@@ -107,6 +116,7 @@ const ProfesionalTable = () => {
         phone: selectedDoctor.phone,
         email: selectedDoctor.email,
         specialityId: selectedDoctor.specialityId || null,
+        alias: (selectedDoctor.alias ?? "").trim() || null, // ✅
       };
 
       const response = await fetch(`${apiUrl}/doctor/${selectedDoctor.id}`, {
@@ -188,7 +198,9 @@ const ProfesionalTable = () => {
   };
 
   const apiRestore = async (id) => {
-    const resp = await fetch(`${apiUrl}/doctor/restore/${id}`, { method: "PATCH" });
+    const resp = await fetch(`${apiUrl}/doctor/restore/${id}`, {
+      method: "PATCH",
+    });
     if (!resp.ok) {
       const data = await resp.json().catch(() => ({}));
       throw new Error(data.message || "No se pudo restaurar el profesional.");
@@ -230,25 +242,18 @@ const ProfesionalTable = () => {
     }
   };
 
-  // ====== UI (MISMAS CLASES QUE REPORTS) ======
- return (
-  <div>
-    <h2 className="text-center mb-4 text-white">Listado de Profesionales</h2>
-
-    {/* === SOLO CARD (sin adddoctor-frame) === */}
-    <div className="card shadow">
+  return (
+    <div>
       <div className="card-body">
-
-        {/* Texto + acciones (misma disposición de Reports) */}
         <form className="row g-3">
           <div className="col-md-9 d-flex align-items-center">
             <span>
               Aquí podés <strong>actualizar</strong> los datos de los doctores o
-              <strong> eliminar</strong> los seleccionados. Usá los checkboxes de la lista.
+              <strong> eliminar</strong> los seleccionados. Usá los checkboxes
+              de la lista.
             </span>
           </div>
 
-          {/* Acciones arriba, mismas clases de Reports */}
           <div className="col-md-3 d-flex justify-content-end gap-2">
             <button
               type="button"
@@ -287,8 +292,10 @@ const ProfesionalTable = () => {
               <th>Nombre</th>
               <th>Especialidad</th>
               <th>Matrícula</th>
+              <th>DNI</th>  
               <th>Teléfono</th>
-              <th>Email</th>
+              <th className="col-alias">Alias</th>
+              <th className="col-email">Email</th>
               <th style={{ width: 120 }}>Restaurar</th>
             </tr>
           </thead>
@@ -299,7 +306,10 @@ const ProfesionalTable = () => {
                 const checked = selectedIds.has(doc.id);
                 const isDeleted = !!doc.deletedAt;
                 return (
-                  <tr key={doc.id} className={isDeleted ? "table-secondary" : ""}>
+                  <tr
+                    key={doc.id}
+                    className={isDeleted ? "table-secondary" : ""}
+                  >
                     <td>
                       <input
                         type="checkbox"
@@ -312,9 +322,10 @@ const ProfesionalTable = () => {
                     <td>{doc.fullName}</td>
                     <td>{doc.speciality?.name || "-"}</td>
                     <td>{doc.license}</td>
+                     <td>{doc.dni}</td>
                     <td>{doc.phone || "-"}</td>
-                    <td>{doc.email || "-"}</td>
-
+                    <td className="col-alias">{doc.alias || "-"}</td>
+                    <td className="col-email">{doc.email || "-"}</td>
                     {/* Restaurar solo si está eliminado */}
                     <td>
                       {isDeleted ? (
@@ -350,106 +361,150 @@ const ProfesionalTable = () => {
               })
             ) : (
               <tr>
-                <td colSpan={7} className="text-center">
+                <td colSpan={8} className="text-center">
                   No hay profesionales cargados.
                 </td>
               </tr>
             )}
           </tbody>
         </table>
-
       </div>
+
+      {/* === Modal Editar === */}
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Editar Profesional</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedDoctor && (
+            <Form>
+              <Form.Group className="mb-3">
+                <Form.Label>Nombre completo</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="fullName"
+                  value={selectedDoctor.fullName}
+                  onChange={(e) =>
+                    setSelectedDoctor({
+                      ...selectedDoctor,
+                      fullName: e.target.value,
+                    })
+                  }
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Matrícula</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="license"
+                  value={selectedDoctor.license}
+                  onChange={(e) =>
+                    setSelectedDoctor({
+                      ...selectedDoctor,
+                      license: e.target.value,
+                    })
+                  }
+                />
+              </Form.Group>
+
+<Form.Group className="mb-3">
+                <Form.Label>DNI</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="dni"
+                  value={selectedDoctor.dni}
+                  onChange={(e) =>
+                    setSelectedDoctor({
+                      ...selectedDoctor,
+                      dni: e.target.value,
+                    })
+                  }
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Teléfono</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="phone"
+                  value={selectedDoctor.phone || ""}
+                  onChange={(e) =>
+                    setSelectedDoctor({
+                      ...selectedDoctor,
+                      phone: e.target.value,
+                    })
+                  }
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Alias</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="alias"
+                  value={selectedDoctor.alias || ""}
+                  onChange={(e) =>
+                    setSelectedDoctor({
+                      ...selectedDoctor,
+                      alias: e.target.value,
+                    })
+                  }
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  type="email"
+                  name="email"
+                  value={selectedDoctor.email || ""}
+                  onChange={(e) =>
+                    setSelectedDoctor({
+                      ...selectedDoctor,
+                      email: e.target.value,
+                    })
+                  }
+                />
+              </Form.Group>
+
+              <Form.Group>
+                <Form.Label>Especialidad</Form.Label>
+                <Form.Select
+                  name="specialityId"
+                  value={selectedDoctor.specialityId}
+                  onChange={(e) =>
+                    setSelectedDoctor({
+                      ...selectedDoctor,
+                      specialityId: e.target.value,
+                    })
+                  }
+                >
+                  <option value="">Seleccione una especialidad</option>
+                  {specialities.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+            </Form>
+          )}
+        </Modal.Body>
+
+        <Modal.Footer>
+          <button
+            className="btn btn-secondary"
+            onClick={() => setShowModal(false)}
+          >
+            Cancelar
+          </button>
+          <button className="btn btn-success" onClick={handleSave}>
+            Guardar cambios
+          </button>
+        </Modal.Footer>
+      </Modal>
     </div>
-
-    {/* === Modal Editar === */}
-    <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-      <Modal.Header closeButton>
-        <Modal.Title>Editar Profesional</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        {selectedDoctor && (
-          <Form>
-            <Form.Group className="mb-3">
-              <Form.Label>Nombre completo</Form.Label>
-              <Form.Control
-                type="text"
-                name="fullName"
-                value={selectedDoctor.fullName}
-                onChange={(e) =>
-                  setSelectedDoctor({ ...selectedDoctor, fullName: e.target.value })
-                }
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Matrícula</Form.Label>
-              <Form.Control
-                type="text"
-                name="license"
-                value={selectedDoctor.license}
-                onChange={(e) =>
-                  setSelectedDoctor({ ...selectedDoctor, license: e.target.value })
-                }
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Teléfono</Form.Label>
-              <Form.Control
-                type="text"
-                name="phone"
-                value={selectedDoctor.phone || ""}
-                onChange={(e) =>
-                  setSelectedDoctor({ ...selectedDoctor, phone: e.target.value })
-                }
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                type="email"
-                name="email"
-                value={selectedDoctor.email || ""}
-                onChange={(e) =>
-                  setSelectedDoctor({ ...selectedDoctor, email: e.target.value })
-                }
-              />
-            </Form.Group>
-
-            <Form.Group>
-              <Form.Label>Especialidad</Form.Label>
-              <Form.Select
-                name="specialityId"
-                value={selectedDoctor.specialityId}
-                onChange={(e) =>
-                  setSelectedDoctor({ ...selectedDoctor, specialityId: e.target.value })
-                }
-              >
-                <option value="">Seleccione una especialidad</option>
-                {specialities.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-          </Form>
-        )}
-      </Modal.Body>
-
-      <Modal.Footer>
-        <button className="btn btn-secondary" onClick={() => setShowModal(false)}>
-          Cancelar
-        </button>
-        <button className="btn btn-success" onClick={handleSave}>
-          Guardar cambios
-        </button>
-      </Modal.Footer>
-    </Modal>
-  </div>
-);
-
+  );
 };
 
 export default ProfesionalTable;

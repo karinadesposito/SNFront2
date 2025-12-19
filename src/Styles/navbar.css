@@ -23,7 +23,9 @@ body.with-fixed-navbar {
   width: auto;
   object-fit: contain;
 }
-
+.saludnet-text{
+  font-size: 1.8rem;
+}
 /* Links */
 .navbar-dark .navbar-nav .nav-link {
   color: #fff;
@@ -51,6 +53,7 @@ body.with-fixed-navbar {
     margin-left: 0.2rem;
   }
   .saludnet-text {
+    
     display: none;
   }
 }

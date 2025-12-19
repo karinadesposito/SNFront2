@@ -47,3 +47,27 @@ body.with-fixed-navbar { padding-top: 0 !important; }
   padding-bottom: 0;
   min-height: calc(100svh - var(--nav-h));
 }
+
+/* comportamiento general */
+.col-email {
+ width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.col-alias {
+ width: 250px;
+}
+
+/* pantallas grandes */
+@media (min-width: 1200px) {
+  .col-alias {
+    max-width:200px;
+
+  }
+
+  .col-email {
+    max-width:250px;
+  }
+}
