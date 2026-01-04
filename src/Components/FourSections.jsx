@@ -30,7 +30,7 @@ const FourSections = () => {
                     </svg>
                   </span>
                 </div>
-                <Link to="/doctores" className="stretched-link" />
+                <Link to="/profesionales" className="stretched-link" />
               </div>
             </div>
           </div>

@@ -55,9 +55,7 @@ export default function CustomNavBar() {
           <div className="d-flex flex-column flex-lg-row w-100">
             {/* Menú a la izquierda */}
             <Nav className="me-lg-3">
-              <Nav.Link as={Link} to="/especialidades" onClick={closeMenu}>
-                Especialidades
-              </Nav.Link>
+
               <Nav.Link as={Link} to="/profesionales" onClick={closeMenu}>
                 Profesionales
               </Nav.Link>
@@ -68,7 +66,7 @@ export default function CustomNavBar() {
               <Nav.Link
                 as={Link}
                 to="/reservar-turno"
-             
+
                 onClick={closeMenu}
               >
                 Reservar turnos
@@ -76,7 +74,7 @@ export default function CustomNavBar() {
               <Nav.Link
                 as={Link}
                 to="/admin"
-               
+
                 onClick={closeMenu}
               >
                 Administración
