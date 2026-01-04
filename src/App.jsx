@@ -13,7 +13,6 @@ import AddDoctor from "./Components/AddDoctor";
 import CreateScheduleForm from "./Components/CreateSchedule";
 import CalendarPatient from "./Components/CalendarPatient";
 import Footer from "./Components/Footer";
-import SpecialityList from "./Components/Speciality";
 import ProfesionalList from "./Components/Profesional";
 import EditDoctor from "./Components/EditDoctor";
 
@@ -26,7 +25,7 @@ import "./Styles/fourSection.css";
 import "./Styles/navbar.css";
 import "./Styles/profesional.css"
 import "./Styles/reports.css";
-import "./Styles/speciality.css"
+
 
 
 function AppRoutes() {
@@ -77,7 +76,6 @@ function AppRoutes() {
           <Route path="/AgregarProfesional" element={<AddDoctor />} />
           <Route path="/reservar-turno" element={<CalendarPatient />} />
           <Route path="/reportes" element={<Reports />} />
-          <Route path="/especialidades" element={<SpecialityList />} />
           <Route path="/profesionales" element={<ProfesionalList />} />
           <Route path="/editarprofesional" element={<EditDoctor />} />
         </Routes>
