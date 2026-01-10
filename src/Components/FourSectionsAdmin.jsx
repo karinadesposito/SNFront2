@@ -16,7 +16,7 @@ const FourSectionsAdmin = () => {
           <div className="col-12 col-md-6 d-flex justify-content-center">
             <div
               className="card-box admin-card w-100"
-              style={{ "--card-bg": `url(${profesionalesImg})` }}
+              
             >
               <div className="card-layer card-title-only">
                 <h2 className="card-title">PROFESIONALES</h2>
@@ -45,10 +45,7 @@ const FourSectionsAdmin = () => {
           <div className="col-12 col-md-6 d-flex justify-content-center">
             <div
               className="card-box admin-card w-100"
-              style={{
-                "--card-bg":
-                  "url(https://www.shutterstock.com/image-illustration/top-view-medical-stethoscope-icon-600nw-2075382679.jpg)",
-              }}
+            
             >
               <div className="card-layer card-title-only">
                 <h2 className="card-title">AGENDA</h2>
@@ -71,7 +68,7 @@ const FourSectionsAdmin = () => {
           <div className="col-12 col-md-6 d-flex justify-content-center">
             <div
               className="card-box admin-card w-100"
-              style={{ "--card-bg": `url(${turnosImg})` }}
+             
             >
               <div className="card-layer card-title-only">
                 <Link to="/reservar-turno" className="card-link">
@@ -109,10 +106,7 @@ const FourSectionsAdmin = () => {
           <div className="col-12 col-md-6 d-flex justify-content-center">
             <div
               className="card-box admin-card w-100"
-              style={{
-                "--card-bg":
-                  "url(https://economia3.com/wp-content/uploads/2021/02/informes_1.jpg)",
-              }}
+              
             >
               <div className="card-layer card-title-only">
                 <h2 className="card-title">REPORTES</h2>

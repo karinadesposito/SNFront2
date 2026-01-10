@@ -1,17 +1,10 @@
-import React, {
-  useState,
-  useEffect,
-  useMemo,
-  useRef,
-  useLayoutEffect,
-} from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Container, Row, Col, Form, ListGroup, Modal } from "react-bootstrap";
 import Select from "react-select";
 import "react-calendar/dist/Calendar.css";
 import Calendar from "react-calendar";
 import Swal from "sweetalert2";
-// import ReCAPTCHA from "react-google-recaptcha"; // ⬅️ Comentado temporalmente
 
 const selectStyles = {
   control: (base) => ({ ...base, borderRadius: 10 }),
@@ -36,20 +29,6 @@ const formatDayLocal = (dayStr) => {
 const CalendarPatient = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
 
-  // // ⚠️ Clave de sitio NO-Enterprise (consola normal de reCAPTCHA)
-  // const recaptchaSiteKey =
-  //   import.meta.env.VITE_RECAPTCHA_SITE_KEY ||
-  //   "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"; // fallback SOLO dev
-  // console.info("reCAPTCHA SITE KEY ►", recaptchaSiteKey);
-
-  // // reCAPTCHA
-  // const recaptchaRef = useRef(null);
-  // const [captchaToken, setCaptchaToken] = useState(null);
-
-  // // Handlers del captcha
-  // const handleCaptchaChange = (token) => setCaptchaToken(token || null);
-  // const handleCaptchaExpired = () => setCaptchaToken(null);
-
   const [doctors, setDoctors] = useState([]);
   const [specialities, setSpecialities] = useState([]);
 
@@ -71,23 +50,12 @@ const CalendarPatient = () => {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [queuedSwal, setQueuedSwal] = useState(null); // si luego querés usar el flujo en onExited
+  const [queuedSwal, setQueuedSwal] = useState(null);
 
-  // Ajuste de altura para panel de horarios
-  const calWrapRef = useRef(null);
-  const [calHeight, setCalHeight] = useState(0);
-
-  useLayoutEffect(() => {
-    const el = calWrapRef.current?.querySelector(".react-calendar");
-    if (!el) return;
-    const ro = new ResizeObserver(([entry]) => {
-      const h = entry?.contentRect?.height || el.getBoundingClientRect().height;
-      setCalHeight(h);
-    });
-    ro.observe(el);
-    setCalHeight(el.getBoundingClientRect().height);
-    return () => ro.disconnect();
-  }, [selectedDoctor, selectedDate, availableDates]);
+  // ====== Coberturas por doctor (para dropdown antes del modal) ======
+  const [doctorCoverages, setDoctorCoverages] = useState([]);
+  const [selectedCoverageId, setSelectedCoverageId] = useState("");
+  const [loadingCoverages, setLoadingCoverages] = useState(false);
 
   // ====== Form (con autocompletado por DNI) ======
   const {
@@ -115,7 +83,6 @@ const CalendarPatient = () => {
     }
   }, [showForm]);
 
-  // Debounce búsqueda de paciente por DNI
   useEffect(() => {
     if (!dniValue || dniValue.length < 8 || !dniRegex.test(dniValue)) {
       setFindingPatient(false);
@@ -143,8 +110,7 @@ const CalendarPatient = () => {
             setPatientFound(payload);
             setValue("fullName", payload.fullName || "");
             setValue("phone", payload.phone || "");
-            setValue("email", payload.email || "");
-            clearErrors(["fullName", "phone", "email"]);
+            clearErrors(["fullName", "phone"]);
           }
         } else if (res.status === 404) {
           setPatientFound(null);
@@ -162,6 +128,43 @@ const CalendarPatient = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dniValue, apiUrl]);
 
+  // ====== Traer coberturas del doctor seleccionado ======
+  useEffect(() => {
+    if (!selectedDoctor) {
+      setDoctorCoverages([]);
+      setSelectedCoverageId("");
+      return;
+    }
+
+    setLoadingCoverages(true);
+    setDoctorCoverages([]);
+    setSelectedCoverageId("");
+
+    fetch(`${apiUrl}/doctor/for-patients/${selectedDoctor}`)
+      .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          const msg =
+            data?.message || "El médico no está disponible para pacientes.";
+          throw new Error(msg);
+        }
+        const payload = data?.data || data;
+        const covs = Array.isArray(payload?.coverages) ? payload.coverages : [];
+        setDoctorCoverages(covs);
+      })
+      .catch((e) => {
+        setDoctorCoverages([]);
+        setSelectedCoverageId("");
+        Swal.fire({
+          title: "⚠️ Médico no disponible",
+          text: e.message || "Este médico no tiene coberturas configuradas.",
+          icon: "info",
+          confirmButtonColor: "#3085d6",
+        });
+      })
+      .finally(() => setLoadingCoverages(false));
+  }, [selectedDoctor, apiUrl]);
+
   // ====== RESERVA ======
   const onSubmit = async (data) => {
     try {
@@ -175,9 +178,22 @@ const CalendarPatient = () => {
         return;
       }
 
+      if (!selectedCoverageId) {
+        Swal.fire({
+          title: "⚠️ Obra social obligatoria",
+          text: "Seleccioná tu obra social antes de confirmar el turno.",
+          icon: "info",
+          confirmButtonColor: "#3085d6",
+        });
+        return;
+      }
+
       const dniClean = String(data.dni || "").replace(/\D+/g, "");
       if (!dniRegex.test(dniClean)) {
-        setError("dni", { type: "manual", message: "DNI inválido (8 dígitos, sin 0 inicial)" });
+        setError("dni", {
+          type: "manual",
+          message: "DNI inválido (8 dígitos, sin 0 inicial)",
+        });
         Swal.fire({
           title: "DNI inválido",
           text: "El DNI debe tener 8 dígitos numéricos sin ceros iniciales.",
@@ -186,17 +202,6 @@ const CalendarPatient = () => {
         });
         return;
       }
-
-      // // reCAPTCHA requerido
-      // if (!captchaToken) {
-      //   Swal.fire({
-      //     title: "Verificación requerida",
-      //     text: "Por favor completá el reCAPTCHA antes de confirmar el turno.",
-      //     icon: "warning",
-      //     confirmButtonColor: "#3085d6",
-      //   });
-      //   return;
-      // }
 
       try {
         Swal.fire({
@@ -208,15 +213,13 @@ const CalendarPatient = () => {
             Swal.showLoading();
           },
         });
-
         const payload = {
           idSchedule: selectedSlot.idSchedule,
-          // recaptchaToken: captchaToken, // ⬅️ comentado temporalmente
+          coverageId: Number(selectedCoverageId), // 👈 acá, en raíz
           patient: {
             fullName: data.fullName,
             dni: dniClean,
             phone: data.phone,
-            email: data.email,
           },
         };
 
@@ -227,14 +230,18 @@ const CalendarPatient = () => {
         });
 
         const result = await response.json();
-        if (!response.ok) throw new Error(result?.message || "Error al reservar turno");
+        if (!response.ok)
+          throw new Error(result?.message || "Error al reservar turno");
 
         Swal.close();
 
         const saved = result?.data || result;
         const doctorName = saved?.doctor?.fullName || "el profesional";
         const dayStr = saved?.day;
-        const timeStr = (saved?.startTime || saved?.start_Time || "").slice(0, 5);
+        const timeStr = (saved?.startTime || saved?.start_Time || "").slice(
+          0,
+          5
+        );
         Swal.fire({
           title: "✅ ¡Turno confirmado!",
           html: `
@@ -247,7 +254,9 @@ const CalendarPatient = () => {
           confirmButtonColor: "#3085d6",
         });
 
-        setSlots((prev) => prev.filter((t) => t.idSchedule !== selectedSlot.idSchedule));
+        setSlots((prev) =>
+          prev.filter((t) => t.idSchedule !== selectedSlot.idSchedule)
+        );
         setSelectedSlot(null);
         setShowForm(false);
         reset();
@@ -257,15 +266,14 @@ const CalendarPatient = () => {
         Swal.close();
         Swal.fire({
           title: "❌ Error al reservar turno",
-          text: error.message || "Ocurrió un error inesperado. Intentalo nuevamente.",
+          text:
+            error.message ||
+            "Ocurrió un error inesperado. Intentalo nuevamente.",
           icon: "error",
           confirmButtonColor: "#d33",
         });
       } finally {
         setLoading(false);
-        // // reset del captcha tras cada intento
-        // recaptchaRef.current?.reset();
-        // setCaptchaToken(null);
 
         if (selectedDoctor) {
           fetch(`${apiUrl}/schedules/available/by-doctor/${selectedDoctor}`)
@@ -401,6 +409,8 @@ const CalendarPatient = () => {
                 setSelectedDate(null);
                 setAvailableDates([]);
                 setSlots([]);
+                setDoctorCoverages([]);
+                setSelectedCoverageId("");
               }}
             />
             <Form.Check
@@ -415,6 +425,8 @@ const CalendarPatient = () => {
                 setSelectedDate(null);
                 setAvailableDates([]);
                 setSlots([]);
+                setDoctorCoverages([]);
+                setSelectedCoverageId("");
               }}
             />
           </Form>
@@ -437,6 +449,8 @@ const CalendarPatient = () => {
                       setSelectedDate(null);
                       setAvailableDates([]);
                       setSlots([]);
+                      setDoctorCoverages([]);
+                      setSelectedCoverageId("");
                     }}
                   />
                 </Form.Group>
@@ -463,6 +477,8 @@ const CalendarPatient = () => {
                         setSelectedDate(null);
                         setAvailableDates([]);
                         setSlots([]);
+                        setDoctorCoverages([]);
+                        setSelectedCoverageId("");
                       }}
                     />
                   </Form.Group>
@@ -490,6 +506,8 @@ const CalendarPatient = () => {
                           setSelectedDate(null);
                           setAvailableDates([]);
                           setSlots([]);
+                          setDoctorCoverages([]);
+                          setSelectedCoverageId("");
                         }}
                       />
                     </Form.Group>
@@ -502,7 +520,7 @@ const CalendarPatient = () => {
           {selectedDoctor && (
             <Row className="mt-4 align-items-stretch">
               <Col md={6} className="mb-4 mb-md-0">
-                <div className="d-flex justify-content-center" ref={calWrapRef}>
+                <div className="d-flex justify-content-center">
                   <Calendar
                     onChange={handleDateChange}
                     value={selectedDate}
@@ -524,10 +542,31 @@ const CalendarPatient = () => {
 
               <Col md={6}>
                 {selectedDate && (
-                  <div
-                    className="slots-panel d-flex flex-column"
-                    style={{ height: calHeight || "auto" }}
-                  >
+                  <div className="slots-panel d-flex flex-column">
+                    <Form.Group className="mb-3">
+                      <Form.Label>Obra social (obligatoria)</Form.Label>
+                      <Form.Select
+                        value={selectedCoverageId}
+                        onChange={(e) => setSelectedCoverageId(e.target.value)}
+                        disabled={
+                          loadingCoverages || doctorCoverages.length === 0
+                        }
+                      >
+                        <option value="">
+                          {loadingCoverages
+                            ? "Cargando coberturas..."
+                            : doctorCoverages.length === 0
+                            ? "Este médico no tiene coberturas configuradas"
+                            : "-- Seleccione --"}
+                        </option>
+                        {doctorCoverages.map((c) => (
+                          <option key={c.id} value={String(c.id)}>
+                            {c.name}
+                          </option>
+                        ))}
+                      </Form.Select>
+                    </Form.Group>
+
                     <h5 className="mb-3">
                       Horarios para el {selectedDate.toLocaleDateString()}
                     </h5>
@@ -538,8 +577,19 @@ const CalendarPatient = () => {
                           <ListGroup.Item
                             key={slot.idSchedule}
                             action
-                            active={selectedSlot?.idSchedule === slot.idSchedule}
+                            active={
+                              selectedSlot?.idSchedule === slot.idSchedule
+                            }
                             onClick={() => {
+                              if (!selectedCoverageId) {
+                                Swal.fire({
+                                  title: "⚠️ Obra social obligatoria",
+                                  text: "Seleccioná tu obra social antes de continuar.",
+                                  icon: "info",
+                                  confirmButtonColor: "#3085d6",
+                                });
+                                return;
+                              }
                               setSelectedSlot(slot);
                               setShowForm(true);
                             }}
@@ -566,8 +616,6 @@ const CalendarPatient = () => {
         onHide={() => {
           setShowForm(false);
           setSelectedSlot(null);
-          // recaptchaRef.current?.reset();
-          // setCaptchaToken(null);
         }}
         onExited={() => {
           if (queuedSwal) {
@@ -609,8 +657,15 @@ const CalendarPatient = () => {
                 <div className="text-muted small">
                   <strong>Médico:</strong>{" "}
                   {doctors?.length
-                    ? doctors.find((d) => d.id === selectedDoctor)?.fullName || "—"
+                    ? doctors.find((d) => d.id === selectedDoctor)?.fullName ||
+                      "—"
                     : selectedDoctor ?? "—"}
+                </div>
+                <div className="text-muted small">
+                  <strong>Obra social:</strong>{" "}
+                  {doctorCoverages.find(
+                    (c) => String(c.id) === String(selectedCoverageId)
+                  )?.name || "—"}
                 </div>
               </Col>
 
@@ -618,7 +673,6 @@ const CalendarPatient = () => {
                 <h5 className="mb-3">Datos del Paciente</h5>
               </Col>
 
-              {/* DNI */}
               <Col md={6} className="mb-3">
                 <Form.Label>DNI</Form.Label>
                 <div className="d-flex align-items-center gap-2">
@@ -637,7 +691,9 @@ const CalendarPatient = () => {
                         if (clean.length < 8) setPatientFound(null);
                       },
                       validate: (v) =>
-                        !v || dniRegex.test(v) || "Debe tener 8 dígitos (sin 0 inicial)",
+                        !v ||
+                        dniRegex.test(v) ||
+                        "Debe tener 8 dígitos (sin 0 inicial)",
                     })}
                   />
                   {findingPatient && (
@@ -650,26 +706,35 @@ const CalendarPatient = () => {
                     </span>
                   )}
                   {!findingPatient && dniValue?.length === 8 && (
-                    <span className={`badge ${patientFound ? "bg-success" : "bg-secondary"}`}>
+                    <span
+                      className={`badge ${
+                        patientFound ? "bg-success" : "bg-secondary"
+                      }`}
+                    >
                       {patientFound ? "Encontrado" : "No encontrado"}
                     </span>
                   )}
                 </div>
                 {errors.dni && (
-                  <span className="text-danger small">{errors.dni.message}</span>
+                  <span className="text-danger small">
+                    {errors.dni.message}
+                  </span>
                 )}
               </Col>
 
-              {/* NOMBRE */}
               <Col md={6} className="mb-3">
                 <Form.Label>Nombre completo</Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="Ej: Juan Pérez"
-                  {...register("fullName", { required: "El nombre es obligatorio" })}
+                  {...register("fullName", {
+                    required: "El nombre es obligatorio",
+                  })}
                 />
                 {errors.fullName && (
-                  <span className="text-danger small">{errors.fullName.message}</span>
+                  <span className="text-danger small">
+                    {errors.fullName.message}
+                  </span>
                 )}
               </Col>
 
@@ -679,40 +744,17 @@ const CalendarPatient = () => {
                   type="text"
                   placeholder="Ej: 2215555555"
                   inputMode="tel"
-                  {...register("phone", { required: "El teléfono es obligatorio" })}
+                  {...register("phone", {
+                    required: "El teléfono es obligatorio",
+                  })}
                 />
                 {errors.phone && (
-                  <span className="text-danger small">{errors.phone.message}</span>
-                )}
-              </Col>
-
-              <Col md={6} className="mb-3">
-                <Form.Label>Correo electrónico</Form.Label>
-                <Form.Control
-                  type="email"
-                  placeholder="Ej: paciente@email.com"
-                  {...register("email", { required: "El correo es obligatorio" })}
-                />
-                {errors.email && (
-                  <span className="text-danger small">{errors.email.message}</span>
+                  <span className="text-danger small">
+                    {errors.phone.message}
+                  </span>
                 )}
               </Col>
             </Row>
-
-            {/* reCAPTCHA — totalmente comentado
-            <div className="mt-2">
-              <ReCAPTCHA
-                ref={recaptchaRef}
-                sitekey={recaptchaSiteKey}
-                onChange={(token) => setCaptchaToken(token)}
-                onExpired={() => setCaptchaToken(null)}
-                onErrored={() => setCaptchaToken(null)}
-              />
-              {recaptchaSiteKey.includes("6LeIxAcT") && (
-                <div className="text-muted small">Usando clave de prueba (solo dev).</div>
-              )}
-            </div>
-            */}
 
             <div className="d-flex justify-content-end gap-2 mt-2">
               <button
@@ -721,19 +763,13 @@ const CalendarPatient = () => {
                 onClick={() => {
                   setShowForm(false);
                   setSelectedSlot(null);
-                  // recaptchaRef.current?.reset();
-                  // setCaptchaToken(null);
                 }}
                 disabled={loading}
               >
                 Cancelar
               </button>
 
-              <button
-                type="submit"
-                className="btn-admin sm"
-                disabled={loading}
-              >
+              <button type="submit" className="btn-admin sm" disabled={loading}>
                 {loading ? "Confirmando..." : "Confirmar Turno"}
               </button>
             </div>
