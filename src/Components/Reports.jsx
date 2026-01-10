@@ -5,12 +5,12 @@ import Swal from "sweetalert2";
 
 // --- Subcomponente para Turnos ---
 const TurnosReport = () => {
-  const [estado, setEstado] = useState("");                  // UI: minúsculas
-  const [idDoctor, setIdDoctor] = useState("");              // guarda string desde <select>
+  const [estado, setEstado] = useState(""); // UI: minúsculas
+  const [idDoctor, setIdDoctor] = useState(""); // guarda string desde <select>
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [patientDni, setPatientDni] = useState("");          // ✅ ahora DNI
-  const [excludePast, setExcludePast] = useState(true);      // excluir pasados por defecto
+  const [patientDni, setPatientDni] = useState(""); // ✅ ahora DNI
+  const [excludePast, setExcludePast] = useState(true); // excluir pasados por defecto
   const [loading, setLoading] = useState(false);
 
   const [data, setData] = useState([]);
@@ -50,14 +50,14 @@ const TurnosReport = () => {
           setDoctors(result);
         } else {
           Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Los datos de doctor no están en el formato esperado.",
-          confirmButtonColor: "#0d6efd",
-        });
+            icon: "error",
+            title: "Error",
+            text: "Los datos de doctor no están en el formato esperado.",
+            confirmButtonColor: "#0d6efd",
+          });
         }
       } catch (error) {
-       Swal.fire({
+        Swal.fire({
           icon: "error",
           title: "Error",
           text: "No se pudieron cargar los doctores.",
@@ -111,7 +111,7 @@ const TurnosReport = () => {
     // Validación de DNI (8 dígitos, sin 0 inicial)
     const dniRegex = /^[1-9]\d{7}$/;
     if (patientDni && !dniRegex.test(patientDni)) {
-       Swal.fire({
+      Swal.fire({
         icon: "warning",
         title: "DNI inválido",
         text: "El DNI debe tener 8 dígitos, sin puntos ni 0 inicial.",
@@ -123,9 +123,10 @@ const TurnosReport = () => {
     const estadoApi = estado ? estado.toUpperCase() : ""; // backend espera MAYÚSCULAS
     const queryParams = buildQueryParams();
 
-    const url = !estadoApi
-      ? `${apiUrl}/schedules?${queryParams}`
-      : `${apiUrl}/schedules/report/${estadoApi}?${queryParams}`;
+ const url = !estadoApi
+  ? `${apiUrl}/schedules/report/ALL?${queryParams}`
+  : `${apiUrl}/schedules/report/${estadoApi}?${queryParams}`;
+
 
     try {
       setLoading(true);
@@ -254,10 +255,9 @@ const TurnosReport = () => {
     }
   };
 
-
   return (
     <div>
-       <div className="adddoctor-frame">
+      <div className="adddoctor-frame">
         <form className="row g-3">
           <div className="col-md-3">
             <label htmlFor="estado" className="form-label">
@@ -356,59 +356,58 @@ const TurnosReport = () => {
             </div>
           </div>
 
-     <div className="col-md-12 d-flex gap-2 justify-content-between">
-  <button
-    type="button"
-    className="btn btn-warning"
-    onClick={fetchReports}
-    disabled={loading}
-  >
-    {loading ? "Cargando..." : "Obtener Reportes"}
-  </button>
+          <div className="col-md-12 d-flex gap-2 justify-content-between">
+            <button
+              type="button"
+              className="btn btn-warning"
+              onClick={fetchReports}
+              disabled={loading}
+            >
+              {loading ? "Cargando..." : "Obtener Reportes"}
+            </button>
 
-  <div className="d-flex flex-wrap gap-2 justify-content-end">
-    <button
-      type="button"
-      className="btn btn-success"
-      onClick={() => updateSelectedReports("EJECUTADO")}
-      disabled={selectedReports.size === 0}
-    >
-      Ejecutar seleccionados
-    </button>
+            <div className="d-flex flex-wrap gap-2 justify-content-end">
+              <button
+                type="button"
+                className="btn btn-success"
+                onClick={() => updateSelectedReports("EJECUTADO")}
+                disabled={selectedReports.size === 0}
+              >
+                Ejecutar seleccionados
+              </button>
 
-    <button
-      type="button"
-      className="btn btn-info"
-      onClick={() => updateSelectedReports("NO_ASISTIDO")}
-      disabled={selectedReports.size === 0}
-    >
-      Marcar como no asistidos
-    </button>
+              <button
+                type="button"
+                className="btn btn-info"
+                onClick={() => updateSelectedReports("NO_ASISTIDO")}
+                disabled={selectedReports.size === 0}
+              >
+                Marcar como no asistidos
+              </button>
 
-    <button
-      type="button"
-      className="btn btn-light"
-      onClick={() => updateSelectedReports("CANCELADO")}
-      disabled={selectedReports.size === 0}
-    >
-      Cancelar seleccionados
-    </button>
+              <button
+                type="button"
+                className="btn btn-light"
+                onClick={() => updateSelectedReports("CANCELADO")}
+                disabled={selectedReports.size === 0}
+              >
+                Cancelar seleccionados
+              </button>
 
-    <button
-      type="button"
-      className="btn btn-danger"
-      onClick={() => updateSelectedReports("ELIMINADO")}
-      disabled={selectedReports.size === 0}
-    >
-      Eliminar seleccionados
-    </button>
-  </div>
-</div>
-
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={() => updateSelectedReports("ELIMINADO")}
+                disabled={selectedReports.size === 0}
+              >
+                Eliminar seleccionados
+              </button>
+            </div>
+          </div>
         </form>
       </div>
 
-     <div className="turnos-table-wrapper">
+      <div className="turnos-table-wrapper">
         <table className="table table-hover">
           <thead className="table-light">
             <tr>
@@ -422,21 +421,25 @@ const TurnosReport = () => {
                       : new Set();
                     setSelectedReports(newSelection);
                   }}
-                  checked={selectedReports.size === data.length && data.length > 0}
+                  checked={
+                    selectedReports.size === data.length && data.length > 0
+                  }
                 />
               </th>
               <th>Doctor</th>
               <th>Fecha</th>
               <th>Hora Inicio</th>
               <th>Paciente</th>
+              <th>Obra Social</th>
               <th>Teléfono</th>
               {estado === "" && <th>Estado</th>}
             </tr>
           </thead>
+
           <tbody>
             {data.length === 0 ? (
               <tr>
-                <td colSpan={estado === "" ? 7 : 6} className="text-center">
+                <td colSpan={estado === "" ? 8 : 7} className="text-center">
                   No hay turnos para mostrar.
                 </td>
               </tr>
@@ -450,10 +453,14 @@ const TurnosReport = () => {
                       onChange={() => toggleReportSelection(turno.idSchedule)}
                     />
                   </td>
+
                   <td>{turno.doctor?.fullName || "Sin asignar"}</td>
                   <td>{turno.day}</td>
-                  <td>{(turno.startTime || turno.start_Time || "").slice(0, 5)}</td>
+                  <td>
+                    {(turno.startTime || turno.start_Time || "").slice(0, 5)}
+                  </td>
                   <td>{turno.patient?.fullName || "Sin asignar"}</td>
+                  <td>{turno.coverage?.name || "—"}</td>
                   <td>{turno.patient?.phone || "Sin asignar"}</td>
                   {estado === "" && (
                     <td>{turno.estado || turno.state || "Sin estado"}</td>
@@ -493,47 +500,42 @@ const DoctoresReport = () => {
   }, [apiUrl]);
 
   return (
-  
- 
-    
-        <div className="card-body">
-          <table className="table table-hover">
-            <thead className="table-light">
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>DNI</th>
-                <th>Matrícula</th>
-                <th>Email</th>
-                <th>Teléfono</th>
-                <th>Especialidad</th>
+    <div className="card-body">
+      <table className="table table-hover">
+        <thead className="table-light">
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>DNI</th>
+            <th>Matrícula</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+            <th>Especialidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          {doctores.length === 0 ? (
+            <tr>
+              <td colSpan={7} className="text-center">
+                No hay doctores para mostrar.
+              </td>
+            </tr>
+          ) : (
+            doctores.map((doc) => (
+              <tr key={doc.id}>
+                <td>{doc.id}</td>
+                <td>{doc.fullName}</td>
+                <td>{doc.dni}</td>
+                <td>{doc.license}</td>
+                <td>{doc.email}</td>
+                <td>{doc.phone}</td>
+                <td>{doc.speciality?.name || "Sin asignar"}</td>
               </tr>
-            </thead>
-            <tbody>
-              {doctores.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="text-center">
-                    No hay doctores para mostrar.
-                  </td>
-                </tr>
-              ) : (
-                doctores.map((doc) => (
-                  <tr key={doc.id}>
-                    <td>{doc.id}</td>
-                    <td>{doc.fullName}</td>
-                    <td>{doc.dni}</td>
-                    <td>{doc.license}</td>
-                    <td>{doc.email}</td>
-                    <td>{doc.phone}</td>
-                    <td>{doc.speciality?.name || "Sin asignar"}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-   
-  
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
   );
 };
 
@@ -563,4 +565,3 @@ const Reports = () => {
 };
 
 export default Reports;
-
