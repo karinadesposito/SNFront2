@@ -17,6 +17,11 @@ const TurnosReport = () => {
   const [doctors, setDoctors] = useState([]);
   const [selectedReports, setSelectedReports] = useState(new Set());
 
+  // ====== NUEVO: edición en celda para monto cobrado ======
+  const [editingId, setEditingId] = useState(null); // idSchedule en edición
+  const [editingValue, setEditingValue] = useState(""); // string para el input
+  const [savingMonto, setSavingMonto] = useState(false);
+
   const estadosEnum = [
     "disponible",
     "confirmado",
@@ -36,6 +41,129 @@ const TurnosReport = () => {
     const mm = String(d.getMonth() + 1).padStart(2, "0");
     const dd = String(d.getDate()).padStart(2, "0");
     return `${yyyy}-${mm}-${dd}`;
+  };
+
+  // ====== NUEVO: helpers monto cobrado ======
+  const getEstadoFila = (turno) => turno?.estado || turno?.state;
+
+  const canEditMontoCobrado = (turno) =>
+    getEstadoFila(turno) === "EJECUTADO" &&
+    Number(turno?.vecesEditadoMontoCobrado ?? 0) < 2;
+
+  const formatMoneyNoDecimals = (value) => {
+    const n = Number(value ?? 0);
+    const safe = Number.isFinite(n) ? Math.trunc(n) : 0;
+    return safe.toLocaleString("es-AR", {
+      style: "currency",
+      currency: "ARS",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
+  };
+
+  const startEditMonto = (turno) => {
+    if (!canEditMontoCobrado(turno)) return;
+    setEditingId(turno.idSchedule);
+
+    const current = Number(turno.montoCobrado ?? 0);
+    const safe = Number.isFinite(current) ? String(Math.trunc(current)) : "0";
+    setEditingValue(safe);
+  };
+
+  const cancelEditMonto = () => {
+    setEditingId(null);
+    setEditingValue("");
+  };
+
+  const saveMontoCobrado = async (turno) => {
+    if (!turno?.idSchedule) return;
+
+    // Validación: entero >= 0
+    if (editingValue === "" || editingValue == null) {
+      Swal.fire({
+        icon: "warning",
+        title: "Monto inválido",
+        text: "Ingresá un monto (0 si no cobró).",
+        confirmButtonColor: "#0d6efd",
+      });
+      return;
+    }
+
+    const parsed = Number(editingValue);
+    if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed < 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Monto inválido",
+        text: "El monto debe ser un número entero (sin decimales) y no puede ser negativo.",
+        confirmButtonColor: "#0d6efd",
+      });
+      return;
+    }
+
+    try {
+      setSavingMonto(true);
+
+      const response = await fetch(`${apiUrl}/schedules/monto-cobrado`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          idSchedule: turno.idSchedule,
+          montoCobrado: parsed,
+        }),
+      });
+
+      if (!response.ok) {
+        let msg = "No se pudo guardar el monto cobrado.";
+        try {
+          const err = await response.json();
+          msg = err?.message || msg;
+        } catch {}
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text:
+            typeof msg === "string"
+              ? msg
+              : "Error al guardar el monto cobrado.",
+          confirmButtonColor: "#0d6efd",
+        });
+        return;
+      }
+
+      const updated = await response.json();
+      const updatedTurno = updated?.data ?? updated;
+
+      // Actualiza el turno en memoria
+      setData((prev) =>
+        prev.map((t) =>
+          t.idSchedule === turno.idSchedule
+            ? {
+                ...t,
+                ...updatedTurno,
+                montoCobrado:
+                  updatedTurno?.montoCobrado ??
+                  updatedTurno?.monto_cobrado ??
+                  t.montoCobrado,
+                vecesEditadoMontoCobrado:
+                  updatedTurno?.vecesEditadoMontoCobrado ??
+                  updatedTurno?.veces_editado_monto_cobrado ??
+                  t.vecesEditadoMontoCobrado,
+              }
+            : t
+        )
+      );
+
+      cancelEditMonto();
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error de conexión",
+        text: "No se pudo conectar con el servidor para guardar el monto cobrado.",
+        confirmButtonColor: "#0d6efd",
+      });
+    } finally {
+      setSavingMonto(false);
+    }
   };
 
   // Carga doctores
@@ -123,10 +251,9 @@ const TurnosReport = () => {
     const estadoApi = estado ? estado.toUpperCase() : ""; // backend espera MAYÚSCULAS
     const queryParams = buildQueryParams();
 
- const url = !estadoApi
-  ? `${apiUrl}/schedules/report/ALL?${queryParams}`
-  : `${apiUrl}/schedules/report/${estadoApi}?${queryParams}`;
-
+    const url = !estadoApi
+      ? `${apiUrl}/schedules/report/ALL?${queryParams}`
+      : `${apiUrl}/schedules/report/${estadoApi}?${queryParams}`;
 
     try {
       setLoading(true);
@@ -147,6 +274,7 @@ const TurnosReport = () => {
       }
 
       setData(filtered);
+      cancelEditMonto();
     } catch (error) {
       setData([]);
       Swal.fire({
@@ -254,6 +382,11 @@ const TurnosReport = () => {
       });
     }
   };
+
+  // ====== NUEVO: colSpan dinámico (por columnas reales) ======
+  // Columnas:
+  // 1 checkbox + Doctor + Fecha + Hora + Paciente + Teléfono + Obra Social + Monto Cobrado + (Estado si estado === "")
+  const totalCols = estado === "" ? 9 : 8;
 
   return (
     <div>
@@ -430,8 +563,9 @@ const TurnosReport = () => {
               <th>Fecha</th>
               <th>Hora Inicio</th>
               <th>Paciente</th>
-              <th>Obra Social</th>
               <th>Teléfono</th>
+              <th>Obra Social</th>
+              <th>Monto cobrado</th>
               {estado === "" && <th>Estado</th>}
             </tr>
           </thead>
@@ -439,34 +573,111 @@ const TurnosReport = () => {
           <tbody>
             {data.length === 0 ? (
               <tr>
-                <td colSpan={estado === "" ? 8 : 7} className="text-center">
+                <td colSpan={totalCols} className="text-center">
                   No hay turnos para mostrar.
                 </td>
               </tr>
             ) : (
-              data.map((turno) => (
-                <tr key={turno.idSchedule}>
-                  <td>
-                    <input
-                      type="checkbox"
-                      checked={selectedReports.has(turno.idSchedule)}
-                      onChange={() => toggleReportSelection(turno.idSchedule)}
-                    />
-                  </td>
+              data.map((turno) => {
+                const estadoFila = getEstadoFila(turno);
+                const veces = Number(turno.vecesEditadoMontoCobrado ?? 0);
 
-                  <td>{turno.doctor?.fullName || "Sin asignar"}</td>
-                  <td>{turno.day}</td>
-                  <td>
-                    {(turno.startTime || turno.start_Time || "").slice(0, 5)}
-                  </td>
-                  <td>{turno.patient?.fullName || "Sin asignar"}</td>
-                  <td>{turno.coverage?.name || "—"}</td>
-                  <td>{turno.patient?.phone || "Sin asignar"}</td>
-                  {estado === "" && (
-                    <td>{turno.estado || turno.state || "Sin estado"}</td>
-                  )}
-                </tr>
-              ))
+                const rowClass =
+                  estadoFila === "EJECUTADO"
+                    ? veces === 0
+                      ? "turno-ejecutado-pendiente"
+                      : "turno-ejecutado-ok"
+                    : "";
+
+                return (
+                  <tr key={turno.idSchedule} className={rowClass}>
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={selectedReports.has(turno.idSchedule)}
+                        onChange={() =>
+                          toggleReportSelection(turno.idSchedule)
+                        }
+                      />
+                    </td>
+
+                    <td>{turno.doctor?.fullName || "Sin asignar"}</td>
+                    <td>{turno.day}</td>
+                    <td>
+                      {(turno.startTime || turno.start_Time || "").slice(0, 5)}
+                    </td>
+                    <td>{turno.patient?.fullName || "Sin asignar"}</td>
+
+                    {/* Teléfono */}
+                    <td>{turno.patient?.phone || "Sin asignar"}</td>
+
+                    {/* Obra Social (al final, antes del monto) */}
+                    <td>{turno.coverage?.name || "—"}</td>
+
+                    {/* Monto cobrado */}
+                    <td
+                      style={{
+                        cursor: canEditMontoCobrado(turno)
+                          ? "pointer"
+                          : "default",
+                        whiteSpace: "nowrap",
+                      }}
+                      onClick={() => startEditMonto(turno)}
+                    >
+                      {editingId === turno.idSchedule ? (
+                        <input
+                          type="text"
+                          value={editingValue}
+                          inputMode="numeric"
+                          className="form-control form-control-sm"
+                          autoFocus
+                          disabled={savingMonto}
+                          onChange={(e) =>
+                            setEditingValue(
+                              e.target.value.replace(/\D+/g, "")
+                            )
+                          }
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              saveMontoCobrado(turno);
+                            }
+                            if (e.key === "Escape") {
+                              e.preventDefault();
+                              cancelEditMonto();
+                            }
+                          }}
+                          onBlur={() => {
+                            // Cancelar si sale sin Enter (no guardar)
+                            cancelEditMonto();
+                          }}
+                          style={{ maxWidth: 120 }}
+                        />
+                      ) : (
+                        <>
+                          {formatMoneyNoDecimals(turno?.montoCobrado ?? 0)}{" "}
+                          {canEditMontoCobrado(turno) && (
+                            <span
+                              title="Editar monto cobrado"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                startEditMonto(turno);
+                              }}
+                              style={{ marginLeft: 6 }}
+                            >
+                              ✏️
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </td>
+
+                    {estado === "" && (
+                      <td>{turno.estado || turno.state || "Sin estado"}</td>
+                    )}
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
@@ -544,7 +755,8 @@ const Reports = () => {
   const [key, setKey] = useState("turnos");
 
   return (
-    <Container className="mt-4">
+<Container className="reports-container">
+
       <h2 className="text-center mb-4 text-white">Reportes</h2>
       <Tabs
         id="reports-tabs"

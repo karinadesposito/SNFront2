@@ -14,7 +14,6 @@ html, body {
   margin: 0;
   padding: 0;
   background: #fff;
-  font-family: var(--font-sans);
 }
 
 /* =========================================
@@ -22,8 +21,9 @@ html, body {
 ========================================= */
 :root {
   --header-h: 64px;
-  --nav-h: 64px; 
+  --nav-h: 30px;
 }
+
 
 #root {
   min-height: 100%;
@@ -42,7 +42,6 @@ main {
 body.with-fixed-navbar { padding-top: 0 !important; }
 .with-fixed-navbar main { padding-top: var(--nav-h); }
 
-
 .no-footer {
   padding-bottom: 0;
   min-height: calc(100svh - var(--nav-h));
@@ -50,24 +49,23 @@ body.with-fixed-navbar { padding-top: 0 !important; }
 
 /* comportamiento general */
 .col-email {
- width: 250px;
+  width: 250px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .col-alias {
- width: 250px;
+  width: 250px;
 }
 
 /* pantallas grandes */
 @media (min-width: 1200px) {
   .col-alias {
-    max-width:200px;
-
+    max-width: 200px;
   }
 
   .col-email {
-    max-width:250px;
+    max-width: 250px;
   }
 }

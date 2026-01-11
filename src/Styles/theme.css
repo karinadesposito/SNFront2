@@ -1,4 +1,4 @@
-/* ========== src/styles/theme.css (ordenado) ========== */
+/* ========== src/styles/theme.css ========== */
 :root{
   /* Tipografía */
   --font-sans: "Nunito", system-ui, -apple-system, "Segoe UI", Roboto,
@@ -9,8 +9,8 @@
   --bs-body-font-family: var(--font-sans);
 
   /* Colores base */
-  --brand: #06475B;             /* principal */
-  --surface: #ffffff;           /* fondos claros */
+  --brand: #06475B;
+  --surface: #ffffff;
   --surface-muted: #f7f9fa;
   --border-muted: rgba(6, 71, 91, 0.12);
 
@@ -28,8 +28,9 @@
   );
 }
 
-/* Herencia de fuente global (una sola vez) */
+/* Herencia de fuente global */
 html, body { font-family: var(--font-sans); }
+
 h1, h2, h3, h4, h5, h6,
 .app-navbar, .app-navbar *,
 .site-footer, .site-footer *,
@@ -46,14 +47,18 @@ input, select, textarea,
   color: #fff;
 }
 
-/* Utilidad: botón sólido de marca (opcional) */
+/* Utilidad: botón sólido de marca */
 .btn-brand {
   background-image: none;
   background-color: var(--brand);
   color: #fff;
 }
+
 .btn-brand:hover,
-.btn-brand:focus { filter: brightness(1.05); }
+.btn-brand:focus {
+  filter: brightness(1.05);
+}
+
 
 
 
