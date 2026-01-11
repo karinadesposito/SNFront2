@@ -1,10 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "../Styles/fourSection.css";
 
-// Imágenes optimizadas locales
-import profesionalesImg from "../assets/optimized/profesionales.webp";
-import turnosImg from "../assets/optimized/turnos.webp";
 
 const FourSectionsAdmin = () => {
   return (
