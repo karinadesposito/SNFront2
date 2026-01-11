@@ -3,7 +3,6 @@ import { Tabs, Tab, Container } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Swal from "sweetalert2";
 
-// --- Subcomponente para Turnos ---
 const TurnosReport = () => {
   const [estado, setEstado] = useState(""); // UI: minúsculas
   const [idDoctor, setIdDoctor] = useState(""); // guarda string desde <select>
@@ -41,6 +40,12 @@ const TurnosReport = () => {
     const mm = String(d.getMonth() + 1).padStart(2, "0");
     const dd = String(d.getDate()).padStart(2, "0");
     return `${yyyy}-${mm}-${dd}`;
+  };
+
+  const formatDateAR = (yyyyMmDd) => {
+    if (!yyyyMmDd || !/^\d{4}-\d{2}-\d{2}$/.test(yyyyMmDd)) return yyyyMmDd;
+    const [y, m, d] = yyyyMmDd.split("-");
+    return `${d}/${m}/${y}`;
   };
 
   // ====== NUEVO: helpers monto cobrado ======
@@ -383,9 +388,120 @@ const TurnosReport = () => {
     }
   };
 
-  // ====== NUEVO: colSpan dinámico (por columnas reales) ======
-  // Columnas:
-  // 1 checkbox + Doctor + Fecha + Hora + Paciente + Teléfono + Obra Social + Monto Cobrado + (Estado si estado === "")
+  // ====== NUEVO: descargar rendición diaria (Excel) ======
+  const canDownloadRendicion =
+    !loading &&
+    estado === "ejecutado" &&
+    idDoctor &&
+    startDate &&
+    endDate &&
+    startDate === endDate;
+
+  const handleDescargarRendicion = async () => {
+    // Validaciones claras (sin inventar flujos)
+    if (estado !== "ejecutado") {
+      Swal.fire({
+        icon: "info",
+        title: "Rendición diaria",
+        text: "Para descargar la rendición, seleccioná estado EJECUTADO.",
+        confirmButtonColor: "#0d6efd",
+      });
+      return;
+    }
+
+    if (!idDoctor) {
+      Swal.fire({
+        icon: "info",
+        title: "Rendición diaria",
+        text: "Seleccioná un doctor para descargar la rendición.",
+        confirmButtonColor: "#0d6efd",
+      });
+      return;
+    }
+
+    if (!startDate || !endDate) {
+      Swal.fire({
+        icon: "info",
+        title: "Rendición diaria",
+        text: "Seleccioná un día (inicio y fin) para descargar la rendición.",
+        confirmButtonColor: "#0d6efd",
+      });
+      return;
+    }
+
+    if (startDate !== endDate) {
+      Swal.fire({
+        icon: "info",
+        title: "Rendición diaria",
+        text: "La rendición se descarga por día. Elegí el mismo día en inicio y fin.",
+        confirmButtonColor: "#0d6efd",
+      });
+      return;
+    }
+
+    const day = startDate; // YYYY-MM-DD
+    const numericDoctorId = Number(idDoctor);
+
+    const url = `${apiUrl}/schedules/rendicion-diaria?idDoctor=${numericDoctorId}&day=${day}`;
+
+    try {
+      setLoading(true);
+
+      const resp = await fetch(url);
+
+      if (!resp.ok) {
+        // Si no hay ejecutados: mensaje definido
+        if (resp.status === 404) {
+          let msg = "NO_EJECUTADOS";
+          try {
+            const err = await resp.json();
+            msg = err?.message || msg;
+          } catch {}
+
+          if (msg === "NO_EJECUTADOS") {
+            Swal.fire({
+              icon: "info",
+              title: "Sin pacientes",
+              text: `El día ${formatDateAR(day)} no asistieron pacientes.`,
+              confirmButtonColor: "#0d6efd",
+            });
+            return;
+          }
+        }
+
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "No se pudo descargar la rendición.",
+          confirmButtonColor: "#0d6efd",
+        });
+        return;
+      }
+
+      const blob = await resp.blob();
+      const fileName = `rendicion_${day}_doctor_${numericDoctorId}.xlsx`;
+
+      const blobUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (e) {
+      Swal.fire({
+        icon: "error",
+        title: "Error de conexión",
+        text: "No se pudo conectar con el servidor para descargar la rendición.",
+        confirmButtonColor: "#0d6efd",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ====== colSpan dinámico ======
   const totalCols = estado === "" ? 9 : 8;
 
   return (
@@ -490,15 +606,27 @@ const TurnosReport = () => {
           </div>
 
           <div className="col-md-12 d-flex gap-2 justify-content-between">
-            <button
-              type="button"
-              className="btn btn-warning"
-              onClick={fetchReports}
-              disabled={loading}
-            >
-              {loading ? "Cargando..." : "Obtener Reportes"}
-            </button>
+            {/* Izquierda: Obtener + Descargar rendición */}
+            <div className="d-flex gap-2">
+              <button
+                type="button"
+                className="btn btn-warning"
+                onClick={fetchReports}
+                disabled={loading}
+              >
+                {loading ? "Cargando..." : "OBTENER REPORTE"}
+              </button>
 
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleDescargarRendicion}
+              >
+                DESCARGAR RENDICIÓN
+              </button>
+            </div>
+
+            {/* Derecha: acciones masivas */}
             <div className="d-flex flex-wrap gap-2 justify-content-end">
               <button
                 type="button"
@@ -506,7 +634,7 @@ const TurnosReport = () => {
                 onClick={() => updateSelectedReports("EJECUTADO")}
                 disabled={selectedReports.size === 0}
               >
-                Ejecutar seleccionados
+                ASISTIÓ
               </button>
 
               <button
@@ -515,7 +643,7 @@ const TurnosReport = () => {
                 onClick={() => updateSelectedReports("NO_ASISTIDO")}
                 disabled={selectedReports.size === 0}
               >
-                Marcar como no asistidos
+                NO ASISTIÓ
               </button>
 
               <button
@@ -524,7 +652,7 @@ const TurnosReport = () => {
                 onClick={() => updateSelectedReports("CANCELADO")}
                 disabled={selectedReports.size === 0}
               >
-                Cancelar seleccionados
+                CANCELAR TURNO
               </button>
 
               <button
@@ -533,7 +661,7 @@ const TurnosReport = () => {
                 onClick={() => updateSelectedReports("ELIMINADO")}
                 disabled={selectedReports.size === 0}
               >
-                Eliminar seleccionados
+                ELIMINAR TURNO
               </button>
             </div>
           </div>
@@ -595,9 +723,7 @@ const TurnosReport = () => {
                       <input
                         type="checkbox"
                         checked={selectedReports.has(turno.idSchedule)}
-                        onChange={() =>
-                          toggleReportSelection(turno.idSchedule)
-                        }
+                        onChange={() => toggleReportSelection(turno.idSchedule)}
                       />
                     </td>
 
@@ -608,13 +734,10 @@ const TurnosReport = () => {
                     </td>
                     <td>{turno.patient?.fullName || "Sin asignar"}</td>
 
-                    {/* Teléfono */}
                     <td>{turno.patient?.phone || "Sin asignar"}</td>
 
-                    {/* Obra Social (al final, antes del monto) */}
                     <td>{turno.coverage?.name || "—"}</td>
 
-                    {/* Monto cobrado */}
                     <td
                       style={{
                         cursor: canEditMontoCobrado(turno)
@@ -633,9 +756,7 @@ const TurnosReport = () => {
                           autoFocus
                           disabled={savingMonto}
                           onChange={(e) =>
-                            setEditingValue(
-                              e.target.value.replace(/\D+/g, "")
-                            )
+                            setEditingValue(e.target.value.replace(/\D+/g, ""))
                           }
                           onKeyDown={(e) => {
                             if (e.key === "Enter") {
@@ -648,7 +769,6 @@ const TurnosReport = () => {
                             }
                           }}
                           onBlur={() => {
-                            // Cancelar si sale sin Enter (no guardar)
                             cancelEditMonto();
                           }}
                           style={{ maxWidth: 120 }}
@@ -755,8 +875,7 @@ const Reports = () => {
   const [key, setKey] = useState("turnos");
 
   return (
-<Container className="reports-container">
-
+    <Container className="reports-container">
       <h2 className="text-center mb-4 text-white">Reportes</h2>
       <Tabs
         id="reports-tabs"
