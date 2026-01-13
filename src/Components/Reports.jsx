@@ -72,26 +72,31 @@ const TurnosReport = () => {
   const buildQueryParams = () => {
     const params = new URLSearchParams();
 
+    if (estado) {
+    params.set("estado", estado.toUpperCase());
+  }
+
     // idDoctor debe viajar como número si existe
     if (idDoctor && !Number.isNaN(Number(idDoctor))) {
       params.set("idDoctor", String(Number(idDoctor)));
     }
 
     // DNI (8 dígitos, sin 0 inicial)
-    if (patientDni) {
-      params.set("patientDni", patientDni);
-    }
+     if (patientDni) {
+    params.set("patientDni", patientDni);
+    params.set("estado", "CONFIRMADO");
+    params.set("startDate", todayStr());
 
-    // Fechas
-    let start = startDate;
-    const end = endDate;
+    return params.toString(); 
+  }
 
-    // Excluir pasados por defecto: si no hay startDate, forzar hoy
-    if (excludePast && !start) {
-      start = todayStr();
-    }
+      let start = startDate;
+  if (excludePast && !startDate) {
+    start = todayStr();
+  }
+
     if (start) params.set("startDate", start);
-    if (end) params.set("endDate", end);
+    if (endDate) params.set("endDate", endDate);
 
     return params.toString();
   };
@@ -120,12 +125,19 @@ const TurnosReport = () => {
       return;
     }
 
-    const estadoApi = estado ? estado.toUpperCase() : ""; // backend espera MAYÚSCULAS
+    //const estadoApi = estado ? estado.toUpperCase() : ""; // backend espera MAYÚSCULAS
     const queryParams = buildQueryParams();
+    const url = `${apiUrl}/schedules/report?${queryParams}`;
 
-    const url = !estadoApi
+    /*const url = !estadoApi
       ? `${apiUrl}/schedules?${queryParams}`
       : `${apiUrl}/schedules/report/${estadoApi}?${queryParams}`;
+
+const url = `${apiUrl}/schedules/report?${queryParams}${
+  estadoApi ? `&estado=${estadoApi}` : ""
+}`;*/
+
+  console.log("URL FINAL:", url);
 
     try {
       setLoading(true);

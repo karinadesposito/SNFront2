@@ -329,7 +329,7 @@ const CalendarPatient = () => {
       return;
     }
 
-    fetch(
+    /*fetch(
       `${apiUrl}/schedules/report/DISPONIBLE?idDoctor=${selectedDoctor}&startDate=${formatted}&endDate=${formatted}`
     )
       .then((res) => res.json())
@@ -344,7 +344,30 @@ const CalendarPatient = () => {
         setSlots(slotsArr);
       })
       .catch(() => setSlots([]));
-  };
+  };*/
+
+  const params = new URLSearchParams({
+  estado: "DISPONIBLE",
+  idDoctor: selectedDoctor,
+  startDate: formatted,
+  endDate: formatted,
+});
+
+fetch(`${apiUrl}/schedules/report?${params.toString()}`)
+  .then((res) => res.json())
+  .then((data) => {
+    const list = data?.data || [];
+    const slotsArr = Array.isArray(list)
+      ? list.map((s) => ({
+          idSchedule: s.idSchedule,
+          time: (s.startTime || s.start_Time || "").slice(0, 5),
+        }))
+      : [];
+    setSlots(slotsArr);
+  })
+  .catch(() => setSlots([]));
+};
+
 
   const tileDisabled = ({ date }) => {
     const formatted = toYMDLocal(date);
