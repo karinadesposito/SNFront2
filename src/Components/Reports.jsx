@@ -488,7 +488,7 @@ const DoctoresReport = () => {
   useEffect(() => {
     const fetchDoctores = async () => {
       try {
-        const response = await fetch(`${apiUrl}/doctor`);
+        const response = await fetch(`${apiUrl}/doctor/information`);
         const result = await response.json();
         if (result?.data && Array.isArray(result.data)) {
           setDoctores(result.data);
@@ -512,7 +512,6 @@ const DoctoresReport = () => {
           <table className="table table-hover">
             <thead className="table-light">
               <tr>
-                <th>ID</th>
                 <th>Nombre</th>
                 <th>DNI</th>
                 <th>Matrícula</th>
@@ -531,7 +530,6 @@ const DoctoresReport = () => {
               ) : (
                 doctores.map((doc) => (
                   <tr key={doc.id}>
-                    <td>{doc.id}</td>
                     <td>{doc.fullName}</td>
                     <td>{doc.dni}</td>
                     <td>{doc.license}</td>
