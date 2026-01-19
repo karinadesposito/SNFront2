@@ -211,20 +211,21 @@ const TurnosReport = () => {
     }
 
     // DNI (8 dígitos, sin 0 inicial)
-    if (patientDni) {
-      params.set("patientDni", patientDni);
-    }
+   if (patientDni) {
+    params.set("patientDni", patientDni);
+    params.set("estado", "CONFIRMADO");
+    params.set("startDate", todayStr());
 
-    // Fechas
+    return params.toString(); 
+  }
+
     let start = startDate;
-    const end = endDate;
+  if (excludePast && !startDate) {
+    start = todayStr();
+  }
 
-    // Excluir pasados por defecto: si no hay startDate, forzar hoy
-    if (excludePast && !start) {
-      start = todayStr();
-    }
     if (start) params.set("startDate", start);
-    if (end) params.set("endDate", end);
+    if (endDate) params.set("endDate", endDate);
 
     return params.toString();
   };
@@ -253,12 +254,8 @@ const TurnosReport = () => {
       return;
     }
 
-    const estadoApi = estado ? estado.toUpperCase() : ""; // backend espera MAYÚSCULAS
     const queryParams = buildQueryParams();
-
-    const url = !estadoApi
-      ? `${apiUrl}/schedules/report/ALL?${queryParams}`
-      : `${apiUrl}/schedules/report/${estadoApi}?${queryParams}`;
+    const url = `${apiUrl}/schedules/report?${queryParams}`;
 
     try {
       setLoading(true);

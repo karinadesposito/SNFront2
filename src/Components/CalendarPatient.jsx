@@ -337,9 +337,9 @@ const CalendarPatient = () => {
       return;
     }
 
-    fetch(
-      `${apiUrl}/schedules/report/DISPONIBLE?idDoctor=${selectedDoctor}&startDate=${formatted}&endDate=${formatted}`
-    )
+   fetch(
+  `${apiUrl}/schedules/report?estado=DISPONIBLE&idDoctor=${selectedDoctor}&startDate=${formatted}&endDate=${formatted}`
+)
       .then((res) => res.json())
       .then((data) => {
         const list = data?.data || data;
