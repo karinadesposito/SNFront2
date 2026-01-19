@@ -254,13 +254,8 @@ const TurnosReport = () => {
       return;
     }
 
-    //const estadoApi = estado ? estado.toUpperCase() : ""; // backend espera MAYÚSCULAS
     const queryParams = buildQueryParams();
     const url = `${apiUrl}/schedules/report?${queryParams}`;
-
-    /*const url = !estadoApi
-      ? `${apiUrl}/schedules/report/ALL?${queryParams}`
-      : `${apiUrl}/schedules/report/${estadoApi}?${queryParams}`;*/
 
     try {
       setLoading(true);
