@@ -25,6 +25,21 @@ const formatDayLocal = (dayStr) => {
   const [y, m, d] = dayStr.split("-");
   return `${d}/${m}/${y}`;
 };
+//Helper para formatear que el nombre y el apellido arranquen con Mayúsculas y sigan por minúsculas
+const capitalizeWords = (value = "") =>
+  value
+    .toLowerCase()
+    .split(" ")
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+
+//Helper para código celular y que se pueda usar para luego vincular whatsapp
+const normalizeArPhone = (value = "") => {
+  const clean = value.replace(/\D+/g, "");
+  if (clean.length !== 10) return clean;
+  return `+549${clean}`;
+};
 
 const CalendarPatient = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
@@ -202,6 +217,22 @@ const CalendarPatient = () => {
         });
         return;
       }
+      const phoneNormalized = normalizeArPhone(data.phone);
+
+      if (!phoneNormalized) {
+        setError("phone", {
+          type: "manual",
+          message: "El teléfono debe tener 10 dígitos válidos",
+        });
+
+        Swal.fire({
+          title: "Teléfono inválido",
+          text: "Ingresá un número de 10 dígitos sin 0 ni 15.",
+          icon: "error",
+          confirmButtonColor: "#d33",
+        });
+        return;
+      }
 
       try {
         Swal.fire({
@@ -219,7 +250,7 @@ const CalendarPatient = () => {
           patient: {
             fullName: data.fullName,
             dni: dniClean,
-            phone: data.phone,
+            phone: phoneNormalized, //data.phone,
           },
         };
 
@@ -240,7 +271,7 @@ const CalendarPatient = () => {
         const dayStr = saved?.day;
         const timeStr = (saved?.startTime || saved?.start_Time || "").slice(
           0,
-          5
+          5,
         );
         Swal.fire({
           title: "✅ ¡Turno confirmado!",
@@ -255,7 +286,7 @@ const CalendarPatient = () => {
         });
 
         setSlots((prev) =>
-          prev.filter((t) => t.idSchedule !== selectedSlot.idSchedule)
+          prev.filter((t) => t.idSchedule !== selectedSlot.idSchedule),
         );
         setSelectedSlot(null);
         setShowForm(false);
@@ -337,9 +368,9 @@ const CalendarPatient = () => {
       return;
     }
 
-   fetch(
-  `${apiUrl}/schedules/report?estado=DISPONIBLE&idDoctor=${selectedDoctor}&startDate=${formatted}&endDate=${formatted}`
-)
+    fetch(
+      `${apiUrl}/schedules/report?estado=DISPONIBLE&idDoctor=${selectedDoctor}&startDate=${formatted}&endDate=${formatted}`,
+    )
       .then((res) => res.json())
       .then((data) => {
         const list = data?.data || data;
@@ -367,12 +398,12 @@ const CalendarPatient = () => {
         label: `${doc.fullName} - Matrícula ${doc.license}`,
         speciality: doc.speciality?.name || "",
       })),
-    [doctors]
+    [doctors],
   );
 
   const specialityOptions = useMemo(
     () => (specialities || []).map((s) => ({ value: s.name, label: s.name })),
-    [specialities]
+    [specialities],
   );
 
   const filteredDoctorOptions = useMemo(
@@ -380,7 +411,7 @@ const CalendarPatient = () => {
       selectedSpeciality
         ? doctorOptions.filter((d) => d.speciality === selectedSpeciality)
         : doctorOptions,
-    [doctorOptions, selectedSpeciality]
+    [doctorOptions, selectedSpeciality],
   );
 
   const selectedDoctorOption =
@@ -498,7 +529,7 @@ const CalendarPatient = () => {
                         options={filteredDoctorOptions}
                         value={
                           filteredDoctorOptions.find(
-                            (o) => o.value === selectedDoctor
+                            (o) => o.value === selectedDoctor,
                           ) || null
                         }
                         onChange={(opt) => {
@@ -556,8 +587,8 @@ const CalendarPatient = () => {
                           {loadingCoverages
                             ? "Cargando coberturas..."
                             : doctorCoverages.length === 0
-                            ? "Este médico no tiene coberturas configuradas"
-                            : "-- Seleccione --"}
+                              ? "Este médico no tiene coberturas configuradas"
+                              : "-- Seleccione --"}
                         </option>
                         {doctorCoverages.map((c) => (
                           <option key={c.id} value={String(c.id)}>
@@ -659,12 +690,12 @@ const CalendarPatient = () => {
                   {doctors?.length
                     ? doctors.find((d) => d.id === selectedDoctor)?.fullName ||
                       "—"
-                    : selectedDoctor ?? "—"}
+                    : (selectedDoctor ?? "—")}
                 </div>
                 <div className="text-muted small">
                   <strong>Obra social:</strong>{" "}
                   {doctorCoverages.find(
-                    (c) => String(c.id) === String(selectedCoverageId)
+                    (c) => String(c.id) === String(selectedCoverageId),
                   )?.name || "—"}
                 </div>
               </Col>
@@ -683,10 +714,13 @@ const CalendarPatient = () => {
                     placeholder="Ej: 30111222"
                     inputMode="numeric"
                     maxLength={8}
+                    isInvalid={!!errors.dni}
                     {...register("dni", {
                       required: "El DNI es obligatorio",
                       onChange: (e) => {
-                        const clean = e.target.value.replace(/\D+/g, "");
+                        const clean = e.target.value
+                          .replace(/\D+/g, "")
+                          .slice(0, 8);
                         setValue("dni", clean, { shouldValidate: true });
                         if (clean.length < 8) setPatientFound(null);
                       },
@@ -727,8 +761,40 @@ const CalendarPatient = () => {
                 <Form.Control
                   type="text"
                   placeholder="Ej: Juan Pérez"
+                  inputMode="text"
+                  maxLength={30}
+                  isInvalid={!!errors.fullName}
                   {...register("fullName", {
                     required: "El nombre es obligatorio",
+                    minLength: {
+                      value: 3,
+                      message: "Debe tener al menos 3 caracteres",
+                    },
+                    maxLength: {
+                      value: 30,
+                      message: "No puede superar los 30 caracteres",
+                    },
+                    pattern: {
+                      value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/,
+                      message: "Solo se permiten letras y espacios",
+                    },
+                    onChange: (e) => {
+                      const clean = e.target.value
+                        .replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "")
+                        .replace(/\s{2,}/g, " ");
+
+                      setValue("fullName", clean, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      });
+                    },
+                    onBlur: (e) => {
+                      const formatted = capitalizeWords(e.target.value.trim());
+
+                      setValue("fullName", formatted, {
+                        shouldValidate: true,
+                      });
+                    },
                   })}
                 />
                 {errors.fullName && (
@@ -742,10 +808,26 @@ const CalendarPatient = () => {
                 <Form.Label>Teléfono</Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="Ej: 2215555555"
+                  placeholder="Ej: 2213250162"
                   inputMode="tel"
+                  maxLength={10}
+                  isInvalid={!!errors.phone}
                   {...register("phone", {
                     required: "El teléfono es obligatorio",
+                    pattern: {
+                      value: /^[1-9]\d{9}$/,
+                      message: "Debe tener 10 dígitos (sin 0 ni 15)",
+                    },
+                    onChange: (e) => {
+                      const clean = e.target.value
+                        .replace(/\D+/g, "")
+                        .slice(0, 10);
+
+                      setValue("phone", clean, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      });
+                    },
                   })}
                 />
                 {errors.phone && (
