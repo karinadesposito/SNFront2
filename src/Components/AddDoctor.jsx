@@ -9,7 +9,7 @@ const AddDoctor = () => {
     fullName: "",
     dni: "",
     license: "",
-    email: "",
+    //email: "",
     phone: "",
     specialityId: "",
     alias:"",
@@ -49,7 +49,7 @@ const AddDoctor = () => {
       fullName: formData.fullName.trim(),
       dni: formData.dni.trim(),
       license: formData.license.trim().toUpperCase(), // 2 letras + 1–6 dígitos
-      email: formData.email.trim().toLowerCase(),
+      //email: formData.email.trim().toLowerCase(),
       phone: formData.phone.trim(), // + opcional, 7–15 dígitos
       specialityId: formData.specialityId,
        ...(formData.alias.trim() ? { alias: formData.alias.trim() } : {}), // ✅ nuevo (no envía si está vacío)
@@ -214,7 +214,7 @@ const AddDoctor = () => {
     </Form.Group>
   </Col>
 
-            <Col md={6}>
+          {/*  <Col md={6}>
               <Form.Group controlId="formEmail">
                 <Form.Label>Email</Form.Label>
                 <Form.Control
@@ -225,7 +225,7 @@ const AddDoctor = () => {
                   required
                 />
               </Form.Group>
-            </Col>
+            </Col> */}
           </Row>
 
        <div className="text-center">

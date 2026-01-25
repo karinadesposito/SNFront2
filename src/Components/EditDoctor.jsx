@@ -114,7 +114,7 @@ const ProfesionalTable = () => {
         fullName: selectedDoctor.fullName,
         license: selectedDoctor.license,
         phone: selectedDoctor.phone,
-        email: selectedDoctor.email,
+        //email: selectedDoctor.email,
         specialityId: selectedDoctor.specialityId || null,
         alias: (selectedDoctor.alias ?? "").trim() || null, // ✅
       };
@@ -295,7 +295,7 @@ const ProfesionalTable = () => {
               <th>DNI</th>  
               <th>Teléfono</th>
               <th className="col-alias">Alias</th>
-              <th className="col-email">Email</th>
+             {/* <th className="col-email">Email</th> */}
               <th style={{ width: 120 }}>Restaurar</th>
             </tr>
           </thead>
@@ -325,7 +325,7 @@ const ProfesionalTable = () => {
                      <td>{doc.dni}</td>
                     <td>{doc.phone || "-"}</td>
                     <td className="col-alias">{doc.alias || "-"}</td>
-                    <td className="col-email">{doc.email || "-"}</td>
+                  {/*  <td className="col-email">{doc.email || "-"}</td> */}
                     {/* Restaurar solo si está eliminado */}
                     <td>
                       {isDeleted ? (
@@ -452,7 +452,7 @@ const ProfesionalTable = () => {
                 />
               </Form.Group>
 
-              <Form.Group className="mb-3">
+             {/* <Form.Group className="mb-3">
                 <Form.Label>Email</Form.Label>
                 <Form.Control
                   type="email"
@@ -465,7 +465,7 @@ const ProfesionalTable = () => {
                     })
                   }
                 />
-              </Form.Group>
+              </Form.Group> */}
 
               <Form.Group>
                 <Form.Label>Especialidad</Form.Label>
