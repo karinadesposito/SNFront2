@@ -25,7 +25,8 @@ const formatDayLocal = (dayStr) => {
   const [y, m, d] = dayStr.split("-");
   return `${d}/${m}/${y}`;
 };
-//Helper para formatear que el nombre y el apellido arranquen con Mayúsculas y sigan por minúsculas
+
+// Helper para formatear que el nombre y el apellido arranquen con Mayúsculas y sigan por minúsculas
 const capitalizeWords = (value = "") =>
   value
     .toLowerCase()
@@ -34,7 +35,7 @@ const capitalizeWords = (value = "") =>
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 
-//Helper para código celular y que se pueda usar para luego vincular whatsapp
+// Helper para código celular y que se pueda usar para luego vincular whatsapp
 const normalizeArPhone = (value = "") => {
   const clean = value.replace(/\D+/g, "");
   if (clean.length !== 10) return clean;
@@ -244,13 +245,14 @@ const CalendarPatient = () => {
             Swal.showLoading();
           },
         });
+
         const payload = {
           idSchedule: selectedSlot.idSchedule,
-          coverageId: Number(selectedCoverageId), // 👈 acá, en raíz
+          coverageId: Number(selectedCoverageId), // 👈 en raíz
           patient: {
             fullName: data.fullName,
             dni: dniClean,
-            phone: phoneNormalized, //data.phone,
+            phone: phoneNormalized,
           },
         };
 
@@ -273,6 +275,7 @@ const CalendarPatient = () => {
           0,
           5,
         );
+
         Swal.fire({
           title: "✅ ¡Turno confirmado!",
           html: `
@@ -290,7 +293,9 @@ const CalendarPatient = () => {
         );
         setSelectedSlot(null);
         setShowForm(false);
+
         reset();
+        setSelectedCoverageId(""); // ✅ limpiar obra social para próxima reserva
         setFindingPatient(false);
         setPatientFound(null);
       } catch (error) {
@@ -629,9 +634,7 @@ const CalendarPatient = () => {
                           </ListGroup.Item>
                         ))
                       ) : (
-                        <ListGroup.Item>
-                          No hay turnos disponibles.
-                        </ListGroup.Item>
+                        <ListGroup.Item>No hay turnos disponibles.</ListGroup.Item>
                       )}
                     </ListGroup>
                   </div>
@@ -647,6 +650,7 @@ const CalendarPatient = () => {
         onHide={() => {
           setShowForm(false);
           setSelectedSlot(null);
+          setSelectedCoverageId(""); // ✅ limpiar obra social al cerrar el modal sin confirmar
         }}
         onExited={() => {
           if (queuedSwal) {
@@ -831,9 +835,7 @@ const CalendarPatient = () => {
                   })}
                 />
                 {errors.phone && (
-                  <span className="text-danger small">
-                    {errors.phone.message}
-                  </span>
+                  <span className="text-danger small">{errors.phone.message}</span>
                 )}
               </Col>
             </Row>
@@ -845,6 +847,7 @@ const CalendarPatient = () => {
                 onClick={() => {
                   setShowForm(false);
                   setSelectedSlot(null);
+                  setSelectedCoverageId(""); // ✅ limpiar obra social al cancelar
                 }}
                 disabled={loading}
               >

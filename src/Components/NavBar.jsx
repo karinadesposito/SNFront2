@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Navbar, Nav, Container } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import logosaludnet from "../assets/logosaludnet.png";
+import cruzBlanca from ".././assets/cruzBlanca.png";
 
 export default function CustomNavBar() {
   const [scrolled, setScrolled] = useState(false);
@@ -38,12 +38,15 @@ export default function CustomNavBar() {
       className={`app-navbar navbar-dark ${scrolled ? "is-scrolled" : ""}`}
     >
       <Container>
-        <Navbar.Brand as={Link} to="/" onClick={closeMenu}>
-          <div className="navbar-logo-text">
-            {/* <img src={logosaludnet} alt="Logo SaludNet" id="logosaludnet" /> */}
-            <span className="saludnet-text">JS</span>
-          </div>
-        </Navbar.Brand>
+      <Navbar.Brand as={Link} to="/" onClick={closeMenu}>
+  <div className="navbar-logo-text">
+    <img
+      src={cruzBlanca}
+      alt="Logo"
+      className="navbar-logo"
+    />
+  </div>
+</Navbar.Brand>
 
         <Navbar.Toggle
           aria-controls="main-navbar"
@@ -51,37 +54,25 @@ export default function CustomNavBar() {
         />
 
         <Navbar.Collapse id="main-navbar">
-          {/* Bloque único, columna en md/sm y fila en lg+ */}
-          <div className="d-flex flex-column flex-lg-row w-100">
-            {/* Menú a la izquierda */}
-            <Nav className="me-lg-3">
+  <div className="d-flex flex-column flex-lg-row w-100">
+    {/* Bloque izquierdo vacío (se puede eliminar si no hay otros links) */}
+    <Nav className="me-lg-3" />
 
-              <Nav.Link as={Link} to="/profesionales" onClick={closeMenu}>
-                Profesionales
-              </Nav.Link>
-            </Nav>
+    {/* Bloque derecho: todos juntos y alineados */}
+    <Nav className="ms-lg-auto">
+      <Nav.Link as={Link} to="/profesionales" onClick={closeMenu}>
+        Profesionales
+      </Nav.Link>
+      <Nav.Link as={Link} to="/reservar-turno" onClick={closeMenu}>
+        Reservar turnos
+      </Nav.Link>
+      <Nav.Link as={Link} to="/admin" onClick={closeMenu}>
+        Administración
+      </Nav.Link>
+    </Nav>
+  </div>
+</Navbar.Collapse>
 
-            {/* CTAs: izquierda en md/sm, derecha en lg+ (sin gaps raros) */}
-            <Nav className="ms-lg-auto">
-              <Nav.Link
-                as={Link}
-                to="/reservar-turno"
-
-                onClick={closeMenu}
-              >
-                Reservar turnos
-              </Nav.Link>
-              <Nav.Link
-                as={Link}
-                to="/admin"
-
-                onClick={closeMenu}
-              >
-                Administración
-              </Nav.Link>
-            </Nav>
-          </div>
-        </Navbar.Collapse>
       </Container>
     </Navbar>
   );

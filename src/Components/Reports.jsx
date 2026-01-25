@@ -154,8 +154,8 @@ const TurnosReport = () => {
                   updatedTurno?.veces_editado_monto_cobrado ??
                   t.vecesEditadoMontoCobrado,
               }
-            : t
-        )
+            : t,
+        ),
       );
 
       cancelEditMonto();
@@ -211,22 +211,22 @@ const TurnosReport = () => {
     }
 
     if (estado) {
-    params.set("estado", estado.toUpperCase());
-  }
+      params.set("estado", estado.toUpperCase());
+    }
 
     // DNI (8 dígitos, sin 0 inicial)
-   if (patientDni) {
-    params.set("patientDni", patientDni);
-    params.set("estado", "CONFIRMADO");
-    params.set("startDate", todayStr());
+    if (patientDni) {
+      params.set("patientDni", patientDni);
+      params.set("estado", "CONFIRMADO");
+      params.set("startDate", todayStr());
 
-    return params.toString(); 
-  }
+      return params.toString();
+    }
 
     let start = startDate;
-  if (excludePast && !startDate) {
-    start = todayStr();
-  }
+    if (excludePast && !startDate) {
+      start = todayStr();
+    }
 
     if (start) params.set("startDate", start);
     if (endDate) params.set("endDate", endDate);
@@ -269,8 +269,8 @@ const TurnosReport = () => {
       const arrayTurnos = Array.isArray(result?.data)
         ? result.data
         : Array.isArray(result)
-        ? result
-        : [];
+          ? result
+          : [];
 
       // Filtro extra en front si excludePast
       let filtered = arrayTurnos;
@@ -342,7 +342,7 @@ const TurnosReport = () => {
               method: "PATCH",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(body),
-            }
+            },
           );
 
           if (!response.ok) {
@@ -355,7 +355,7 @@ const TurnosReport = () => {
             }
             errores.push(errorMsg);
           }
-        })
+        }),
       );
 
       setSelectedReports(new Set());
@@ -839,7 +839,6 @@ const DoctoresReport = () => {
             <th>Nombre</th>
             <th>DNI</th>
             <th>Matrícula</th>
-            {/*<th>Email</th> */}
             <th>Teléfono</th>
             <th>Especialidad</th>
             <th>Alias</th>
@@ -859,14 +858,14 @@ const DoctoresReport = () => {
                 <td>{doc.fullName}</td>
                 <td>{doc.dni}</td>
                 <td>{doc.license}</td>
-               {/* <td>{doc.email}</td> */}
+
                 <td>{doc.phone}</td>
                 <td>{doc.speciality?.name || "Sin asignar"}</td>
                 <td>{doc.alias || "Sin alias"}</td>
                 <td>
-               {Array.isArray(doc.coverages) && doc.coverages.length > 0
-                ? doc.coverages.map((c) => c.name).join(", ")
-                : "Sin asignar"}
+                  {Array.isArray(doc.coverages) && doc.coverages.length > 0
+                    ? doc.coverages.map((c) => c.name).join(", ")
+                    : "Sin asignar"}
                 </td>
               </tr>
             ))
