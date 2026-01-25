@@ -20,7 +20,7 @@ html, body {
    Variables de layout (fallbacks)
 ========================================= */
 :root {
-  --header-h: 64px;
+  --header-h: 6px;
   --nav-h: 30px;
 }
 
@@ -48,12 +48,7 @@ body.with-fixed-navbar { padding-top: 0 !important; }
 }
 
 /* comportamiento general */
-.col-email {
-  width: 250px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+
 
 .col-alias {
   width: 250px;
@@ -65,7 +60,5 @@ body.with-fixed-navbar { padding-top: 0 !important; }
     max-width: 200px;
   }
 
-  .col-email {
-    max-width: 250px;
-  }
+  
 }

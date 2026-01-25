@@ -59,22 +59,7 @@ export default function Contacto() {
                 />
               </div>
 
-              <div className="mb-3">
-                <label
-                  htmlFor="cf-email"
-                  className="form-label visually-hidden"
-                >
-                  Email
-                </label>
-                <input
-                  id="cf-email"
-                  type="email"
-                  className="form-control"
-                  placeholder="Email *"
-                  required
-                />
-              </div>
-
+          
               <div className="mb-3">
                 <label
                   htmlFor="cf-consulta"

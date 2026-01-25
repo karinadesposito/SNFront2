@@ -1,81 +1,18 @@
-.home-bg {
-  position: relative;
-  background-image: var(--home-bg);
-  background-repeat: no-repeat;
-  background-position: 50% 0%;
-  background-size: cover;
-  background-attachment: scroll;
-height: 75vh;
-  display: flex;
-  align-items: center;
-  padding-block: clamp(48px, 8vh, 96px);
-  color: #fff;
-}
-
-.home-bg::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0.35) 0%,
-      rgba(0, 0, 0, 0.15) 40%,
-      rgba(0, 0, 0, 0.05) 100%
-    ),
-    rgba(0, 0, 0, 0.35);
-  z-index: 0;
-}
-
-.home-wrap {
-  position: relative;
-  z-index: 1;
-  backdrop-filter: saturate(120%);
-}
-
-.home-title {
-  margin-bottom: 0.5rem;
-  text-wrap: balance;
-  
-}
-.home-subtitle {
-  opacity: 0.9;
-  margin: 0;
-}
-.home-wrap {
-  display: flex;
-  align-items: center;
-  min-height: calc(100vh - var(--nav-h));
-}
-@supports (height: 100svh) {
-  .home-wrap {
-    min-height: calc(100svh - var(--nav-h));
-  }
-}
-
-.home-wrap .row {
+.home-bg{
+  padding: 0;
   width: 100%;
+  overflow: hidden;
+
+  /* un poco más de alto, sobre todo en desktop */
+  height: clamp(220px, 30vw, 560px);
 }
 
-/* md (≥ 768px): un poco menos de zoom = “se achica” */
-@media (min-width: 768px) {
-  .home-bg {
-    background-size: 100% auto; /* menos zoom que mobile */
-    background-position: 60% 12vh; /* leve corrimiento derecha/abajo */
-    background-attachment: fixed; /* parallax sólo en desktop */
-  }
-}
+.home-hero-logo{
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 
-/* xl (≥ 1200px): la más chica y BAJAMOS la imagen */
-@media (min-width: 1200px) {
-  .home-bg {
-    background-size: 100% auto; /* la menor escala */
-    background-position: 58% 10vh; /* baja ~10vh para ver mejor la parte de arriba */
-  }
-}
-/* Pegar al final de home.css */
-.home-bg {
-  /* sube el hero para cubrir el padding del main */
-  margin-top: calc(-1 * var(--nav-h));
-  /* devuelve el respiro arriba del contenido del hero */
-  padding-top: calc(var(--nav-h) + clamp(48px, 8vh, 96px));
+  /* baja levemente el foco para que no se corte la cruz */
+  object-position: center 40%;
 }

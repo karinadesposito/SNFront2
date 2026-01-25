@@ -1,21 +1,14 @@
-:root {
-  --nav-bg: #06475b; /* color base de tu navbar */
-  --nav-h: 64px; /* se actualiza en runtime desde NavBar.jsx */
-}
-
-/* Evita que la navbar fija tape el contenido */
 body.with-fixed-navbar {
   padding-top: var(--nav-h);
 }
 
-/* ========= Base de la navbar fija ========= */
 .app-navbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1040; /* por encima del contenido */
-  background-color: #073043; /* fallback sólido */
+  background-color: #06475B; /* fallback sólido */
 }
 
 #logosaludnet {
@@ -71,12 +64,11 @@ body.with-fixed-navbar {
   right: 0;
   bottom: 0;
   height: 1px;
-  background: linear-gradient(
-    to right,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.8) 20%,
-    rgba(255, 255, 255, 0.8) 80%,
-    rgba(255, 255, 255, 0) 100%
-  );
+
   pointer-events: none; /* no interfiere con clics */
+}
+.navbar-logo {
+  height: 36px;      /* tamaño visual del logo */
+  width: auto;       /* mantiene proporción */
+  display: block;
 }
