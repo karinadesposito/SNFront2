@@ -210,6 +210,10 @@ const TurnosReport = () => {
       params.set("idDoctor", String(Number(idDoctor)));
     }
 
+    if (estado) {
+    params.set("estado", estado.toUpperCase());
+  }
+
     // DNI (8 dígitos, sin 0 inicial)
    if (patientDni) {
     params.set("patientDni", patientDni);
@@ -811,7 +815,7 @@ const DoctoresReport = () => {
   useEffect(() => {
     const fetchDoctores = async () => {
       try {
-        const response = await fetch(`${apiUrl}/doctor`);
+        const response = await fetch(`${apiUrl}/doctor/information`);
         const result = await response.json();
         if (result?.data && Array.isArray(result.data)) {
           setDoctores(result.data);
@@ -832,13 +836,14 @@ const DoctoresReport = () => {
       <table className="table table-hover">
         <thead className="table-light">
           <tr>
-            <th>ID</th>
             <th>Nombre</th>
             <th>DNI</th>
             <th>Matrícula</th>
-            <th>Email</th>
+            {/*<th>Email</th> */}
             <th>Teléfono</th>
             <th>Especialidad</th>
+            <th>Alias</th>
+            <th>Coberturas</th>
           </tr>
         </thead>
         <tbody>
@@ -851,13 +856,18 @@ const DoctoresReport = () => {
           ) : (
             doctores.map((doc) => (
               <tr key={doc.id}>
-                <td>{doc.id}</td>
                 <td>{doc.fullName}</td>
                 <td>{doc.dni}</td>
                 <td>{doc.license}</td>
-                <td>{doc.email}</td>
+               {/* <td>{doc.email}</td> */}
                 <td>{doc.phone}</td>
                 <td>{doc.speciality?.name || "Sin asignar"}</td>
+                <td>{doc.alias || "Sin alias"}</td>
+                <td>
+               {Array.isArray(doc.coverages) && doc.coverages.length > 0
+                ? doc.coverages.map((c) => c.name).join(", ")
+                : "Sin asignar"}
+                </td>
               </tr>
             ))
           )}
