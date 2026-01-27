@@ -153,12 +153,11 @@ const AddDoctor = () => {
                   value={formData.license}
                   onChange={handleChange}
                   required
-                  // 2 letras (MP/MN mayús. o minús.) + 1–6 dígitos, sin espacios ni guiones
-                  pattern="^(?:[Mm][Pp]|[Mm][Nn])\d{1,6}$"
-                  title="Use 2 letras (MP o MN) seguidas de 1 a 6 números, sin espacios ni guiones."
+                  pattern="^(?:MP|MN)-?\d{1,6}$"
+                  title="Formato válido: MP12, MP-12, MP000012 o MP-000012"
                 />
                 <Form.Text muted>
-                  Formato: 2 letras (MP o MN) + 1–6 dígitos, sin espacios ni guiones.
+                 Ejemplos válidos: MP12, MP-12, MP000012. Se guardará como MP-000012.
                 </Form.Text>
               </Form.Group>
             </Col>
