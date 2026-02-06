@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserDoctor } from "@fortawesome/free-solid-svg-icons";
 import "../Styles/profesional.css";
 import Swal from "sweetalert2";
+import { Link } from "react-router-dom";
 
 const ProfesionalList = () => {
   const [doctors, setDoctors] = useState([]);
@@ -77,8 +78,8 @@ const ProfesionalList = () => {
         <Row className="g-4 justify-content-center">
           {doctors.map((doctor) => (
             <Col key={doctor.id} xs={12} sm={6} md={4} lg={3}>
-              <Card className="card--gradient shadow-sm border-0 h-100 text-center p-3">
-                <Card.Body>
+              <Card className="doctor-card shadow-sm border-0 h-100 text-center p-3">
+                <Card.Body className="doctor-card-body">
                   <FontAwesomeIcon
                     icon={faUserDoctor}
                     className="profesional-icon mb-2"
@@ -91,6 +92,12 @@ const ProfesionalList = () => {
                       {doctor.description}
                     </p>
                   )}
+                  <Link
+      to={`/reservar-turno?doctor=${doctor.id}`}
+      className="btn btn-brand w-100"
+    >
+      Reservar turno
+    </Link>
                 </Card.Body>
               </Card>
             </Col>

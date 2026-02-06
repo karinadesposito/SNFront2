@@ -5,6 +5,7 @@ import Select from "react-select";
 import "react-calendar/dist/Calendar.css";
 import Calendar from "react-calendar";
 import Swal from "sweetalert2";
+import { useSearchParams } from "react-router-dom";
 
 const selectStyles = {
   control: (base) => ({ ...base, borderRadius: 10 }),
@@ -48,6 +49,7 @@ const CalendarPatient = () => {
   const [doctors, setDoctors] = useState([]);
   const [specialities, setSpecialities] = useState([]);
 
+  const [searchParams] = useSearchParams();
   const [searchMode, setSearchMode] = useState("doctor"); // "doctor" | "speciality"
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [selectedSpeciality, setSelectedSpeciality] = useState("");
@@ -68,6 +70,7 @@ const CalendarPatient = () => {
 
   const [queuedSwal, setQueuedSwal] = useState(null);
 
+ 
   // ====== Coberturas por doctor (para dropdown antes del modal) ======
   const [doctorCoverages, setDoctorCoverages] = useState([]);
   const [selectedCoverageId, setSelectedCoverageId] = useState("");
@@ -145,6 +148,20 @@ const CalendarPatient = () => {
   }, [dniValue, apiUrl]);
 
   // ====== Traer coberturas del doctor seleccionado ======
+  useEffect(() => {
+  const doctorFromUrl = searchParams.get("doctor");
+  if (!doctorFromUrl || doctors.length === 0) return;
+
+  const id = Number(doctorFromUrl);
+  if (isNaN(id)) return;
+
+  const exists = doctors.some((d) => d.id === id);
+  if (!exists) return;
+
+  setSearchMode("doctor");
+  setSelectedDoctor(id);
+}, [searchParams, doctors]);
+
   useEffect(() => {
     if (!selectedDoctor) {
       setDoctorCoverages([]);
