@@ -1,0 +1,62 @@
+.site-footer {
+  background: #06475B;
+  color: #fff;
+  padding: 16px 0;          /* ↑ subí el padding vertical */
+  min-height: 64px;         /* ↑ alto mínimo cómodo del footer */
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  border-top: 1px solid #e5e7eb;
+  flex-shrink: 0;           /* no se comprime en layouts flex */
+}
+
+/* Sin gutter vertical dentro del footer */
+.site-footer .row {
+  --bs-gutter-y: 0;
+}
+
+/* Quitar márgenes heredados que suman alto */
+.site-footer * {
+  margin: 0;
+}
+
+/* Sociales */
+.social {
+  display: flex;
+  gap: 12px;                /* un poco más de espacio entre iconos */
+}
+
+.social-icon {
+  display: inline-flex;
+  width: 32px;              /* ↑ icono más grande */
+  height: 32px;             /* ↑ icono más grande */
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  opacity: 0.9;
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+
+.social-icon:hover,
+.social-icon:focus {
+  transform: scale(1.06);
+  opacity: 1;
+}
+
+.social-icon svg {
+  width: 22px;              /* ↑ pictograma un poco mayor */
+  height: 22px;
+  display: block;           /* evita “salto” por línea base */
+}
+
+/* Texto central */
+.brand-first {
+  font-size: 1rem;          /* ↑ tipografía levemente más grande */
+}
+
+/* Logo derecho */
+#pixeliaBlanco {
+  display: block;
+  height: 100px;             /* ↑ logo más alto */
+  width: auto;
+}

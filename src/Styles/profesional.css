@@ -1,0 +1,108 @@
+/*.doctor-container {
+  padding: 3rem 1rem;
+}
+
+.doctor-title {
+  color: #0c0c0c;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-weight: 700;
+}
+
+.card--gradient {
+  background-image: var(--grad-card);
+  color: #fff;
+  border-radius: 1rem;
+  box-shadow: var(--shadow-2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card--gradient:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.card--gradient h5 {
+  font-weight: 700;
+}
+
+.card--gradient p {
+  opacity: 0.9;
+}
+
+/* Iconos de especialidad */
+.profesional-icon {
+  font-size: 2.2rem;
+  color: #fff;
+}
+
+.sort-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.sort-btn {
+  background-image: var(--grad-card);
+  color: #fff;
+  border: none;
+  border-radius: 1rem;
+  padding: 0.7rem 1.5rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-2);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.sort-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+.sort-btn.active {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  opacity: 0.9;
+}
+
+.doctor-container {
+  padding: 3rem 1rem;
+}
+
+.doctor-title {
+  color: #0c0c0c;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-weight: 700;
+}
+
+.doctor-card {
+  background-color: #348ea5;
+  color: #0c0c0c;
+  border-radius: 1rem;
+  box-shadow: var(--shadow-2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.doctor-card-body {
+  background-color: #ffffff;
+  color: #0c0c0c;
+  border-radius: 0.75rem;
+  background: none !important;
+  background-color: #ffffff !important;
+}
+
+.doctor-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.doctor-card h3,
+.doctor-card h5 {
+  font-weight: 700;
+}
+
+/* Icono ahora oscuro */
+.profesional-icon {
+  font-size: 2.2rem;
+  color: var(--brand);
+}
